@@ -1,0 +1,14 @@
+{
+  "name": "mr-wholesome-bot",
+  "version": "1.0.0",
+  "description": "A general purpose Discord bot for The Akialytes Discord server programmed in the Discord.JS library.",
+  "main": "bot.js",
+  "author": "LoadXBare",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^13.5.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.6.0"
+  }
+}
