@@ -1,5 +1,5 @@
-const { msgEditColour } = require('../data/config.json');
-const { logChannel } = require('../private/config.json');
+const { msgEditColour } = require('../data/config.js');
+const { logChannel } = require('../private/config.js');
 
 module.exports = async (msgBefore, msgAfter) => {
 	if (msgAfter.author.bot) return;

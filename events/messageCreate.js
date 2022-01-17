@@ -1,4 +1,4 @@
-const { prefix } = require('../data/config.json');
+const { prefix } = require('../data/config.js');
 const commandHandler = require('../lib/commandHandler.js');
 
 module.exports = async (msg) => {
@@ -13,10 +13,7 @@ module.exports = async (msg) => {
 
 	// Auto-Publish any messages posted in Announcement channels that ping the @Streamies role
 	else if (msg.channel.type === 'GUILD_NEWS' && msg.content.includes('<@&855810156856082442>')) {
-		await msg.crosspost().catch((reason) => {
-			console.log('Could not publish message!');
-			console.log(reason);
-		});
+		await msg.crosspost();
 	}
 
 	// React to Akia's message with akiaBonque if she says 'sorry' anywhere in her message
