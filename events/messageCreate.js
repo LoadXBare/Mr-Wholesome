@@ -1,14 +1,16 @@
 const { prefix } = require('../data/config.js');
 const commandHandler = require('../lib/commandHandler.js');
 
-module.exports = async (msg) => {
+module.exports = async (args) => {
+	const msg = args[0];
+
 	// The message is a command
 	if (msg.content.startsWith(prefix)) {
-		const args = msg.content.split(' ');
-		const cmd = args[0].slice(1);
-		args.shift();
+		const cmdArgs = msg.content.split(' ');
+		const cmd = cmdArgs[0].slice(1);
+		cmdArgs.shift();
 
-		commandHandler.handle(cmd, args, msg);
+		commandHandler.handle(cmd, cmdArgs, msg);
 	}
 
 	// Auto-Publish any messages posted in Announcement channels that ping the @Streamies role

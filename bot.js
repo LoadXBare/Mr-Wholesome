@@ -2,8 +2,9 @@ global.client = require('./lib/client.js');
 
 /* TODO
 * Ticket system
+* Warnings system
+* Random animal command (Fox, Cat, Dog, Bird, Rat?, Bear?, Sheep?, Mink?)
 * Reaction roles using buttons
-* Action logging (deleted messages, edited messages, nickname changes, etc.)
 * User birthdays
 * Minigames?
 */
