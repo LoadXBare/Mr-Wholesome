@@ -1,7 +1,9 @@
 const { msgEditColour } = require('../data/config.js');
-const { logChannelId } = require('../private/config.js');
+const { logChannelId, ignoredChannels } = require('../private/config.js');
 
 module.exports = async (args) => {
+	if (ignoredChannels.includes(args[0].channel.id)) return;
+
 	const msgBefore = args[0];
 	const msgAfter = args[1];
 

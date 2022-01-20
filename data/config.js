@@ -10,3 +10,18 @@ module.exports.roleDeleteColour = this.memberLeaveColour;
 module.exports.roleUpdateColour = this.msgEditColour;
 module.exports.guildBanAddColour = this.msgDeleteColour;
 module.exports.guildBanRemoveColour = this.msgEditColour;
+module.exports.events = [
+	'guildBanAdd',
+	'guildBanRemove',
+	'guildMemberAdd',
+	'guildMemberRemove',
+	'guildMemberUpdate',
+	'messageCreate',
+	'interactionCreate',
+	'messageDelete',
+	'messageUpdate',
+	'ready',
+	'roleCreate',
+	'roleDelete',
+	'roleUpdate'
+];

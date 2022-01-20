@@ -7,7 +7,7 @@ module.exports = async (args) => {
 	// The message is a command
 	if (msg.content.startsWith(prefix)) {
 		const cmdArgs = msg.content.split(' ');
-		const cmd = cmdArgs[0].slice(1);
+		const cmd = cmdArgs[0].slice(1).toLowerCase();
 		cmdArgs.shift();
 
 		commandHandler.handle(cmd, cmdArgs, msg);
@@ -19,7 +19,7 @@ module.exports = async (args) => {
 	}
 
 	// React to Akia's message with akiaBonque if she says 'sorry' anywhere in her message
-	else if (msg.content.toLowerCase().includes('sorry') && msg.author.id === '263104208079814656') {
+	else if (msg.content.search(/[Ss]+[Oo]+[Rr]+[Yy]+/g) !== -1 && msg.author.id === '263104208079814656') {
 		await msg.react('<:akiaBonque:876905175565086720>');
 	}
 };

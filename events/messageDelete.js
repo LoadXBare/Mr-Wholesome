@@ -1,7 +1,9 @@
-const { logChannelId } = require('../private/config.js');
+const { logChannelId, ignoredChannels } = require('../private/config.js');
 const { msgDeleteColour } = require('../data/config.js');
 
 module.exports = async (args) => {
+	if (ignoredChannels.includes(args[0].channel.id)) return;
+
 	const msgDeleted = args[0];
 
 	if (msgDeleted.author.bot) { return; }
