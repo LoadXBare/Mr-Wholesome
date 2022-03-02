@@ -1,9 +1,9 @@
-import { channelMention } from '@discordjs/builders';
+import { channelMention, formatEmoji } from '@discordjs/builders';
 import { Message, MessageEmbed, PartialMessage, TextChannel } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
-import { privateChannels } from '../../private/config.js';
+import { emotes, privateChannels } from '../../private/config.js';
 
 export const messageDelete = async (message: Message | PartialMessage) => {
 	const {
@@ -23,7 +23,7 @@ export const messageDelete = async (message: Message | PartialMessage) => {
 	const action = await guild.fetchAuditLogs({ type: 'MESSAGE_DELETE', limit: 1 });
 	const logEntry = new MessageEmbed()
 		.setAuthor({ name: author.tag, iconURL: member.avatarURL() === null ? author.avatarURL() : member.avatarURL() })
-		.setTitle('Message Deleted')
+		.setTitle(`${formatEmoji(emotes.msgDelete)} Message Deleted`)
 		.setFields([
 			{ name: 'Channel', value: channelMention(channelId) }
 		])

@@ -2,16 +2,18 @@ import { ButtonInteraction, Interaction } from 'discord.js';
 import { BotInteraction } from '..';
 import * as interactions from './interactions/index.js';
 
-export const handleInteraction = async (interaction: Interaction | ButtonInteraction, type: BotInteraction) => {
-	if (type === 'ignore') return;
-
+const handleButtonInteraction = async (interaction: ButtonInteraction, type: BotInteraction) => {
 	if (type === 'role') {
-		const i = interaction as ButtonInteraction;
-		await i.deferReply({ ephemeral: true });
+		await interaction.deferReply({ ephemeral: true });
 
-		const roleId = i.customId.slice(i.customId.search(/\d/));
+		const roleId = interaction.customId.slice(interaction.customId.search(/\d/));
 		const role = await interaction.guild.roles.fetch(roleId);
 
-		interactions.updateRole(i, role);
+		interactions.updateRole(interaction, role);
 	}
+};
+
+export const handleInteraction = async (interaction: Interaction | ButtonInteraction, type: BotInteraction) => {
+	if (type === 'ignore') return;
+	if (interaction.isButton) handleButtonInteraction(interaction as ButtonInteraction, type);
 };

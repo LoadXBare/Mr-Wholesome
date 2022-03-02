@@ -5,12 +5,13 @@ import { BotCommand } from '../index.js';
 
 export const ping = async (args: BotCommand): Promise<void> => {
 	const { message } = args;
-	const pingDelay: string = (Date.now() - message.createdTimestamp).toString();
 
+	const reply = await message.reply({ content: 'uwu' });
 	const pingCommand: MessageEmbed = new MessageEmbed()
 		.setTitle('Tweet!')
-		.setDescription(`⌛ ${inlineCode(`${pingDelay}ms`)}`)
+		.setDescription(`⌛ ⇒ ${inlineCode(`${reply.createdTimestamp - message.createdTimestamp}ms`)}\
+		\n☁️ ⇒ ${inlineCode(`${message.client.ws.ping}ms`)}`)
 		.setColor(COLORS.COMMAND);
 
-	await message.reply({ embeds: [pingCommand] });
+	await reply.edit({ content: null, embeds: [pingCommand] });
 };

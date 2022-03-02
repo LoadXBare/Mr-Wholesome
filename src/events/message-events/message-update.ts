@@ -1,8 +1,9 @@
-import { channelMention, hyperlink } from '@discordjs/builders';
+import { channelMention, formatEmoji, hyperlink } from '@discordjs/builders';
 import { Message, MessageEmbed, PartialMessage } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
+import { emotes } from '../../private/config.js';
 
 const GetIndexOfFirstEdit = (oldContent: string, newContent: string) => {
 	const lengthOfLongestMessage: number =
@@ -47,7 +48,7 @@ export const messageUpdate = async (oldMessage: Message | PartialMessage, newMes
 
 	const logEntry = new MessageEmbed()
 		.setAuthor({ name: author.tag, iconURL: member.avatarURL() === null ? author.avatarURL() : member.avatarURL() })
-		.setTitle('Message Edited')
+		.setTitle(`${formatEmoji(emotes.msgUpdate)} Message Edited`)
 		.setFields([
 			{ name: 'Channel', value: `${channelMention(channel.id)} ${hyperlink('Jump to message', url)}` },
 			{ name: 'Before', value: oldContent },

@@ -1,8 +1,8 @@
-import { time, userMention } from '@discordjs/builders';
+import { formatEmoji, time, userMention } from '@discordjs/builders';
 import { GuildMember, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
-import { theAkialytes } from '../../private/config.js';
+import { emotes, theAkialytes } from '../../private/config.js';
 
 export const guildMemberAdd = async (member: GuildMember) => {
 	const { user, client, id, roles } = member;
@@ -13,7 +13,7 @@ export const guildMemberAdd = async (member: GuildMember) => {
 	const logEntry = new MessageEmbed()
 		.setAuthor({ name: user.tag, iconURL: member.avatarURL() === null ? member.user.avatarURL() : member.avatarURL() })
 		.setThumbnail(user.avatarURL())
-		.setTitle('Member Joined')
+		.setTitle(`${formatEmoji(emotes.memJoin)} Member Joined`)
 		.setFields([
 			{ name: 'Member', value: userMention(id) },
 			{ name: 'Account Age', value: `Created: ${time(Math.ceil(user.createdTimestamp / 1000), 'R')}` }

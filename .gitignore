@@ -3,4 +3,4 @@ private
 dist
 .env
 prisma/migrations
-/interactions
+backlog

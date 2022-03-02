@@ -5,6 +5,9 @@
 		"moduleResolution": "Node",
 		"noImplicitAny": true,
 		"rootDir": "./src",
-		"outDir": "./dist"
-	}
+		"outDir": "./dist",
+	},
+	"exclude": [
+		"backlog"
+	]
 }
