@@ -3,7 +3,7 @@ import { ButtonInteraction, GuildMemberRoleManager, Role } from 'discord.js';
 
 export const updateRole = async (interaction: ButtonInteraction, role: Role) => {
 	const memberRoles = interaction.member.roles as GuildMemberRoleManager;
-	const reason = '#get-roles';
+	const reason = 'Role Menu';
 
 	if (memberRoles.cache.has(role.id)) {
 		await interaction.editReply(`Successfully ${bold('removed')} role: ${roleMention(role.id)}!`);

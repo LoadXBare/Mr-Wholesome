@@ -2,6 +2,7 @@ import { channelMention } from '@discordjs/builders';
 import { Message, MessageEmbed } from 'discord.js';
 import { BotCommand } from '..';
 import { COLORS } from '../config/constants';
+import { handleError } from '../lib/error-handler';
 import prisma from '../prisma/client';
 
 class embedBase {
@@ -15,18 +16,12 @@ class embedBase {
 
 export const setlogchannel = async (args: BotCommand) => {
 	const { commandArgs, message } = args;
+	if (typeof commandArgs.at(0) === 'undefined') return handleError.missingArg({ message: message, missingArg: 'Channel ID' });
 
 	const channelId = commandArgs.at(0).replace(/\D/g, '');
 
-	try {
-		await message.client.channels.fetch(channelId);
-	} catch {
-		const error = new MessageEmbed(new embedBase(message))
-			.setDescription(`:warning: "${channelId}" is not a valid channel!`)
-			.setColor(COLORS.FAIL);
-		await message.reply({ embeds: [error] });
-		return;
-	}
+	try { await message.client.channels.fetch(channelId); }
+	catch { return handleError.invalidArg({ invalidArg: 'Channel ID', message: message, passedArg: channelId }); }
 
 	const guildConfig = await prisma.guildConfig.upsert({
 		where: { guildId: message.guildId },

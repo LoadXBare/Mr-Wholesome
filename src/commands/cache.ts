@@ -1,8 +1,11 @@
 import { MessageEmbed, TextChannel } from 'discord.js';
 import { BotCommand } from '..';
 import { COLORS } from '../config/constants';
+import { botOwnerId } from '../private/config';
 
 export const cache = async (args: BotCommand) => {
+	if (args.message.author.id !== botOwnerId) return;
+
 	const { message } = args;
 	let messageCacheSize = 0;
 

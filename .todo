@@ -17,7 +17,6 @@ Todos:
 			☐ Slots command
 		☐ Levelling system
 			☐ Level leaderboards
-		☐ Error handling system
 
 	Potential:
 		☐ Akia birthday command
@@ -35,3 +34,4 @@ Todos:
 	Done:
 		✔ Convert all JavaScript files to TypeScript
 		✔ Add emotes to log entries
+		✔ Error handling system

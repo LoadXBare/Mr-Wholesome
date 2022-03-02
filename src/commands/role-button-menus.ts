@@ -1,6 +1,7 @@
 import { Message, MessageActionRow, MessageButton, MessageEmbed, TextChannel } from 'discord.js';
 import { BotCommand } from '..';
 import { COLORS } from '../config/constants.js';
+import { handleError } from '../lib/error-handler';
 import { theAkialytes } from '../private/config.js';
 
 class embedBase {
@@ -16,27 +17,12 @@ export const rolebuttonmenus = async (args: BotCommand) => {
 	const { commandArgs, message } = args;
 	const { client, guild } = message;
 
-	if (typeof commandArgs.at(0) === 'undefined') {
-		const error = new MessageEmbed(new embedBase(message))
-			.setDescription(':warning: Channel must be non-empty string!')
-			.setColor(COLORS.FAIL);
-
-		await message.reply({ embeds: [error] });
-		return;
-	}
+	if (typeof commandArgs.at(0) === 'undefined') return handleError.missingArg({ message: message, missingArg: 'Channel ID' });
 
 	const channelId = commandArgs.at(0).replace(/\D/g, '');
 
-	try {
-		await client.channels.fetch(channelId);
-	} catch {
-		const error = new MessageEmbed(new embedBase(message))
-			.setDescription(`:warning: "${channelId}" is not a valid Channel ID!`)
-			.setColor(COLORS.FAIL);
-
-		await message.reply({ embeds: [error] });
-		return;
-	}
+	try { await client.channels.fetch(channelId); }
+	catch { return handleError.invalidArg({ invalidArg: 'Channel ID', message: message, passedArg: channelId }); }
 
 	const channelToSendMenu = await client.channels.fetch(channelId) as TextChannel;
 

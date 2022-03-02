@@ -4,6 +4,29 @@ export type BotInteraction =
 	| 'role'
 	| 'ignore';
 
+export type ErrorInvalidArg = {
+	invalidArg: string,
+	passedArg: string,
+	message: Message
+};
+
+export type ErrorMissingArg = {
+	missingArg: string,
+	message: Message
+};
+
+export type ErrorDatabaseDuplicate = {
+	entry: string,
+	field: string,
+	message: Message
+};
+
+export type ErrorDatabaseEntryNotFound = {
+	entry: string,
+	field: string,
+	message: Message
+}
+
 export type clientEventTypes =
 	| 'guildBanAdd'
 	| 'guildBanRemove'
