@@ -5,7 +5,7 @@ import { COLORS } from '../config/constants';
 import { handleError } from '../lib/error-handler';
 import prisma from '../prisma/client';
 
-class embedBase {
+class EmbedBase {
 	constructor(message: Message) {
 		const { author, member } = message;
 		return new MessageEmbed()
@@ -16,7 +16,8 @@ class embedBase {
 
 export const setlogchannel = async (args: BotCommand) => {
 	const { commandArgs, message } = args;
-	if (typeof commandArgs.at(0) === 'undefined') return handleError.missingArg({ message: message, missingArg: 'Channel ID' });
+	if (typeof commandArgs.at(0) === 'undefined')
+		return handleError.missingArg({ message: message, missingArg: 'Channel ID' });
 
 	const channelId = commandArgs.at(0).replace(/\D/g, '');
 
@@ -29,9 +30,9 @@ export const setlogchannel = async (args: BotCommand) => {
 		create: { guildId: message.guildId }
 	});
 
-	const success = new MessageEmbed(new embedBase(message))
+	const success = new MessageEmbed(new EmbedBase(message))
 		.setDescription(`Successfully set the Log Channel for this guild to ${channelMention(guildConfig.logChannel)}!`)
 		.setColor(COLORS.SUCCESS);
 
-	await message.reply({ embeds: [success] });
+	message.reply({ embeds: [success] });
 };

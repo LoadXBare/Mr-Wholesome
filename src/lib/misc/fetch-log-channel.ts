@@ -8,11 +8,8 @@ export const fetchLogChannel = async (guildId: string, client: Client) => {
 		create: { guildId: guildId }
 	});
 
-	try {
-		await client.channels.fetch(guildConfig.logChannel);
-	} catch {
-		return null;
-	}
+	try { await client.channels.fetch(guildConfig.logChannel); }
+	catch { return null; }
 
 	const logChannel = await client.channels.fetch(guildConfig.logChannel) as TextChannel;
 	return logChannel;

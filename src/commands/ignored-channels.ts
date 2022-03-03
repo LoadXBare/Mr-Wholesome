@@ -5,7 +5,7 @@ import { COLORS } from '../config/constants';
 import { handleError } from '../lib/error-handler';
 import prisma from '../prisma/client';
 
-class embedBase {
+class EmbedBase {
 	constructor(message: Message) {
 		const { author, member } = message;
 		new MessageEmbed()
@@ -16,7 +16,8 @@ class embedBase {
 
 const addIgnoredChannel = async (commandArgs: Array<string>, message: Message) => {
 	commandArgs.shift();
-	if (typeof commandArgs.at(0) === 'undefined') return handleError.missingArg({ message: message, missingArg: 'Channel ID' });
+	if (typeof commandArgs.at(0) === 'undefined')
+		return handleError.missingArg({ message: message, missingArg: 'Channel ID' });
 
 	const channelId = commandArgs.at(0).replace(/\D/g, '');
 
@@ -31,7 +32,8 @@ const addIgnoredChannel = async (commandArgs: Array<string>, message: Message) =
 
 	const ignoredChannels: Array<string> = JSON.parse(guildConfig.ignoredChannels);
 
-	if (ignoredChannels.includes(channelId)) return handleError.databaseDuplicateEntry({ field: 'Ignored Channels', entry: channelId, message: message });
+	if (ignoredChannels.includes(channelId))
+		return handleError.databaseDuplicateEntry({ field: 'Ignored Channels', entry: channelId, message: message });
 
 	ignoredChannels.push(channelId);
 
@@ -45,11 +47,11 @@ const addIgnoredChannel = async (commandArgs: Array<string>, message: Message) =
 
 	ignoredChannels.forEach((channel) => desc = desc.concat(`\n• ${channelMention(channel)}`));
 
-	const success = new MessageEmbed(new embedBase(message))
+	const success = new MessageEmbed(new EmbedBase(message))
 		.setDescription(desc)
 		.setColor(COLORS.SUCCESS);
 
-	await message.reply({ embeds: [success] });
+	message.reply({ embeds: [success] });
 };
 
 const removeIgnoredChannel = async (commandArgs: Array<string>, message: Message) => {
@@ -88,11 +90,11 @@ const removeIgnoredChannel = async (commandArgs: Array<string>, message: Message
 		desc = desc.concat(`\n• ${channelMention(channel)}`);
 	});
 
-	const success = new MessageEmbed(new embedBase(message))
+	const success = new MessageEmbed(new EmbedBase(message))
 		.setDescription(desc)
 		.setColor(COLORS.SUCCESS);
 
-	await message.reply({ embeds: [success] });
+	message.reply({ embeds: [success] });
 };
 
 const resetIgnoredChannels = async (message: Message) => {
@@ -102,11 +104,11 @@ const resetIgnoredChannels = async (message: Message) => {
 		create: { guildId: message.guildId }
 	});
 
-	const success = new MessageEmbed(new embedBase(message))
+	const success = new MessageEmbed(new EmbedBase(message))
 		.setDescription('Successfully reset Ignored Channels for this guild!')
 		.setColor(COLORS.SUCCESS);
 
-	await message.reply({ embeds: [success] });
+	message.reply({ embeds: [success] });
 };
 
 export const ignoredchannels = async (args: BotCommand) => {

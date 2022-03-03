@@ -5,21 +5,25 @@ import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { emotes } from '../../private/config.js';
 
 export const guildMemberRemove = async (member: GuildMember | PartialGuildMember) => {
-	const { user, client, id, joinedTimestamp } = member;
+	const { user, id } = member;
 
-	const logChannel = await fetchLogChannel(member.guild.id, client);
-	if (logChannel === null) return;
+	const logChannel = await fetchLogChannel(member.guild.id, member.client);
+	if (logChannel === null)
+		return;
 
 	const logEntry = new MessageEmbed()
-		.setAuthor({ name: user.tag, iconURL: member.avatarURL() === null ? member.user.avatarURL() : member.avatarURL() })
+		.setAuthor({
+			name: user.tag,
+			iconURL: member.displayAvatarURL()
+		})
 		.setTitle(`${formatEmoji(emotes.memLeave)} Member Left`)
 		.setFields([
 			{ name: 'Member', value: userMention(id) },
-			{ name: 'Join Date', value: `Joined: ${time(Math.ceil(joinedTimestamp / 1000), 'R')}` }
+			{ name: 'Join Date', value: `Joined: ${time(member.joinedAt, 'R')}` }
 		])
 		.setFooter({ text: `User ID: ${id}` })
-		.setTimestamp(Date.now())
+		.setTimestamp()
 		.setColor(COLORS.NEGATIVE);
 
-	await logChannel.send({ embeds: [logEntry] });
+	logChannel.send({ embeds: [logEntry] });
 };

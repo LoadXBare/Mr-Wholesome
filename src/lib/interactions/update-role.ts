@@ -6,10 +6,10 @@ export const updateRole = async (interaction: ButtonInteraction, role: Role) => 
 	const reason = 'Role Menu';
 
 	if (memberRoles.cache.has(role.id)) {
-		await interaction.editReply(`Successfully ${bold('removed')} role: ${roleMention(role.id)}!`);
 		await memberRoles.remove(role, reason);
+		interaction.editReply(`Successfully ${bold('removed')} role: ${roleMention(role.id)}!`);
 	} else {
-		await interaction.editReply(`Successfully ${bold('applied')} role: ${roleMention(role.id)}!`);
 		await memberRoles.add(role, reason);
+		interaction.editReply(`Successfully ${bold('applied')} role: ${roleMention(role.id)}!`);
 	}
 };

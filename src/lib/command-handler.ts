@@ -3,7 +3,8 @@ import * as commands from '../commands/index.js';
 import { BotCommand } from '../index.js';
 
 export const handleCommand = async (message: Message): Promise<void> => {
-	if (message.author.bot) return;
+	if (message.author.bot)
+		return;
 
 	const commandArgs: Array<string> = message.content.split(' ');
 	const command: string = commandArgs[0].slice(1).toLowerCase();

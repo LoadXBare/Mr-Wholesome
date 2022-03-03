@@ -5,23 +5,27 @@ import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { emotes, theAkialytes } from '../../private/config.js';
 
 export const guildMemberAdd = async (member: GuildMember) => {
-	const { user, client, id, roles } = member;
+	const { user, id, roles } = member;
 
-	const logChannel = await fetchLogChannel(member.guild.id, client);
-	if (logChannel === null) return;
+	const logChannel = await fetchLogChannel(member.guild.id, member.client);
+	if (logChannel === null)
+		return;
 
 	const logEntry = new MessageEmbed()
-		.setAuthor({ name: user.tag, iconURL: member.avatarURL() === null ? member.user.avatarURL() : member.avatarURL() })
-		.setThumbnail(user.avatarURL())
+		.setAuthor({
+			name: user.tag,
+			iconURL: member.displayAvatarURL()
+		})
+		.setThumbnail(user.displayAvatarURL())
 		.setTitle(`${formatEmoji(emotes.memJoin)} Member Joined`)
 		.setFields([
 			{ name: 'Member', value: userMention(id) },
-			{ name: 'Account Age', value: `Created: ${time(Math.ceil(user.createdTimestamp / 1000), 'R')}` }
+			{ name: 'Account Age', value: `Created: ${time(user.createdAt, 'R')}` }
 		])
 		.setFooter({ text: `User ID: ${id}` })
-		.setTimestamp(Date.now())
+		.setTimestamp()
 		.setColor(COLORS.POSITIVE);
 
-	await roles.add(theAkialytes.roles.Akialyte.id, 'Joined Server');
-	await logChannel.send({ embeds: [logEntry] });
+	roles.add(theAkialytes.roles.Akialyte.id, 'Joined Server');
+	logChannel.send({ embeds: [logEntry] });
 };

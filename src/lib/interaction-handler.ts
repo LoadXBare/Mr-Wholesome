@@ -14,6 +14,8 @@ const handleButtonInteraction = async (interaction: ButtonInteraction, type: Bot
 };
 
 export const handleInteraction = async (interaction: Interaction | ButtonInteraction, type: BotInteraction) => {
-	if (type === 'ignore') return;
-	if (interaction.isButton) handleButtonInteraction(interaction as ButtonInteraction, type);
+	if (type === 'ignore')
+		return;
+	if (interaction.isButton)
+		handleButtonInteraction(interaction as ButtonInteraction, type);
 };

@@ -6,27 +6,31 @@ import { emotes } from '../../private/config.js';
 
 export const guildMemberUpdate = async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
 	const { nickname: oldNickname } = oldMember;
-	const { nickname: newNickname, client, user, id } = newMember;
+	const { nickname: newNickname, user, id } = newMember;
 
 	// Only interested in nickname changes, not role changes
-	if (oldNickname === newNickname) return;
+	if (oldNickname === newNickname)
+		return;
 
-	const logChannel = await fetchLogChannel(newMember.guild.id, client);
-	if (logChannel === null) return;
+	const logChannel = await fetchLogChannel(newMember.guild.id, newMember.client);
+	if (logChannel === null)
+		return;
 
-	const oldNick = oldNickname === null ? 'None' : oldNickname;
-	const newNick = newNickname === null ? 'None' : newNickname;
+	const formatNickname = (nick: string) => (nick === null ? 'None' : nick);
 
 	const logEntry = new MessageEmbed()
-		.setAuthor({ name: user.tag, iconURL: newMember.avatarURL() === null ? newMember.user.avatarURL() : newMember.avatarURL() })
+		.setAuthor({
+			name: user.tag,
+			iconURL: newMember.displayAvatarURL()
+		})
 		.setTitle(`${formatEmoji(emotes.memUpdate)} Nickname Changed`)
 		.setFields([
-			{ name: 'Before', value: oldNick },
-			{ name: 'After', value: newNick }
+			{ name: 'Before', value: formatNickname(oldNickname) },
+			{ name: 'After', value: formatNickname(newNickname) }
 		])
 		.setFooter({ text: `User ID: ${id}` })
-		.setTimestamp(Date.now())
+		.setTimestamp()
 		.setColor(COLORS.NEUTRAL);
 
-	await logChannel.send({ embeds: [logEntry] });
+	logChannel.send({ embeds: [logEntry] });
 };

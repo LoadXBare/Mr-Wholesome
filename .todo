@@ -31,7 +31,7 @@ Todos:
 	Backlog:
 		☐ Ticket system
 
-	Done:
-		✔ Convert all JavaScript files to TypeScript
-		✔ Add emotes to log entries
-		✔ Error handling system
+Done:
+	✔ Convert all JavaScript files to TypeScript
+	✔ Add emotes to log entries
+	✔ Error handling system

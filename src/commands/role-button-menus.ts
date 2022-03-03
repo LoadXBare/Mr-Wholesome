@@ -4,7 +4,7 @@ import { COLORS } from '../config/constants.js';
 import { handleError } from '../lib/error-handler';
 import { theAkialytes } from '../private/config.js';
 
-class embedBase {
+class EmbedBase {
 	constructor(message: Message) {
 		const { author, member } = message;
 		return new MessageEmbed()
@@ -17,7 +17,8 @@ export const rolebuttonmenus = async (args: BotCommand) => {
 	const { commandArgs, message } = args;
 	const { client, guild } = message;
 
-	if (typeof commandArgs.at(0) === 'undefined') return handleError.missingArg({ message: message, missingArg: 'Channel ID' });
+	if (typeof commandArgs.at(0) === 'undefined')
+		return handleError.missingArg({ message: message, missingArg: 'Channel ID' });
 
 	const channelId = commandArgs.at(0).replace(/\D/g, '');
 
@@ -26,7 +27,7 @@ export const rolebuttonmenus = async (args: BotCommand) => {
 
 	const channelToSendMenu = await client.channels.fetch(channelId) as TextChannel;
 
-	const rolesMenuInfo = new MessageEmbed(new embedBase(message))
+	const rolesMenuInfo = new MessageEmbed(new EmbedBase(message))
 		.setAuthor({ name: guild.name, iconURL: guild.iconURL() })
 		.setDescription('Click any of the buttons below to add or remove roles!\
 		\n\nClicking on a button **without** having that role will give it to you.\
@@ -97,5 +98,5 @@ export const rolebuttonmenus = async (args: BotCommand) => {
 
 	await channelToSendMenu.send({ embeds: [rolesMenuInfo] });
 	await channelToSendMenu.send({ embeds: [pronounMenu], components: [pronounMenuButtons] });
-	await channelToSendMenu.send({ embeds: [otherMenu], components: [otherMenuButtons, otherMenuButtons2] });
+	channelToSendMenu.send({ embeds: [otherMenu], components: [otherMenuButtons, otherMenuButtons2] });
 };

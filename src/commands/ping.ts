@@ -13,5 +13,5 @@ export const ping = async (args: BotCommand): Promise<void> => {
 		\n☁️ ⇒ ${inlineCode(`${message.client.ws.ping}ms`)}`)
 		.setColor(COLORS.COMMAND);
 
-	await reply.edit({ content: null, embeds: [pingCommand] });
+	reply.edit({ content: null, embeds: [pingCommand] });
 };
