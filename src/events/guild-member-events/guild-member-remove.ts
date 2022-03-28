@@ -1,6 +1,7 @@
-import { formatEmoji, time, userMention } from '@discordjs/builders';
+import { time, userMention } from '@discordjs/builders';
 import { GuildMember, MessageEmbed, PartialGuildMember } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
+import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { emotes } from '../../private/config.js';
 
@@ -13,15 +14,14 @@ export const guildMemberRemove = async (member: GuildMember | PartialGuildMember
 
 	const logEntry = new MessageEmbed()
 		.setAuthor({
-			name: user.tag,
-			iconURL: member.displayAvatarURL()
+			name: 'Member Left',
+			iconURL: emojiUrl(emotes.memLeave)
 		})
-		.setTitle(`${formatEmoji(emotes.memLeave)} Member Left`)
 		.setFields([
 			{ name: 'Member', value: userMention(id) },
 			{ name: 'Join Date', value: `Joined: ${time(member.joinedAt, 'R')}` }
 		])
-		.setFooter({ text: `User ID: ${id}` })
+		.setFooter({ text: `${user.tag} • User ID: ${id}`, iconURL: member.displayAvatarURL() })
 		.setTimestamp()
 		.setColor(COLORS.NEGATIVE);
 

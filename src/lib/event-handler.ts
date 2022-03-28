@@ -1,4 +1,4 @@
-import { Client } from 'discord.js';
+import { Client, Message } from 'discord.js';
 import * as events from '../events/index.js';
 
 export const initializeEventHandler = async (client: Client) => {
@@ -16,7 +16,7 @@ export const initializeEventHandler = async (client: Client) => {
 	client.on('interactionCreate', (i) => events.interactionCreate(i));
 	client.on('messageCreate', (m) => events.messageCreate(m));
 	client.on('messageDelete', (m) => events.messageDelete(m));
-	client.on('messageUpdate', (oM, nM) => events.messageUpdate(oM, nM));
+	client.on('messageUpdate', (oM, nM) => events.messageUpdate(oM as Message, nM as Message));
 	client.on('ready', (c) => events.ready(c));
 	client.on('roleCreate', (r) => events.roleCreate(r));
 	client.on('roleDelete', (r) => events.roleDelete(r));

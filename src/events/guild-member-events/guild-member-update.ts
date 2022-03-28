@@ -1,6 +1,6 @@
-import { formatEmoji } from '@discordjs/builders';
 import { GuildMember, MessageEmbed, PartialGuildMember } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
+import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { emotes } from '../../private/config.js';
 
@@ -20,15 +20,14 @@ export const guildMemberUpdate = async (oldMember: GuildMember | PartialGuildMem
 
 	const logEntry = new MessageEmbed()
 		.setAuthor({
-			name: user.tag,
-			iconURL: newMember.displayAvatarURL()
+			name: 'Nickname Changed',
+			iconURL: emojiUrl(emotes.memUpdate)
 		})
-		.setTitle(`${formatEmoji(emotes.memUpdate)} Nickname Changed`)
 		.setFields([
 			{ name: 'Before', value: formatNickname(oldNickname) },
 			{ name: 'After', value: formatNickname(newNickname) }
 		])
-		.setFooter({ text: `User ID: ${id}` })
+		.setFooter({ text: `${user.tag} • User ID: ${id}`, iconURL: newMember.displayAvatarURL() })
 		.setTimestamp()
 		.setColor(COLORS.NEUTRAL);
 

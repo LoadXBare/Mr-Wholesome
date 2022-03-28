@@ -1,7 +1,7 @@
 import { MessageEmbed, Role } from 'discord.js';
 import { RoleChanges } from '../..';
 import { COLORS } from '../../config/constants.js';
-import { fetchLogChannel } from '../../lib/misc/fetch-log-channel';
+import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 
 export const roleUpdate = async (oldRole: Role, newRole: Role) => {
 	const { guild } = newRole;

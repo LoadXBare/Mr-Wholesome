@@ -1,6 +1,7 @@
-import { formatEmoji, time, userMention } from '@discordjs/builders';
+import { time, userMention } from '@discordjs/builders';
 import { GuildMember, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
+import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { emotes, theAkialytes } from '../../private/config.js';
 
@@ -13,19 +14,18 @@ export const guildMemberAdd = async (member: GuildMember) => {
 
 	const logEntry = new MessageEmbed()
 		.setAuthor({
-			name: user.tag,
-			iconURL: member.displayAvatarURL()
+			name: 'Member Joined',
+			iconURL: emojiUrl(emotes.memJoin)
 		})
 		.setThumbnail(user.displayAvatarURL())
-		.setTitle(`${formatEmoji(emotes.memJoin)} Member Joined`)
 		.setFields([
 			{ name: 'Member', value: userMention(id) },
 			{ name: 'Account Age', value: `Created: ${time(user.createdAt, 'R')}` }
 		])
-		.setFooter({ text: `User ID: ${id}` })
+		.setFooter({ text: `${user.tag} • User ID: ${id}`, iconURL: user.displayAvatarURL() })
 		.setTimestamp()
 		.setColor(COLORS.POSITIVE);
 
-	roles.add(theAkialytes.roles.Akialyte.id, 'Joined Server');
+	roles.add(theAkialytes.roles.Akialyte, 'Joined Server');
 	logChannel.send({ embeds: [logEntry] });
 };

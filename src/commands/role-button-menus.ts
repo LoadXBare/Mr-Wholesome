@@ -1,7 +1,7 @@
 import { Message, MessageActionRow, MessageButton, MessageEmbed, TextChannel } from 'discord.js';
 import { BotCommand } from '..';
 import { COLORS } from '../config/constants.js';
-import { handleError } from '../lib/error-handler';
+import { handleError } from '../lib/error-handler.js';
 import { theAkialytes } from '../private/config.js';
 
 class EmbedBase {
@@ -39,23 +39,23 @@ export const rolebuttonmenus = async (args: BotCommand) => {
 		.setColor(COLORS.COMMAND);
 	const pronounMenuButtons = new MessageActionRow().addComponents(
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['He/Him'].id}`)
+			.setCustomId(`role: ${theAkialytes.roles['He/Him']}`)
 			.setLabel('He/Him')
 			.setStyle('PRIMARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['They/Them'].id}`)
+			.setCustomId(`role: ${theAkialytes.roles['They/Them']}`)
 			.setLabel('They/Them')
 			.setStyle('PRIMARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['She/Her'].id}`)
+			.setCustomId(`role: ${theAkialytes.roles['She/Her']}`)
 			.setLabel('She/Her')
 			.setStyle('PRIMARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['Any/All'].id}`)
+			.setCustomId(`role: ${theAkialytes.roles['Any/All']}`)
 			.setLabel('Any/All')
 			.setStyle('PRIMARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['Other Pronouns (Ask Me)'].id}`)
+			.setCustomId(`role: ${theAkialytes.roles['Other Pronouns (Ask Me)']}`)
 			.setLabel('Other (Ask Me)')
 			.setStyle('PRIMARY')
 	);
@@ -65,33 +65,33 @@ export const rolebuttonmenus = async (args: BotCommand) => {
 		.setColor(COLORS.COMMAND);
 	const otherMenuButtons = new MessageActionRow().addComponents(
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Minecrafter.id}`)
+			.setCustomId(`role: ${theAkialytes.roles.Minecrafter}`)
 			.setLabel('Minecrafter')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Crafter.id}`)
+			.setCustomId(`role: ${theAkialytes.roles.Crafter}`)
 			.setLabel('Crafter')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Artist.id}`)
+			.setCustomId(`role: ${theAkialytes.roles.Artist}`)
 			.setLabel('Artist')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Writer.id}`)
+			.setCustomId(`role: ${theAkialytes.roles.Writer}`)
 			.setLabel('Writer')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Musician.id}`)
+			.setCustomId(`role: ${theAkialytes.roles.Musician}`)
 			.setLabel('Musician')
 			.setStyle('SECONDARY')
 	);
 	const otherMenuButtons2 = new MessageActionRow().addComponents(
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Streamies.id}`)
+			.setCustomId(`role: ${theAkialytes.roles.Streamies}`)
 			.setLabel('Streamies')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['Server Events'].id}`)
+			.setCustomId(`role: ${theAkialytes.roles['Server Events']}`)
 			.setLabel('Server Events')
 			.setStyle('SECONDARY')
 	);

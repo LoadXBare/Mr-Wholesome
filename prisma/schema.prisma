@@ -19,5 +19,5 @@ model guildWarnings {
   warnerId         String
   warneeId         String
   reason           String @default("None provided.")
-  warningTimestamp String
+  warningTimestamp Int
 }

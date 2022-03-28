@@ -1,7 +1,7 @@
 import { inlineCode } from '@discordjs/builders';
 import { Message, MessageEmbed } from 'discord.js';
 import { ErrorInvalidArg, ErrorMissingArg, ErrorDatabaseDuplicate, ErrorDatabaseEntryNotFound } from '..';
-import { COLORS } from '../config/constants';
+import { COLORS } from '../config/constants.js';
 
 export const sendError = (message: Message, errorEmbed: MessageEmbed) => {
 	message.reply({ embeds: [errorEmbed] });

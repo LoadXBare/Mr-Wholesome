@@ -4,3 +4,4 @@ dist
 .env
 prisma/migrations
 backlog
+assets

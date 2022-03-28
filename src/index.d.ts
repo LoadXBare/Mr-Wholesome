@@ -1,8 +1,18 @@
-import { ColorResolvable, Message } from 'discord.js';
+import { Collection, ColorResolvable, Message, MessageAttachment } from 'discord.js';
 
-export type BotInteraction =
-	| 'role'
-	| 'ignore';
+export type InteractionTypes =
+	| 'ignore'
+	| 'role';
+
+export type BotInteractionInfo = {
+	type: string,
+	[index: string]: string
+};
+
+export type ButtonChoice = {
+	type: InteractionTypes,
+	value: string
+}
 
 export type ErrorInvalidArg = {
 	invalidArg: string,
@@ -65,3 +75,15 @@ export type BotCommand = {
 	command: string,
 	commandArgs: Array<string>
 };
+
+export type AttachmentUpdate = {
+	oldAttachments: Collection<string, MessageAttachment>,
+	newAttachments: Collection<string, MessageAttachment>,
+	message: Message
+}
+
+export type ContentUpdate = {
+	oldContent: string,
+	newContent: string,
+	message: Message
+}

@@ -1,3 +1,8 @@
+/**
+ * Generates and returns a Random ID of a specified length.
+ * 
+ * @param length The character length of the Random ID. 
+ */
 export const generateId = (length: number) => {
 	const validCharacters = 'aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789';
 	let id = '';

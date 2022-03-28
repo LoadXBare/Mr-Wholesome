@@ -1,9 +1,9 @@
 import { channelMention } from '@discordjs/builders';
 import { Message, MessageEmbed } from 'discord.js';
 import { BotCommand } from '..';
-import { COLORS } from '../config/constants';
-import { handleError } from '../lib/error-handler';
-import prisma from '../prisma/client';
+import { COLORS } from '../config/constants.js';
+import { handleError } from '../lib/error-handler.js';
+import prisma from '../prisma/client.js';
 
 class EmbedBase {
 	constructor(message: Message) {
