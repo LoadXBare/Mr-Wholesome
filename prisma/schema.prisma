@@ -21,3 +21,16 @@ model guildWarnings {
   reason           String @default("None provided.")
   warningTimestamp Int
 }
+
+model userBirthdays {
+  userId   String @id
+  birthday String
+}
+
+model userWatchlist {
+  noteId           String @id
+  userId           String
+  creatorId        String
+  createdTimestamp String
+  noteText         String
+}

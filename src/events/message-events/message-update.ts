@@ -2,6 +2,7 @@ import { channelMention, hyperlink } from '@discordjs/builders';
 import { Message, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { AttachmentUpdate, ContentUpdate } from '../../index.js';
+import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
@@ -95,7 +96,8 @@ const attachmentUpdate = async (args: AttachmentUpdate) => {
 
 export const messageUpdate = async (oldMessage: Message, newMessage: Message) => {
 	const { content: oldContent, attachments: oldAttachments } = oldMessage;
-	const { content: newContent, attachments: newAttachments, guildId, client, channelId } = newMessage;
+	const { content: newContent, attachments: newAttachments, guildId, client, channelId, author } = newMessage;
+	const onWatchlist = await checkWatchlist(author);
 
 	const logChannel = await fetchLogChannel(guildId, client);
 	const ignoredChannels = await fetchIgnoredChannels(guildId);
@@ -111,6 +113,9 @@ export const messageUpdate = async (oldMessage: Message, newMessage: Message) =>
 
 	if (!logEntry)
 		return;
+
+	if (onWatchlist)
+		logEntry.setThumbnail(emojiUrl(emotes.watchlist));
 
 	logChannel.send({ embeds: [logEntry] });
 };

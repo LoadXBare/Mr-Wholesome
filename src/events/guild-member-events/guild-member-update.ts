@@ -1,5 +1,6 @@
 import { GuildMember, MessageEmbed, PartialGuildMember } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
+import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { emotes } from '../../private/config.js';
@@ -7,6 +8,7 @@ import { emotes } from '../../private/config.js';
 export const guildMemberUpdate = async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
 	const { nickname: oldNickname } = oldMember;
 	const { nickname: newNickname, user, id } = newMember;
+	const onWatchlist = await checkWatchlist(user);
 
 	// Only interested in nickname changes, not role changes
 	if (oldNickname === newNickname)
@@ -30,6 +32,9 @@ export const guildMemberUpdate = async (oldMember: GuildMember | PartialGuildMem
 		.setFooter({ text: `${user.tag} • User ID: ${id}`, iconURL: newMember.displayAvatarURL() })
 		.setTimestamp()
 		.setColor(COLORS.NEUTRAL);
+
+	if (onWatchlist)
+		logEntry.setThumbnail(emojiUrl(emotes.watchlist));
 
 	logChannel.send({ embeds: [logEntry] });
 };

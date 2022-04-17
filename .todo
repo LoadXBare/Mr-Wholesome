@@ -1,8 +1,5 @@
 Todos:
 	New:
-		☐ User birthdays
-		☐ Watchlist system
-			Add notes tied to user IDs
 		☐ Random animal command
 			☐ Fox
 			☐ Cat
@@ -39,3 +36,5 @@ Done:
 	✔ Add emotes to log entries
 	✔ Error handling system
 	✔ Warning system
+	✔ User birthdays
+	✔ Watchlist system

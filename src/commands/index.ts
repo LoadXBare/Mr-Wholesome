@@ -1,3 +1,4 @@
+export { birthday } from './birthday/birthday.js';
 export { delwarn } from './delete-warning.js';
 export { tcg } from './fetch-trading-card-info.js';
 export { ignoredchannels } from './ignored-channels.js';
@@ -6,3 +7,4 @@ export { rolebuttonmenus } from './role-button-menus.js';
 export { setlogchannel } from './set-log-channel.js';
 export { warn } from './warn.js';
 export { warnings } from './warnings.js';
+export { wl } from './watchlist/watchlist.js';

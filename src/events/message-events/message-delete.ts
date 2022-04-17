@@ -1,6 +1,7 @@
 import { channelMention, inlineCode } from '@discordjs/builders';
 import { Message, MessageEmbed, PartialMessage } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
+import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
@@ -9,6 +10,7 @@ import { emotes } from '../../private/config.js';
 
 export const messageDelete = async (message: Message | PartialMessage) => {
 	const { author, client, guild, channelId, content, attachments, member } = message;
+	const onWatchlist = await checkWatchlist(author);
 	const logChannel = await fetchLogChannel(guild.id, client);
 	const ignoredChannels = await fetchIgnoredChannels(guild.id);
 
@@ -63,6 +65,9 @@ export const messageDelete = async (message: Message | PartialMessage) => {
 			logEntry.addField('Attachments', `${imageURLsList}`);
 		}
 	}
+
+	if (onWatchlist)
+		logEntry.setThumbnail(emojiUrl(emotes.watchlist));
 
 	logChannel.send({ embeds: [logEntry] });
 };
