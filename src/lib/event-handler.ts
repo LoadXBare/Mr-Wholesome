@@ -21,5 +21,5 @@ export const initializeEventHandler = async (client: Client) => {
 	client.on('roleCreate', (r) => events.roleCreate(r));
 	client.on('roleDelete', (r) => events.roleDelete(r));
 	client.on('roleUpdate', (oR, nR) => events.roleUpdate(oR, nR));
-	client.on('rateLimit', (d) => console.log(`The client is being rate-limited!\n${d}`));
+	client.on('rateLimit', (d) => console.log('The client is being rate-limited!', d));
 };
