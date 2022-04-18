@@ -1,6 +1,6 @@
 import { roleMention } from '@discordjs/builders';
 import { Message } from 'discord.js';
-import { PREFIX } from '../../config/constants.js';
+import { COMMAND_INFO, PREFIX } from '../../config/constants.js';
 import { handleCommand } from '../../lib/command-handler.js';
 import { emotes, theAkialytes } from '../../private/config.js';
 
@@ -28,4 +28,8 @@ export const messageCreate = (message: Message) => {
 	// React to anyone's message with ARSON if they say 'arson' anywhere in their message
 	if (content.search(/(?<!\S)[a]+[r]+[s]+[o]+[n]+/mi) !== -1)
 		message.react(emotes.arson);
+
+	// A temporary check to ensure people aren't using the old Birthday Bot commands
+	if (content.startsWith('bb.'))
+		message.reply({ content: 'Birthdays are now handled by me!\nPlease use `!birthday` instead.', embeds: [COMMAND_INFO.BIRTHDAY] });
 };

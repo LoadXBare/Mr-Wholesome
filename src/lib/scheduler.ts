@@ -5,29 +5,23 @@ import prisma from '../prisma/client';
 import { theAkialytes } from '../private/config';
 
 const checkRoles = async (guild: Guild) => {
-	const members = await guild.members.fetch();
+	const birthdaysList = await prisma.userBirthdays.findMany();
 
 	if (dayjs().format('MMMM DD') !== 'September 03') {
 		const member = await guild.members.fetch(theAkialytes.ownerId);
 		member.roles.add(theAkialytes.roles['Birthday Role']);
 	}
 
-	for (let i = 0; i < members.size; i++) {
-		const member = members.at(i);
+	for (let i = 0; i < birthdaysList.length; i++) {
+		const member = await guild.members.fetch(birthdaysList.at(i).userId);
+		const memberRoles = member.roles.cache;
+		const memberBirthday = birthdaysList.at(i).birthday;
 
 		if (member.id === theAkialytes.ownerId)
 			return;
 
-		const memberRoles = member.roles.cache;
-
-		if (memberRoles.has(theAkialytes.roles['Birthday Role'])) {
-			const userBirthday = await prisma.userBirthdays.findUnique({
-				where: { userId: member.id }
-			});
-
-			if (userBirthday.birthday !== dayjs().format('MMMM DD')) {
-				member.roles.remove(theAkialytes.roles['Birthday Role']);
-			}
+		if (memberRoles.has(theAkialytes.roles['Birthday Role']) && memberBirthday !== dayjs().format('MMMM DD')) {
+			member.roles.remove(theAkialytes.roles['Birthday Role']);
 		}
 	}
 };
@@ -78,7 +72,7 @@ const birthdayScheduler = async (client: Client) => {
 		const currentDate = dayjs().format('MMMM DD');
 
 		checkRoles(theAkialytesGuild);
-		if (currentDate === lastRunDate)
+		if (currentDate === lastRunDate || dayjs().get('hour') > 1)
 			return;
 
 		const birthdayChannel = await client.channels.fetch(theAkialytes.birthdayChannelId) as TextChannel;
