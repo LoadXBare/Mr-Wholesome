@@ -1,34 +1,28 @@
-import { Message, MessageActionRow, MessageButton, MessageEmbed, TextChannel } from 'discord.js';
+import { inlineCode } from '@discordjs/builders';
+import { MessageActionRow, MessageButton, MessageEmbed, TextChannel } from 'discord.js';
 import { BotCommand } from '..';
 import { COLORS } from '../config/constants.js';
-import { handleError } from '../lib/error-handler.js';
-import { theAkialytes } from '../private/config.js';
+import { fetchDiscordChannel } from '../lib/misc/fetch-discord-channel.js';
+import { generateId } from '../lib/misc/generate-id.js';
+import { sendError } from '../lib/misc/send-error.js';
+import { config } from '../private/config.js';
 
-class EmbedBase {
-	constructor(message: Message) {
-		const { author, member } = message;
-		return new MessageEmbed()
-			.setAuthor({ name: author.tag, iconURL: member.avatarURL() === null ? author.avatarURL() : member.avatarURL() })
-			.setTitle('Get Roles');
-	}
-}
-
-export const rolebuttonmenus = async (args: BotCommand) => {
+export const rolebuttonmenus = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
-	const { client, guild } = message;
+	const { guild } = message;
 
-	if (typeof commandArgs.at(0) === 'undefined')
-		return handleError.missingArg({ message: message, missingArg: 'Channel ID' });
+	const channelIDText = commandArgs.shift() ?? 'undefined';
+	const channelID = channelIDText.replace(/\D/g, '');
+	const channelToSendMenu = await fetchDiscordChannel(message.guild, channelID) as TextChannel;
 
-	const channelId = commandArgs.at(0).replace(/\D/g, '');
+	if (channelToSendMenu === null) {
+		sendError(message, `${inlineCode(channelIDText)} is not a valid Channel!`);
+		return;
+	}
 
-	try { await client.channels.fetch(channelId); }
-	catch { return handleError.invalidArg({ invalidArg: 'Channel ID', message: message, passedArg: channelId }); }
-
-	const channelToSendMenu = await client.channels.fetch(channelId) as TextChannel;
-
-	const rolesMenuInfo = new MessageEmbed(new EmbedBase(message))
+	const rolesMenuInfo = new MessageEmbed()
 		.setAuthor({ name: guild.name, iconURL: guild.iconURL() })
+		.setTitle('Get Roles')
 		.setDescription('Click any of the buttons below to add or remove roles!\
 		\n\nClicking on a button **without** having that role will give it to you.\
 		\nClicking on a button **while** having that role will remove it from you.')
@@ -39,23 +33,23 @@ export const rolebuttonmenus = async (args: BotCommand) => {
 		.setColor(COLORS.COMMAND);
 	const pronounMenuButtons = new MessageActionRow().addComponents(
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['He/Him']}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['He/Him'], ID: generateId(5) }))
 			.setLabel('He/Him')
 			.setStyle('PRIMARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['They/Them']}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['They/Them'], ID: generateId(5) }))
 			.setLabel('They/Them')
 			.setStyle('PRIMARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['She/Her']}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['She/Her'], ID: generateId(5) }))
 			.setLabel('She/Her')
 			.setStyle('PRIMARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['Any/All']}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['Any/All'], ID: generateId(5) }))
 			.setLabel('Any/All')
 			.setStyle('PRIMARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['Other Pronouns (Ask Me)']}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['Other Pronouns (Ask Me)'], ID: generateId(5) }))
 			.setLabel('Other (Ask Me)')
 			.setStyle('PRIMARY')
 	);
@@ -65,33 +59,33 @@ export const rolebuttonmenus = async (args: BotCommand) => {
 		.setColor(COLORS.COMMAND);
 	const otherMenuButtons = new MessageActionRow().addComponents(
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Minecrafter}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Minecrafter, ID: generateId(5) }))
 			.setLabel('Minecrafter')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Crafter}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Crafter, ID: generateId(5) }))
 			.setLabel('Crafter')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Artist}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Artist, ID: generateId(5) }))
 			.setLabel('Artist')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Writer}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Writer, ID: generateId(5) }))
 			.setLabel('Writer')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Musician}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Musician, ID: generateId(5) }))
 			.setLabel('Musician')
 			.setStyle('SECONDARY')
 	);
 	const otherMenuButtons2 = new MessageActionRow().addComponents(
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles.Streamies}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Streamies, ID: generateId(5) }))
 			.setLabel('Streamies')
 			.setStyle('SECONDARY'),
 		new MessageButton()
-			.setCustomId(`role: ${theAkialytes.roles['Server Events']}`)
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['Server Events'], ID: generateId(5) }))
 			.setLabel('Server Events')
 			.setStyle('SECONDARY')
 	);

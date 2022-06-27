@@ -1,87 +1,124 @@
-import { userMention } from '@discordjs/builders';
-import * as dayjs from 'dayjs';
+import { inlineCode, userMention } from '@discordjs/builders';
+import dayjs from 'dayjs';
 import { Client, Guild, TextChannel } from 'discord.js';
-import prisma from '../prisma/client';
-import { theAkialytes } from '../private/config';
+import { mongodb } from '../api/mongo.js';
+import { config } from '../private/config.js';
+import { fetchDiscordChannel } from './misc/fetch-discord-channel.js';
+import { fetchGuildMember } from './misc/fetch-guild-member.js';
 
-const checkRoles = async (guild: Guild) => {
-	const birthdaysList = await prisma.userBirthdays.findMany();
+const checkRoles = async (guild: Guild): Promise<void> => {
+	const akiasBirthday = 'September 03';
+	const currentDate = dayjs().format('MMMM DD');
+	const birthdayList = await mongodb.userBirthday.find();
 
-	if (dayjs().format('MMMM DD') !== 'September 03') {
-		const member = await guild.members.fetch(theAkialytes.ownerId);
-		member.roles.add(theAkialytes.roles['Birthday Role']);
+	if (currentDate !== akiasBirthday) {
+		const member = await fetchGuildMember(guild, config.theAkialytesOwnerId);
+		member.roles.add(config.roles['Birthday Role'], 'Definitely Akia\'s birthday');
 	}
 
-	for (let i = 0; i < birthdaysList.length; i++) {
-		const member = await guild.members.fetch(birthdaysList.at(i).userId);
+
+	/* -- NOTE --
+	   This rate-limits the bot and will not scale well with database size.
+	   Perhaps there is a more efficient way?
+	*/
+	for (let i = 0; i < birthdayList.length; i++) {
+		const userID = birthdayList.at(i).userID;
+		const member = await fetchGuildMember(guild, userID);
+
+		if (member === null) {
+			continue;
+		}
+
 		const memberRoles = member.roles.cache;
-		const memberBirthday = birthdaysList.at(i).birthday;
+		const memberBirthday = birthdayList.at(i).birthday;
+		const memberHasBirthdayRole = memberRoles.has(config.roles['Birthday Role']);
+		const isMembersBirthday = memberBirthday === currentDate;
 
-		if (member.id === theAkialytes.ownerId)
-			return;
-
-		if (memberRoles.has(theAkialytes.roles['Birthday Role']) && memberBirthday !== dayjs().format('MMMM DD')) {
-			member.roles.remove(theAkialytes.roles['Birthday Role']);
+		if (userID === config.theAkialytesOwnerId) {
+			continue;
+		}
+		else if (memberHasBirthdayRole && !isMembersBirthday) {
+			member.roles.remove(config.roles['Birthday Role'], 'No longer birthday');
 		}
 	}
 };
 
-const postBirthdayMessage = async (date: string, guild: Guild, channel: TextChannel) => {
-	const birthdaysToday = await prisma.userBirthdays.findMany({
-		where: { birthday: { equals: date } }
+const postBirthdayMessage = async (date: string, guild: Guild, birthdayChannel: TextChannel): Promise<void> => {
+	const currentDate = dayjs().format('MMMM DD');
+	const birthdaysToday = await mongodb.userBirthday.find({
+		birthday: currentDate
 	});
+
 	let birthdayMessage = '';
 
 	if (birthdaysToday.length === 0) {
 		return;
-	} else if (birthdaysToday.length === 1) {
-		const userId = birthdaysToday.at(0).userId;
-		const member = await guild.members.fetch(userId);
-		if (userId === theAkialytes.ownerId) {
-			birthdayMessage = `Today is *definitely not* ${userMention(userId)}'s birthday, please continue your day as normal! ${theAkialytes.emotes.akiaLaugh}`;
-			member.roles.remove(theAkialytes.roles['Birthday Role']);
-		} else {
-			birthdayMessage = `Today is ${userMention(userId)}'s birthday!\nLet's wish them a happy birthday 🥳`;
-			member.roles.add(theAkialytes.roles['Birthday Role']);
+	}
+	else if (birthdaysToday.length === 1) {
+		const userID = birthdaysToday.at(0).userID;
+		const member = await fetchGuildMember(guild, userID);
+
+		if (member === null) {
+			return;
 		}
-	} else {
+
+		if (userID === config.theAkialytesOwnerId) {
+			birthdayMessage = `Today is *definitely not* ${userMention(userID)}'s birthday, please continue your day as normal! ${config.emotes.akiaLaugh}`;
+			member.roles.remove(config.roles['Birthday Role'], 'Definitely not Akia\'s birthday');
+		}
+		else {
+			birthdayMessage = `Today is ${userMention(userID)}'s birthday!\nLet's wish them a happy birthday 🥳`;
+			member.roles.add(config.roles['Birthday Role'], 'Birthday');
+		}
+	}
+	else {
 		birthdayMessage = 'We have more than 1 birthday today!\nLet\'s wish a happy birthday to ';
 		for (let i = 0; i < birthdaysToday.length; i++) {
-			const userId = birthdaysToday.at(i).userId;
-			const member = await guild.members.fetch(userId);
+			const userID = birthdaysToday.at(i).userID;
+			const member = await fetchGuildMember(guild, userID);
 
-			member.roles.add(theAkialytes.roles['Birthday Role']);
+			if (member === null) {
+				birthdayMessage = birthdayMessage.concat(inlineCode('[Member Left Server]'));
+			}
+			else {
+				member.roles.add(config.roles['Birthday Role']);
 
-			birthdayMessage = birthdayMessage.concat(`${userMention(userId)}`);
-			if (i === birthdaysToday.length - 2)
+				birthdayMessage = birthdayMessage.concat(`${userMention(userID)}`);
+			}
+
+			if (i === birthdaysToday.length - 2) {
 				birthdayMessage = birthdayMessage.concat(' and ');
-			else if (i < birthdaysToday.length - 2)
+			}
+			else if (i < birthdaysToday.length - 2) {
 				birthdayMessage = birthdayMessage.concat(', ');
+			}
 		}
 		birthdayMessage = birthdayMessage.concat(' 🥳');
 	}
 
-	channel.send(birthdayMessage);
+	birthdayChannel.send(birthdayMessage);
 };
 
-const birthdayScheduler = async (client: Client) => {
-	const theAkialytesGuild = await client.guilds.fetch(theAkialytes.guildId);
-	let lastRunDate = 'MMMM DD';
+const birthdayScheduler = async (client: Client): Promise<void> => {
+	const theAkialytesGuild = await client.guilds.fetch(config.theAkialytesGuildId);
+	const birthdayChannel = await fetchDiscordChannel(theAkialytesGuild, config.birthdayChannelId) as TextChannel;
+	const intervalMins = 30;
+	let lastRunDate = 'undefined';
 
 	setInterval(async () => {
 		const currentDate = dayjs().format('MMMM DD');
+		const currentHour = dayjs().get('hour');
 
 		checkRoles(theAkialytesGuild);
-		if (currentDate === lastRunDate || dayjs().get('hour') > 1)
+		if (currentDate === lastRunDate || currentHour > 1) {
 			return;
-
-		const birthdayChannel = await client.channels.fetch(theAkialytes.birthdayChannelId) as TextChannel;
+		}
 		lastRunDate = currentDate;
 
 		postBirthdayMessage(currentDate, theAkialytesGuild, birthdayChannel);
-	}, 5 * 60 * 1000);
+	}, intervalMins * 1000);
 };
 
-export const startScheduler = (client: Client) => {
+export const startScheduler = (client: Client): void => {
 	birthdayScheduler(client);
 };

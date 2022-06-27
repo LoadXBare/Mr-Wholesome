@@ -1,13 +1,13 @@
 import { inlineCode } from '@discordjs/builders';
 import { MessageEmbed } from 'discord.js';
-import { COLORS } from '../config/constants.js';
-import { BotCommand } from '../index.js';
+import { COLORS } from '../../config/constants.js';
+import { BotCommand } from '../../index.js';
 
 export const ping = async (args: BotCommand): Promise<void> => {
 	const { message } = args;
 
 	const reply = await message.reply({ content: 'uwu' });
-	const pingCommand: MessageEmbed = new MessageEmbed()
+	const pingCommand = new MessageEmbed()
 		.setTitle('Tweet!')
 		.setDescription(`⌛ ⇒ ${inlineCode(`${reply.createdTimestamp - message.createdTimestamp}ms`)}\
 		\n☁️ ⇒ ${inlineCode(`${message.client.ws.ping}ms`)}`)

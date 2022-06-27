@@ -1,11 +1,12 @@
 {
 	"compilerOptions": {
 		"target": "ESNext",
-		"module": "CommonJS",
+		"module": "ESNext",
 		"moduleResolution": "Node",
 		"noImplicitAny": true,
 		"rootDir": "./src",
 		"outDir": "./dist",
+		"allowSyntheticDefaultImports": true
 	},
 	"exclude": [
 		"backlog"

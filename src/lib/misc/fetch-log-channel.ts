@@ -1,23 +1,22 @@
 import { Client, TextChannel } from 'discord.js';
-import prisma from '../../prisma/client.js';
+import { mongodb } from '../../api/mongo.js';
 
-/**
- * Fetches and returns a Text Channel object (or null) for the Log Channel for the specified Guild ID.
- * 
- * @param guildId The Guild ID to fetch the Log Channel for.
- * @param client The bot client.
- */
-
-export const fetchLogChannel = async (guildId: string, client: Client) => {
-	const guildConfig = await prisma.guildConfig.upsert({
-		where: { guildId: guildId },
-		update: {},
-		create: { guildId: guildId }
+export const fetchLogChannel = async (guildId: string, client: Client): Promise<null | TextChannel> => {
+	let guildConfig = await mongodb.guildConfig.findOne({
+		guildID: guildId
 	});
 
-	try { await client.channels.fetch(guildConfig.logChannel); }
-	catch { return null; }
+	if (guildConfig === null) {
+		guildConfig = await mongodb.guildConfig.create({
+			guildID: guildId
+		});
+	}
 
-	const logChannel = await client.channels.fetch(guildConfig.logChannel) as TextChannel;
-	return logChannel;
+	try {
+		const logChannel = await client.channels.fetch(guildConfig.logChannelID) as TextChannel;
+		return logChannel;
+	}
+	catch {
+		return null;
+	}
 };

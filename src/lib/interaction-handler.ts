@@ -1,27 +1,23 @@
 import { ButtonInteraction, Interaction } from 'discord.js';
-import * as interactions from './interactions/index.js';
+import interactions from '../lib/interactions/index.js';
 
-const handleButtonInteraction = async (interaction: ButtonInteraction, type: string) => {
-	switch (type) {
-		case 'role':
-			await interaction.deferReply({ ephemeral: true });
-
-			const roleId = interaction.customId.slice(interaction.customId.search(/\d/));
-			const role = await interaction.guild.roles.fetch(roleId);
-
-			interactions.updateRole(interaction, role);
-			break;
-
-		default:
-
-			break;
-	}
+export const handleInteraction = async (interaction: Interaction): Promise<void> => {
+	// Currently unused
 };
 
-export const handleInteraction = async (interaction: Interaction | ButtonInteraction, type: string) => {
-	if (type === 'ignore')
-		return;
+export const handleButtonInteraction = async (interaction: ButtonInteraction): Promise<void> => {
+	const data = JSON.parse(interaction.customId);
+	const type = data.type;
 
-	if (interaction.isButton)
-		handleButtonInteraction(interaction as ButtonInteraction, type);
+	if (type === 'ignore') {
+		return;
+	}
+	else if (type === 'role') {
+		await interaction.deferReply({ ephemeral: true });
+
+		const roleID = data.roleID;
+		const role = await interaction.guild.roles.fetch(roleID);
+
+		interactions.updateRole(interaction, role);
+	}
 };

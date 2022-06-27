@@ -1,13 +1,32 @@
-export { guildBanAdd } from './guild-ban-events/guild-ban-add.js';
-export { guildBanRemove } from './guild-ban-events/guild-ban-remove.js';
-export { guildMemberAdd } from './guild-member-events/guild-member-add.js';
-export { guildMemberRemove } from './guild-member-events/guild-member-remove.js';
-export { guildMemberUpdate } from './guild-member-events/guild-member-update.js';
-export { interactionCreate } from './interaction-create.js';
-export { messageCreate } from './message-events/message-create.js';
-export { messageDelete } from './message-events/message-delete.js';
-export { messageUpdate } from './message-events/message-update.js';
-export { ready } from './ready.js';
-export { roleCreate } from './role-events/role-create.js';
-export { roleDelete } from './role-events/role-delete.js';
-export { roleUpdate } from './role-events/role-update.js';
+import { Events } from '../index.js';
+import { guildBanAdd } from './guild-ban-events/guild-ban-add.js';
+import { guildBanRemove } from './guild-ban-events/guild-ban-remove.js';
+import { guildMemberAdd } from './guild-member-events/guild-member-add.js';
+import { guildMemberRemove } from './guild-member-events/guild-member-remove.js';
+import { guildMemberUpdate } from './guild-member-events/guild-member-update.js';
+import { interactionCreate } from './interaction-create.js';
+import { messageCreate } from './message-events/message-create.js';
+import { messageDelete } from './message-events/message-delete.js';
+import { messageUpdate } from './message-events/message-update.js';
+import { ready } from './ready.js';
+import { roleCreate } from './role-events/role-create.js';
+import { roleDelete } from './role-events/role-delete.js';
+import { roleUpdate } from './role-events/role-update.js';
+
+const events: Events = {
+	'guildBanAdd': guildBanAdd,
+	'guildBanRemove': guildBanRemove,
+	'guildMemberAdd': guildMemberAdd,
+	'guildMemberRemove': guildMemberRemove,
+	'guildMemberUpdate': guildMemberUpdate,
+	'interactionCreate': interactionCreate,
+	'messageCreate': messageCreate,
+	'messageDelete': messageDelete,
+	'messageUpdate': messageUpdate,
+	'ready': ready,
+	'roleCreate': roleCreate,
+	'roleDelete': roleDelete,
+	'roleUpdate': roleUpdate
+};
+
+export default events;

@@ -1,29 +1,27 @@
-import { GuildMember, MessageEmbed, PartialGuildMember } from 'discord.js';
+import { GuildMember, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
-import { emotes } from '../../private/config.js';
+import { config } from '../../private/config.js';
 
-export const guildMemberUpdate = async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
+export const guildMemberUpdate = async (oldMember: GuildMember, newMember: GuildMember): Promise<void> => {
 	const { nickname: oldNickname } = oldMember;
 	const { nickname: newNickname, user, id } = newMember;
-	const onWatchlist = await checkWatchlist(user);
+	const onWatchlist = await checkWatchlist(user.id);
+	const logChannel = await fetchLogChannel(newMember.guild.id, newMember.client);
 
 	// Only interested in nickname changes, not role changes
-	if (oldNickname === newNickname)
+	if (oldNickname === newNickname || logChannel === null) {
 		return;
+	}
 
-	const logChannel = await fetchLogChannel(newMember.guild.id, newMember.client);
-	if (logChannel === null)
-		return;
+	const formatNickname = (nick: string): string => (nick === null ? 'None' : nick);
 
-	const formatNickname = (nick: string) => (nick === null ? 'None' : nick);
-
-	const logEntry = new MessageEmbed()
+	const logEntryEmbed = new MessageEmbed()
 		.setAuthor({
 			name: 'Nickname Changed',
-			iconURL: emojiUrl(emotes.memUpdate)
+			iconURL: emojiUrl(config.botEmotes.memUpdate)
 		})
 		.setFields([
 			{ name: 'Before', value: formatNickname(oldNickname) },
@@ -33,8 +31,9 @@ export const guildMemberUpdate = async (oldMember: GuildMember | PartialGuildMem
 		.setTimestamp()
 		.setColor(COLORS.NEUTRAL);
 
-	if (onWatchlist)
-		logEntry.setThumbnail(emojiUrl(emotes.watchlist));
+	if (onWatchlist) {
+		logEntryEmbed.setThumbnail(emojiUrl(config.botEmotes.watchlist));
+	}
 
-	logChannel.send({ embeds: [logEntry] });
+	logChannel.send({ embeds: [logEntryEmbed] });
 };

@@ -1,5 +1,6 @@
 Todos:
 	New:
+		☐ Ticket system
 		☐ Random animal command
 			✔ Fox
 			✔ Cat
@@ -20,16 +21,10 @@ Todos:
 		☐ Akia birthday command
 
 	Changes:
-		☐ Remove hardcoded role when member joins server in `guild-member-add.ts`
-		☐ Remove hardcoded roles from `role-button-menu.ts`
-			☐ Add new command to add roles to database
-		☐ Add "sent successfully" embed to `role-button-menu.ts`
-		☐ Add the ability to view all warnings within a guild
-		☐ Simplify command names
-		☐ Convert existing commands to slash commands
-	
+		☐ 
+
 	Backlog:
-		☐ Ticket system
+		☐ 
 
 Done:
 	✔ Convert all JavaScript files to TypeScript
@@ -38,3 +33,12 @@ Done:
 	✔ Warning system
 	✔ User birthdays
 	✔ Watchlist system
+	✔ Re-write all existing files for Version 1.0
+	✔ Add the ability to view all warnings within a guild
+	✔ Simplify command names
+
+Cancelled:
+	✘ Remove hardcoded roles from `role-button-menu.ts`
+		✘ Add new command to add roles to database
+	✘ Add "sent successfully" embed to `role-button-menu.ts`
+	✘ Convert existing commands to slash commands

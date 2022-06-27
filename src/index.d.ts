@@ -1,4 +1,4 @@
-import { Collection, ColorResolvable, Message, MessageAttachment } from 'discord.js';
+import { Collection, ColorResolvable, Message, MessageAttachment, MessageEmbed } from 'discord.js';
 
 export type InteractionTypes =
 	| 'ignore'
@@ -14,44 +14,17 @@ export type ButtonChoice = {
 	value: string
 }
 
-export type ErrorInvalidArg = {
-	invalidArg: string,
-	passedArg: string,
-	message: Message
-};
-
-export type ErrorMissingArg = {
-	missingArg: string,
-	message: Message
-};
-
-export type ErrorDatabaseDuplicate = {
-	entry: string,
-	field: string,
-	message: Message
-};
-
-export type ErrorDatabaseEntryNotFound = {
-	entry: string,
-	field: string,
-	message: Message
+export type Events = {
+	[event: string]: Function
 }
 
-export type clientEventTypes =
-	| 'guildBanAdd'
-	| 'guildBanRemove'
-	| 'guildMemberAdd'
-	| 'guildMemberRemove'
-	| 'guildMemberUpdate'
-	| 'messageCreate'
-	| 'interactionCreate'
-	| 'messageDelete'
-	| 'messageUpdate'
-	| 'ready'
-	| 'roleCreate'
-	| 'roleDelete'
-	| 'roleUpdate'
-	| 'rateLimit';
+export type CommandInfo = {
+	[command: string]: MessageEmbed
+}
+
+export type Commands = {
+	[command: string]: Function
+}
 
 export type RoleChanges =
 	| 'name'
@@ -72,7 +45,6 @@ export type Colors = {
 
 export type BotCommand = {
 	message: Message,
-	command: string,
 	commandArgs: Array<string>
 };
 

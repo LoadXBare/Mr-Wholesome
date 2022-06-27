@@ -1,13 +1,28 @@
-export { birthday } from './birthday/birthday.js';
-export { delwarn } from './delete-warning.js';
-export { tcg } from './fetch-trading-card-info.js';
-export { ignoredchannels } from './ignored-channels.js';
-export { ping } from './ping.js';
-export { cat } from './random-animal/cat.js';
-export { dog } from './random-animal/dog.js';
-export { fox } from './random-animal/fox.js';
-export { rolebuttonmenus } from './role-button-menus.js';
-export { setlogchannel } from './set-log-channel.js';
-export { warn } from './warn.js';
-export { warnings } from './warnings.js';
-export { wl } from './watchlist/watchlist.js';
+import { Commands } from '../index.js';
+import { birthday } from './fun/birthday.js';
+import { cat, dog, fox } from './fun/random-animal.js';
+import { help } from './information/help.js';
+import { ping } from './information/ping.js';
+import { warn } from './moderation/warn.js';
+import { watchlist } from './moderation/watchlist.js';
+import { rolebuttonmenus } from './role-button-menus.js';
+import { tcg } from './utility/fetch-trading-card.js';
+import { ignoredchannel } from './utility/ignored-channel.js';
+import { logchannel } from './utility/log-channel.js';
+
+const commands: Commands = {
+	'birthday': birthday,
+	'cat': cat,
+	'dog': dog,
+	'fox': fox,
+	'help': help,
+	'ping': ping,
+	'warn': warn,
+	'watchlist': watchlist,
+	'rolebuttonmenus': rolebuttonmenus,
+	'tcg': tcg,
+	'ignoredchannel': ignoredchannel,
+	'logchannel': logchannel
+};
+
+export default commands;

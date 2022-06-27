@@ -4,17 +4,18 @@ import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
-import { emotes } from '../../private/config.js';
+import { config } from '../../private/config.js';
 
-export const guildBanAdd = async (ban: GuildBan) => {
+export const guildBanAdd = async (ban: GuildBan): Promise<void> => {
 	const { user, reason } = ban;
-	const onWatchlist = await checkWatchlist(user);
+	const onWatchlist = await checkWatchlist(user.id);
 
 	const logChannel = await fetchLogChannel(ban.guild.id, ban.client);
-	if (logChannel === null)
+	if (logChannel === null) {
 		return;
+	}
 
-	const logEntry = new MessageEmbed()
+	const logEntryEmbed = new MessageEmbed()
 		.setAuthor({
 			name: user.tag,
 			iconURL: user.displayAvatarURL()
@@ -23,14 +24,15 @@ export const guildBanAdd = async (ban: GuildBan) => {
 		.setThumbnail(user.displayAvatarURL())
 		.setFields([
 			{ name: 'Member', value: userMention(user.id) },
-			{ name: 'Reason', value: typeof reason === 'undefined' ? 'None' : reason }
+			{ name: 'Reason', value: reason === undefined ? 'None' : reason }
 		])
 		.setFooter({ text: `User ID: ${user.id}` })
 		.setTimestamp()
 		.setColor(COLORS.NEGATIVE);
 
-	if (onWatchlist)
-		logEntry.setThumbnail(emojiUrl(emotes.watchlist));
+	if (onWatchlist) {
+		logEntryEmbed.setThumbnail(emojiUrl(config.botEmotes.watchlist));
+	}
 
-	logChannel.send({ embeds: [logEntry] });
+	logChannel.send({ embeds: [logEntryEmbed] });
 };
