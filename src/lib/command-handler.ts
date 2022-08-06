@@ -1,6 +1,9 @@
 import { Message } from 'discord.js';
 import commands from '../commands/index.js';
+import { LOG_COLORS, MOD_COMMANDS } from '../config/constants.js';
 import { BotCommand } from '../index.js';
+import { isModerator } from './misc/check-moderator.js';
+import { sendError } from './misc/send-error.js';
 
 export const handleCommand = (message: Message): void => {
 	if (message.author.bot) {
@@ -15,7 +18,15 @@ export const handleCommand = (message: Message): void => {
 	const args: BotCommand = { message, commandArgs };
 
 	if (commandsList.includes(command)) {
+		if (MOD_COMMANDS.includes(command)) {
+			if (!isModerator(message.member)) {
+				sendError(message, 'You do not have permission to perform this command!');
+				return;
+			}
+		}
+
 		commands[command](args);
+		console.log(LOG_COLORS.SUCCESS(`Handled Command: ${command}`));
 	}
 	else {
 		// Command does not exist, ignore

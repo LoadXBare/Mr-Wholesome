@@ -3,6 +3,7 @@ import { birthday } from './fun/birthday.js';
 import { cat, dog, fox } from './fun/random-animal.js';
 import { help } from './information/help.js';
 import { ping } from './information/ping.js';
+import { ban } from './moderation/ban.js';
 import { warn } from './moderation/warn.js';
 import { watchlist } from './moderation/watchlist.js';
 import { rolebuttonmenus } from './role-button-menus.js';
@@ -17,6 +18,7 @@ const commands: Commands = {
 	'fox': fox,
 	'help': help,
 	'ping': ping,
+	'ban': ban,
 	'warn': warn,
 	'watchlist': watchlist,
 	'rolebuttonmenus': rolebuttonmenus,

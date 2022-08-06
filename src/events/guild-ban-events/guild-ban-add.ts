@@ -2,7 +2,6 @@ import { userMention } from '@discordjs/builders';
 import { GuildBan, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
-import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { config } from '../../private/config.js';
 
@@ -31,7 +30,7 @@ export const guildBanAdd = async (ban: GuildBan): Promise<void> => {
 		.setColor(COLORS.NEGATIVE);
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(emojiUrl(config.botEmotes.watchlist));
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

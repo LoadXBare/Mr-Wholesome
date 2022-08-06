@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { GuildMember, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
-import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { config } from '../../private/config.js';
 
@@ -18,8 +17,7 @@ export const guildMemberAdd = async (member: GuildMember): Promise<void> => {
 
 	const logEntryEmbed = new MessageEmbed()
 		.setAuthor({
-			name: 'Member Joined',
-			iconURL: emojiUrl(config.botEmotes.memJoin)
+			name: 'Member Joined'
 		})
 		.setThumbnail(user.displayAvatarURL())
 		.setFields([
@@ -31,7 +29,7 @@ export const guildMemberAdd = async (member: GuildMember): Promise<void> => {
 		.setColor(COLORS.POSITIVE);
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(emojiUrl(config.botEmotes.watchlist));
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
 	}
 
 	roles.add(config.roles.Akialyte, 'Joined Server');

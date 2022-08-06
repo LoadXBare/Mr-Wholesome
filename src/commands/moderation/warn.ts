@@ -51,14 +51,14 @@ const addWarning = async (message: Message, warnedUser: User, warningReason: str
 		return interaction.user.id === creatorUserID;
 	};
 
-	const buttonChoice = await message.channel.awaitMessageComponent({ componentType: 'BUTTON', idle: 5_000, filter: interactionFilter }).catch(() => { });
+	const buttonChoice = await message.channel.awaitMessageComponent({ componentType: 'BUTTON', idle: 30_000, filter: interactionFilter }).catch(() => { });
 
 	if (typeof buttonChoice === 'undefined') {
 		const warningTimeoutEmbed = new MessageEmbed(warningEmbed)
-			.setFooter({ text: 'Warning timedout.' })
+			.setFooter({ text: 'Warning timed out.' })
 			.setColor(COLORS.TIMEOUT);
 
-		commandReply.edit({ embeds: [warningTimeoutEmbed] });
+		commandReply.edit({ embeds: [warningTimeoutEmbed], components: [] });
 		return;
 	}
 
@@ -69,7 +69,8 @@ const addWarning = async (message: Message, warnedUser: User, warningReason: str
 			creatorUserID: creatorUserID,
 			guildID: message.guildId,
 			warnedUserID: warnedUserID,
-			warningReason: warningReason
+			warningReason: warningReason,
+			warningDate: dayjs().toISOString()
 		});
 
 		const warningSentEmbed = new MessageEmbed(warningEmbed)
@@ -169,7 +170,7 @@ const removeWarning = async (message: Message, warningID: string): Promise<void>
 
 	if (typeof buttonChoice === 'undefined') {
 		const deleteWarningTimedoutEmbed = new MessageEmbed(deleteWarningEmbed)
-			.setFooter({ text: 'Warning deletion timedout.' })
+			.setFooter({ text: 'Warning deletion timed out.' })
 			.setColor(COLORS.TIMEOUT);
 		commandReply.edit({ embeds: [deleteWarningTimedoutEmbed], components: [] });
 		return;
@@ -319,7 +320,7 @@ export const warn = async (args: BotCommand): Promise<void> => {
 
 	if (user !== null) {
 		let warningReason = commandArgs.join(' ');
-		if (warningReason === '') {
+		if (warningReason.length === 0) {
 			warningReason = 'No reason provided.';
 		}
 

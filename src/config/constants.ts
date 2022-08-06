@@ -1,10 +1,29 @@
 import { inlineCode } from '@discordjs/builders';
+import chalk from 'chalk';
 import { Intents, MessageEmbed } from 'discord.js';
 import { Colors, CommandInfo } from '..';
 import { numSuffix } from '../lib/misc/number-suffix.js';
 import { config } from '../private/config.js';
 
 export const BOT_PREFIX = config.botPrefix;
+
+export const LOG_COLORS = {
+	INFO: chalk.blueBright,
+	ERROR: chalk.redBright,
+	SUCCESS: chalk.greenBright,
+	NEUTRAL: chalk.yellowBright,
+	HIGHLIGHT: chalk.bold
+};
+
+export const MOD_COMMANDS = [
+	'ban',
+	'warn',
+	'watchlist',
+	'rolebuttonmenus',
+	'tcg',
+	'ignoredchannel',
+	'logchannel'
+];
 
 export const COLORS: Colors = {
 	COMMAND: '#704f95',
@@ -154,6 +173,37 @@ export const COMMAND_INFO: CommandInfo = {
 				name: 'Example 2',
 				value: `${inlineCode(`${BOT_PREFIX}birthday upcoming`)}\
 				\n┗ Displays the upcoming 4 birthdays.`
+			}
+		])
+		.setColor(COLORS.COMMAND),
+	'BAN': new MessageEmbed()
+		.setTitle(`Command Info: "${BOT_PREFIX}ban"`)
+		.setDescription('Allows you to ban, unban or view bans within this guild.')
+		.setFields([
+			{
+				name: 'Example 1',
+				value: `${inlineCode(`${BOT_PREFIX}ban @LoadXBare#7156 1 Excessive spamming`)}\
+				\n┗ Bans the user @LoadXBare#7156 with the reason "Excessive spamming" and deletes their messages less than 1 day old.`
+			},
+			{
+				name: 'Example 2',
+				value: `${inlineCode(`${BOT_PREFIX}ban add @LoadXBare#7156 Spamming`)}\
+				\n┗ Bans @LoadXBare#7156 with the reason "Spamming" but does not delete any of their messages.`
+			},
+			{
+				name: 'Example 3',
+				value: `${inlineCode(`${BOT_PREFIX}ban @LoadXBare#7156`)}\
+				\n┗ Bans @LoadXBare#7156 without reason and without deleting any of their messages.`
+			},
+			{
+				name: 'Example 4',
+				value: `${inlineCode(`${BOT_PREFIX}ban remove 62ee7953d6903000dc5fb0b2`)}\
+				\n┗ Unbans the user tied to the specified Ban ID. (Ban can still be viewed)`
+			},
+			{
+				name: 'Example 5',
+				value: `${inlineCode(`${BOT_PREFIX}ban view`)}\
+				\n┗ Displays all bans within the guild.`
 			}
 		])
 		.setColor(COLORS.COMMAND)

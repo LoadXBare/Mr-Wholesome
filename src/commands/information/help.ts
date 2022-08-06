@@ -32,7 +32,7 @@ export const help = (args: BotCommand): Promise<void> => {
 
 	// -- This section will be re-written at a later date to remove hard-coded values --
 	const informationCommands = ['help', 'ping'];
-	const moderationCommands = ['warn', 'watchlist'];
+	const moderationCommands = ['ban', 'warn', 'watchlist'];
 	const utilityCommands = ['tcg', 'ignoredchannel', 'logchannel'];
 	const funCommands = ['birthday', 'dog', 'cat', 'fox'];
 

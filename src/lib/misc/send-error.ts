@@ -1,11 +1,10 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { config } from '../../private/config.js';
-import { emojiUrl } from './emoji-url.js';
 
 export const sendError = (message: Message, data: string): void => {
 	const replyEmbed = new MessageEmbed()
-		.setAuthor({ name: 'Error', iconURL: emojiUrl(config.botEmotes.error) })
+		.setAuthor({ name: 'Error', iconURL: config.botEmoteUrls.error })
 		.setDescription(data)
 		.setColor(COLORS.FAIL);
 	try {

@@ -2,7 +2,6 @@ import { channelMention, hyperlink } from '@discordjs/builders';
 import { Collection, Message, MessageAttachment, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
-import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { storeAttachments } from '../../lib/misc/store-attachments.js';
@@ -59,8 +58,7 @@ const contentUpdate = async (oldContent: string, newContent: string, message: Me
 
 	const logEntryEmbed = new MessageEmbed()
 		.setAuthor({
-			name: 'Message Edited',
-			iconURL: emojiUrl(config.botEmotes.msgUpdate)
+			name: 'Message Edited'
 		})
 		.setFields([
 			{
@@ -89,8 +87,7 @@ const attachmentUpdate = async (oldAttachments: Collection<string, MessageAttach
 
 	const logEntryEmbed = new MessageEmbed()
 		.setAuthor({
-			name: 'Message Attachment Removed',
-			iconURL: emojiUrl(config.botEmotes.attachmentUpdate)
+			name: 'Message Attachment Removed'
 		})
 		.setFields([
 			{
@@ -134,7 +131,7 @@ export const messageUpdate = async (oldMessage: Message, newMessage: Message): P
 	}
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(emojiUrl(config.botEmotes.watchlist));
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

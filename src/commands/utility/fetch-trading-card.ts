@@ -3,8 +3,6 @@ import { MessageEmbed } from 'discord.js';
 import fetch from 'node-fetch';
 import { BotCommand } from '../..';
 import { COLORS } from '../../config/constants.js';
-import { isModerator } from '../../lib/misc/check-moderator.js';
-import { sendError } from '../../lib/misc/send-error.js';
 
 type TradingCard = {
 	saveOnly: boolean,
@@ -116,11 +114,6 @@ const formatAttackCardInfo = (tradingCard: TradingCard): MessageEmbed => {
 
 export const tcg = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
-
-	if (!isModerator(message.member)) {
-		sendError(message, 'You don\'t have permission to perform this command!');
-		return;
-	}
 
 	const userToLookup = commandArgs.shift() ?? 'undefined';
 	const commandFlag = commandArgs.shift() ?? '';

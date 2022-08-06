@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { GuildMember, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
-import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { config } from '../../private/config.js';
 
@@ -18,8 +17,7 @@ export const guildMemberRemove = async (member: GuildMember): Promise<void> => {
 
 	const logEntryEmbed = new MessageEmbed()
 		.setAuthor({
-			name: 'Member Left',
-			iconURL: emojiUrl(config.botEmotes.memLeave)
+			name: 'Member Left'
 		})
 		.setFields([
 			{ name: 'Member', value: userMention(id) },
@@ -30,7 +28,7 @@ export const guildMemberRemove = async (member: GuildMember): Promise<void> => {
 		.setColor(COLORS.NEGATIVE);
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(emojiUrl(config.botEmotes.watchlist));
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

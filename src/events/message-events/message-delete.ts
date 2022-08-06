@@ -2,7 +2,6 @@ import { channelMention, inlineCode } from '@discordjs/builders';
 import { Message, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
-import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { storeAttachments } from '../../lib/misc/store-attachments.js';
@@ -32,8 +31,7 @@ export const messageDelete = async (message: Message): Promise<void> => {
 
 	const logEntryEmbed = new MessageEmbed()
 		.setAuthor({
-			name: 'Message Deleted',
-			iconURL: emojiUrl(config.botEmotes.msgDelete)
+			name: 'Message Deleted'
 		})
 		.setFields([
 			{
@@ -106,7 +104,7 @@ export const messageDelete = async (message: Message): Promise<void> => {
 	}
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(emojiUrl(config.botEmotes.watchlist));
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

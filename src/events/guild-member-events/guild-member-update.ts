@@ -1,7 +1,6 @@
 import { GuildMember, MessageEmbed } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
-import { emojiUrl } from '../../lib/misc/emoji-url.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { config } from '../../private/config.js';
 
@@ -20,8 +19,7 @@ export const guildMemberUpdate = async (oldMember: GuildMember, newMember: Guild
 
 	const logEntryEmbed = new MessageEmbed()
 		.setAuthor({
-			name: 'Nickname Changed',
-			iconURL: emojiUrl(config.botEmotes.memUpdate)
+			name: 'Nickname Changed'
 		})
 		.setFields([
 			{ name: 'Before', value: formatNickname(oldNickname) },
@@ -32,7 +30,7 @@ export const guildMemberUpdate = async (oldMember: GuildMember, newMember: Guild
 		.setColor(COLORS.NEUTRAL);
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(emojiUrl(config.botEmotes.watchlist));
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

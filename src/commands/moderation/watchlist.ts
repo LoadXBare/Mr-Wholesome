@@ -4,7 +4,6 @@ import { Message, MessageEmbed, User } from 'discord.js';
 import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { isModerator } from '../../lib/misc/check-moderator.js';
 import { fetchDiscordUser } from '../../lib/misc/fetch-discord-user.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
@@ -17,6 +16,7 @@ const addNote = async (creatorUser: User, watchedUser: User, noteText: string, m
 		creatorUserID: creatorUser.id,
 		watchedUserID: watchedUser.id,
 		guildID: message.guildId,
+		creationDate: dayjs().toISOString(),
 		noteText: noteText
 	});
 
@@ -183,11 +183,6 @@ const viewNotes = async (message: Message, data: string): Promise<void> => {
 
 export const watchlist = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
-
-	if (!isModerator(message.member)) {
-		sendError(message, 'You do not have permission to perform this command!');
-		return;
-	}
 
 	const operation = commandArgs.shift() ?? 'undefined';
 
