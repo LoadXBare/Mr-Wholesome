@@ -1,5 +1,4 @@
-import { channelMention, inlineCode } from '@discordjs/builders';
-import { Message, MessageEmbed } from 'discord.js';
+import { channelMention, EmbedBuilder, inlineCode, Message } from 'discord.js';
 import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
@@ -29,7 +28,7 @@ const setLogChannel = async (message: Message, channelID: string): Promise<void>
 		}
 	);
 
-	const logChannelSetEmbed = new MessageEmbed()
+	const logChannelSetEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()

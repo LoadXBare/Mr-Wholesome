@@ -1,4 +1,4 @@
-import { GuildMember, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
@@ -17,7 +17,7 @@ export const guildMemberUpdate = async (oldMember: GuildMember, newMember: Guild
 
 	const formatNickname = (nick: string): string => (nick === null ? 'None' : nick);
 
-	const logEntryEmbed = new MessageEmbed()
+	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: 'Nickname Changed'
 		})

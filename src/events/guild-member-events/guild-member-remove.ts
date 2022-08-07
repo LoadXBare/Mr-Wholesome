@@ -1,6 +1,5 @@
-import { inlineCode, userMention } from '@discordjs/builders';
 import dayjs from 'dayjs';
-import { GuildMember, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, GuildMember, inlineCode, userMention } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
@@ -15,7 +14,7 @@ export const guildMemberRemove = async (member: GuildMember): Promise<void> => {
 		return;
 	}
 
-	const logEntryEmbed = new MessageEmbed()
+	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: 'Member Left'
 		})

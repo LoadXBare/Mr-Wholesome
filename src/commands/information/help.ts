@@ -1,5 +1,4 @@
-import { inlineCode } from '@discordjs/builders';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder, inlineCode } from 'discord.js';
 import { BOT_PREFIX, COLORS, COMMAND_INFO } from '../../config/constants.js';
 import { BotCommand } from '../../index.js';
 import { sendError } from '../../lib/misc/send-error.js';
@@ -54,7 +53,7 @@ export const help = (args: BotCommand): Promise<void> => {
 	}
 	// ----
 
-	const helpMenuEmbed = new MessageEmbed()
+	const helpMenuEmbed = new EmbedBuilder()
 		.setTitle('Available Commands')
 		.setDescription(`You can get more detailed information on a command by running ${inlineCode(`${P}help [command]`)}, for example: ${inlineCode(`${P}help ping`)}`)
 		.setFields([

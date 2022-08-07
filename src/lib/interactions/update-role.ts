@@ -1,5 +1,4 @@
-import { roleMention } from '@discordjs/builders';
-import { ButtonInteraction, GuildMemberRoleManager, Role } from 'discord.js';
+import { ButtonInteraction, GuildMemberRoleManager, Role, roleMention } from 'discord.js';
 
 export const updateRole = async (interaction: ButtonInteraction, role: Role): Promise<void> => {
 	const memberRoles = interaction.member.roles as GuildMemberRoleManager;

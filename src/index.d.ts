@@ -1,4 +1,4 @@
-import { Collection, ColorResolvable, Message, MessageAttachment, MessageEmbed } from 'discord.js';
+import { Attachment, Collection, ColorResolvable, EmbedBuilder, Message } from 'discord.js';
 
 export type InteractionTypes =
 	| 'ignore'
@@ -19,7 +19,7 @@ export type Events = {
 }
 
 export type CommandInfo = {
-	[command: string]: MessageEmbed
+	[command: string]: EmbedBuilder
 }
 
 export type Commands = {
@@ -49,8 +49,8 @@ export type BotCommand = {
 };
 
 export type AttachmentUpdate = {
-	oldAttachments: Collection<string, MessageAttachment>,
-	newAttachments: Collection<string, MessageAttachment>,
+	oldAttachments: Collection<string, Attachment>,
+	newAttachments: Collection<string, Attachment>,
 	message: Message
 }
 

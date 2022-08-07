@@ -1,6 +1,5 @@
-import { inlineCode } from '@discordjs/builders';
 import dayjs from 'dayjs';
-import { Message, MessageEmbed, User } from 'discord.js';
+import { EmbedBuilder, inlineCode, Message, User } from 'discord.js';
 import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
@@ -20,7 +19,7 @@ const addNote = async (creatorUser: User, watchedUser: User, noteText: string, m
 		noteText: noteText
 	});
 
-	const noteAddedEmbed = new MessageEmbed()
+	const noteAddedEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()
@@ -55,7 +54,7 @@ const removeNote = async (noteID: string, message: Message): Promise<void> => {
 		return;
 	}
 
-	const noteRemovedEmbed = new MessageEmbed()
+	const noteRemovedEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()
@@ -79,6 +78,11 @@ const viewNotes = async (message: Message, data: string): Promise<void> => {
 		});
 
 		let notesList = '';
+
+		if (notes.length === 0) {
+			notesList = 'There are no users on the watchlist in this guild! 🎉';
+		}
+
 		const userNotesCount: NoteCount = {};
 		for (const note of notes) {
 			const userCount = userNotesCount[note.watchedUserID];
@@ -97,7 +101,7 @@ const viewNotes = async (message: Message, data: string): Promise<void> => {
 			notesList = notesList.concat(`**${watchedUser.tag}** - ${noteCount} note(s)\n`);
 		}
 
-		const guildNotesEmbed = new MessageEmbed()
+		const guildNotesEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: message.author.tag,
 				iconURL: message.member.displayAvatarURL()
@@ -116,7 +120,7 @@ const viewNotes = async (message: Message, data: string): Promise<void> => {
 
 		let notesList = '';
 		if (notes.length === 0) {
-			notesList = '**This user has no notes!** 🎉';
+			notesList = 'This user has no notes! 🎉';
 		}
 		else {
 			for (const note of notes) {
@@ -125,7 +129,7 @@ const viewNotes = async (message: Message, data: string): Promise<void> => {
 			}
 		}
 
-		const notesListEmbed = new MessageEmbed()
+		const notesListEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: message.author.tag,
 				iconURL: message.member.displayAvatarURL()
@@ -142,7 +146,7 @@ const viewNotes = async (message: Message, data: string): Promise<void> => {
 		if (typeof note === 'undefined') return; // This is required to satisfy TypeScript's engine, else it still thinks "note" has type "void", will be removed if better alternative found
 
 		const creatorUser = await fetchDiscordUser(message.client, note.creatorUserID);
-		const specificNoteEmbed = new MessageEmbed()
+		const specificNoteEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: message.author.tag,
 				iconURL: message.member.displayAvatarURL()

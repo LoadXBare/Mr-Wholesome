@@ -1,18 +1,18 @@
-import { inlineCode, userMention } from '@discordjs/builders';
 import dayjs from 'dayjs';
-import { Client, Guild, TextChannel } from 'discord.js';
+import { Client, Guild, inlineCode, TextChannel, userMention } from 'discord.js';
 import { mongodb } from '../api/mongo.js';
-import { LOG_COLORS } from '../config/constants.js';
 import { config } from '../private/config.js';
 import { fetchDiscordChannel } from './misc/fetch-discord-channel.js';
 import { fetchGuildMember } from './misc/fetch-guild-member.js';
+import { log } from './misc/log.js';
 
 const checkRoles = async (guild: Guild): Promise<void> => {
 	const akiasBirthday = 'September 03';
 	const currentDate = dayjs().format('MMMM DD');
 	const birthdayList = await mongodb.userBirthday.find();
 
-	console.log(LOG_COLORS.NEUTRAL('Checking roles...'));
+	log('Checking roles...');
+	const startTime = dayjs().valueOf();
 
 	if (currentDate !== akiasBirthday) {
 		const member = await fetchGuildMember(guild, config.theAkialytesOwnerId);
@@ -41,15 +41,15 @@ const checkRoles = async (guild: Guild): Promise<void> => {
 		}
 		else if (memberHasBirthdayRole && !isMembersBirthday) {
 			member.roles.remove(config.roles['Birthday Role'], 'No longer birthday');
-			console.log(LOG_COLORS.SUCCESS(`Removed birthday role from ${member.user.tag}!`));
+			log(`Removed birthday role from ${member.user.tag}!`);
 		}
 		else if (!memberHasBirthdayRole && isMembersBirthday) {
 			member.roles.add(config.roles['Birthday Role'], 'Birthday');
-			console.log(LOG_COLORS.SUCCESS(`Added birthday role to ${member.user.tag}!`));
+			log(`Added birthday role to ${member.user.tag}!`);
 		}
 	}
 
-	console.log(LOG_COLORS.SUCCESS('Roles checked!'));
+	log(`Roles checked! (${(dayjs().valueOf() - startTime).toLocaleString()}ms)`);
 };
 
 const postBirthdayMessage = async (date: string, guild: Guild, birthdayChannel: TextChannel): Promise<void> => {
@@ -79,7 +79,7 @@ const postBirthdayMessage = async (date: string, guild: Guild, birthdayChannel: 
 			birthdayMessage = `Today is ${userMention(userID)}'s birthday!\nLet's wish them a happy birthday 🥳`;
 			member.roles.add(config.roles['Birthday Role'], 'Birthday');
 		}
-		console.log(LOG_COLORS.SUCCESS(`Given birthday role to ${member.user.tag}!`));
+		log(`Given birthday role to ${member.user.tag}!`);
 	}
 	else {
 		birthdayMessage = 'We have more than 1 birthday today!\nLet\'s wish a happy birthday to ';
@@ -92,7 +92,7 @@ const postBirthdayMessage = async (date: string, guild: Guild, birthdayChannel: 
 			}
 			else {
 				member.roles.add(config.roles['Birthday Role']);
-				console.log(LOG_COLORS.SUCCESS(`Given birthday role to ${member.user.tag}!`));
+				log(`Given birthday role to ${member.user.tag}!`);
 
 				birthdayMessage = birthdayMessage.concat(`${userMention(userID)}`);
 			}
@@ -108,7 +108,7 @@ const postBirthdayMessage = async (date: string, guild: Guild, birthdayChannel: 
 	}
 
 	birthdayChannel.send(birthdayMessage);
-	console.log(LOG_COLORS.SUCCESS(`Birthday message posted to #${birthdayChannel.name}!`));
+	log(`Birthday message posted to #${birthdayChannel.name}!`);
 };
 
 const birthdayScheduler = async (client: Client): Promise<void> => {

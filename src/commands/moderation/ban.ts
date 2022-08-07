@@ -1,6 +1,5 @@
-import { codeBlock, inlineCode } from '@discordjs/builders';
 import dayjs from 'dayjs';
-import { ButtonInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, codeBlock, ComponentType, EmbedBuilder, inlineCode, Message, User } from 'discord.js';
 import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
@@ -12,7 +11,7 @@ const addBan = async (message: Message, bannedUser: User, reason: string, days: 
 	const creatorUserID = message.author.id;
 	const bannedUserID = bannedUser.id;
 
-	const banEmbed = new MessageEmbed()
+	const banEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()
@@ -31,19 +30,19 @@ const addBan = async (message: Message, bannedUser: User, reason: string, days: 
 		])
 		.setColor(COLORS.COMMAND);
 
-	const confirmButtons = new MessageActionRow().setComponents(
-		new MessageButton()
+	const confirmButtons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'YesDM' }))
 			.setLabel('Yes')
-			.setStyle('SUCCESS'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Success),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'No' }))
 			.setLabel('No')
-			.setStyle('DANGER'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Danger),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'Yes' }))
 			.setLabel('Yes (Don\'t DM)')
-			.setStyle('SECONDARY')
+			.setStyle(ButtonStyle.Secondary)
 	);
 
 	const commandReply = await message.reply({ embeds: [banEmbed], components: [confirmButtons] });
@@ -52,10 +51,10 @@ const addBan = async (message: Message, bannedUser: User, reason: string, days: 
 		return interaction.user.id === creatorUserID;
 	};
 
-	const buttonChoice = await message.channel.awaitMessageComponent({ componentType: 'BUTTON', idle: 30_000, filter: interactionFilter }).catch(() => { });
+	const buttonChoice = await message.channel.awaitMessageComponent({ componentType: ComponentType.Button, idle: 30_000, filter: interactionFilter }).catch(() => { });
 
 	if (typeof buttonChoice === 'undefined') {
-		const banTimeoutEmbed = new MessageEmbed(banEmbed)
+		const banTimeoutEmbed = EmbedBuilder.from(banEmbed)
 			.setFooter({ text: 'Ban timed out.' })
 			.setColor(COLORS.TIMEOUT);
 
@@ -75,14 +74,14 @@ const addBan = async (message: Message, bannedUser: User, reason: string, days: 
 			unbanned: false
 		});
 
-		const banSentEmbed = new MessageEmbed(banEmbed)
+		const banSentEmbed = EmbedBuilder.from(banEmbed)
 			.setDescription('Member banned and successfully DMed!')
 			.setFields()
 			.setFooter({ text: `Ban ID: ${ban._id}` })
 			.setColor(COLORS.SUCCESS);
 
 		if (choice === 'YesDM') {
-			const banDMEmbed = new MessageEmbed()
+			const banDMEmbed = new EmbedBuilder()
 				.setDescription(`You have been banned from **${message.guild.name}**.`)
 				.setFields([
 					{
@@ -100,7 +99,7 @@ const addBan = async (message: Message, bannedUser: User, reason: string, days: 
 				banSentEmbed
 					.setDescription('Member banned!\
 					\n(However there was a problem DMing the member)')
-					.setColor('YELLOW');
+					.setColor('Yellow');
 			}
 		}
 		else {
@@ -110,7 +109,7 @@ const addBan = async (message: Message, bannedUser: User, reason: string, days: 
 
 		try {
 			await sleep(1000); // This is required to combat a rare error that can occur when the user is banned faster than it takes the "guildBanAdd" event to run causing a null error when reading "member.displayAvatarURL()".
-			await message.guild.bans.create(bannedUser, { days: days, reason: reason });
+			await message.guild.bans.create(bannedUser, { deleteMessageDays: days, reason: reason });
 		}
 		catch (e) {
 			await commandReply.delete();
@@ -122,7 +121,7 @@ const addBan = async (message: Message, bannedUser: User, reason: string, days: 
 		commandReply.edit({ embeds: [banSentEmbed], components: [] });
 	}
 	else {
-		const banCancelledEmbed = new MessageEmbed(banEmbed)
+		const banCancelledEmbed = EmbedBuilder.from(banEmbed)
 			.setFooter({ text: 'Ban cancelled.' })
 			.setColor(COLORS.NEGATIVE);
 
@@ -141,7 +140,7 @@ const removeBan = async (banID: string, message: Message): Promise<void> => {
 	const creatorUser = await fetchDiscordUser(message.client, ban.creatorUserID);
 	const bannedUser = await fetchDiscordUser(message.client, ban.bannedUserID);
 
-	const unbanEmbed = new MessageEmbed()
+	const unbanEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()
@@ -163,15 +162,15 @@ const removeBan = async (banID: string, message: Message): Promise<void> => {
 		])
 		.setColor(COLORS.COMMAND);
 
-	const confirmButtons = new MessageActionRow().setComponents(
-		new MessageButton()
+	const confirmButtons = new ActionRowBuilder<ButtonBuilder>().setComponents(
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'Yes' }))
 			.setLabel('Yes')
-			.setStyle('SUCCESS'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Success),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'No' }))
 			.setLabel('No')
-			.setStyle('DANGER')
+			.setStyle(ButtonStyle.Danger)
 	);
 
 	const commandReply = await message.reply({ embeds: [unbanEmbed], components: [confirmButtons] });
@@ -180,10 +179,10 @@ const removeBan = async (banID: string, message: Message): Promise<void> => {
 		return interaction.user.id === message.author.id;
 	};
 
-	const buttonChoice = await message.channel.awaitMessageComponent({ componentType: 'BUTTON', idle: 30_000, filter: interactionFilter }).catch(() => { });
+	const buttonChoice = await message.channel.awaitMessageComponent({ componentType: ComponentType.Button, idle: 30_000, filter: interactionFilter }).catch(() => { });
 
 	if (typeof buttonChoice === 'undefined') {
-		const unbanTimeoutEmbed = new MessageEmbed(unbanEmbed)
+		const unbanTimeoutEmbed = EmbedBuilder.from(unbanEmbed)
 			.setFooter({ text: 'Unban timed out.' })
 			.setColor(COLORS.TIMEOUT);
 
@@ -209,7 +208,7 @@ const removeBan = async (banID: string, message: Message): Promise<void> => {
 			return;
 		}
 
-		const memberUnbannedEmbed = new MessageEmbed(unbanEmbed)
+		const memberUnbannedEmbed = EmbedBuilder.from(unbanEmbed)
 			.setDescription(`${inlineCode(bannedUser.tag)} has successfully been unbanned!`)
 			.setFields()
 			.setColor(COLORS.SUCCESS);
@@ -217,7 +216,7 @@ const removeBan = async (banID: string, message: Message): Promise<void> => {
 		commandReply.edit({ embeds: [memberUnbannedEmbed], components: [] });
 	}
 	else {
-		const unbanCancelledEmbed = new MessageEmbed(unbanEmbed)
+		const unbanCancelledEmbed = EmbedBuilder.from(unbanEmbed)
 			.setFooter({ text: 'Unban cancelled.' })
 			.setColor(COLORS.NEGATIVE);
 
@@ -232,6 +231,11 @@ const viewBans = async (banID: string, message: Message): Promise<void> => {
 		});
 
 		let bansList = '';
+
+		if (guildBansList.length === 0) {
+			bansList = 'There are no bans within this guild! 🎉';
+		}
+
 		for (const ban of guildBansList) {
 			const currentUser = await fetchDiscordUser(message.client, ban.bannedUserID);
 			let banText = '';
@@ -245,7 +249,7 @@ const viewBans = async (banID: string, message: Message): Promise<void> => {
 			bansList = bansList.concat(banText);
 		}
 
-		const bansListEmbed = new MessageEmbed()
+		const bansListEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: message.author.tag,
 				iconURL: message.member.displayAvatarURL()
@@ -269,13 +273,13 @@ const viewBans = async (banID: string, message: Message): Promise<void> => {
 		const creatorUser = await fetchDiscordUser(message.client, ban.creatorUserID);
 		const unbannedNotice = '__**This member has since been unbanned!**__';
 
-		const banEmbed = new MessageEmbed()
+		const banEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: message.author.tag,
 				iconURL: message.member.displayAvatarURL()
 			})
 			.setTitle(`Displaying ban information for ${inlineCode(bannedUser.tag)}`)
-			.setDescription(ban.unbanned ? unbannedNotice : '')
+			.setDescription(ban.unbanned ? unbannedNotice : null)
 			.setFields([
 				{
 					name: 'Banned By',

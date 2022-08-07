@@ -1,6 +1,5 @@
-import { inlineCode } from '@discordjs/builders';
 import dayjs from 'dayjs';
-import { Message, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, inlineCode, Message } from 'discord.js';
 import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
@@ -28,7 +27,7 @@ const setBirthday = async (message: Message, birthDate: string): Promise<void> =
 		{ upsert: true }
 	);
 
-	const birthdaySetEmbed = new MessageEmbed()
+	const birthdaySetEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()
@@ -59,7 +58,7 @@ const upcomingBirthdays = async (message: Message): Promise<void> => {
 		}
 	}
 
-	const upcomingBirthdaysEmbed = new MessageEmbed()
+	const upcomingBirthdaysEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()

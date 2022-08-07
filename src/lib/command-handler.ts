@@ -1,8 +1,9 @@
 import { Message } from 'discord.js';
 import commands from '../commands/index.js';
-import { LOG_COLORS, MOD_COMMANDS } from '../config/constants.js';
+import { MOD_COMMANDS } from '../config/constants.js';
 import { BotCommand } from '../index.js';
 import { isModerator } from './misc/check-moderator.js';
+import { log } from './misc/log.js';
 import { sendError } from './misc/send-error.js';
 
 export const handleCommand = (message: Message): void => {
@@ -26,7 +27,7 @@ export const handleCommand = (message: Message): void => {
 		}
 
 		commands[command](args);
-		console.log(LOG_COLORS.SUCCESS(`Handled Command: ${command}`));
+		log(`Handled Command: ${command}`);
 	}
 	else {
 		// Command does not exist, ignore

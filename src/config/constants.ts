@@ -1,19 +1,9 @@
-import { inlineCode } from '@discordjs/builders';
-import chalk from 'chalk';
-import { Intents, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, GatewayIntentBits, inlineCode } from 'discord.js';
 import { Colors, CommandInfo } from '..';
 import { numSuffix } from '../lib/misc/number-suffix.js';
 import { config } from '../private/config.js';
 
 export const BOT_PREFIX = config.botPrefix;
-
-export const LOG_COLORS = {
-	INFO: chalk.blueBright,
-	ERROR: chalk.redBright,
-	SUCCESS: chalk.greenBright,
-	NEUTRAL: chalk.yellowBright,
-	HIGHLIGHT: chalk.bold
-};
 
 export const MOD_COMMANDS = [
 	'ban',
@@ -36,15 +26,16 @@ export const COLORS: Colors = {
 	POSITIVE: '#079e00'
 };
 
-export const INTENTS = new Intents([
-	Intents.FLAGS.GUILDS,
-	Intents.FLAGS.GUILD_MESSAGES,
-	Intents.FLAGS.GUILD_MEMBERS,
-	Intents.FLAGS.GUILD_BANS
-]);
+export const INTENTS = [
+	GatewayIntentBits.Guilds,
+	GatewayIntentBits.GuildMembers,
+	GatewayIntentBits.GuildMessages,
+	GatewayIntentBits.MessageContent,
+	GatewayIntentBits.GuildBans
+];
 
 export const COMMAND_INFO: CommandInfo = {
-	'WARN': new MessageEmbed()
+	'WARN': new EmbedBuilder()
 		.setTitle(`Command Info: "${BOT_PREFIX}warn"`)
 		.setDescription('Gives a warning to, removes a warning from, or views all warnings for a specific member or all warnings within the guild.')
 		.setFields([
@@ -75,7 +66,7 @@ export const COMMAND_INFO: CommandInfo = {
 			}
 		])
 		.setColor(COLORS.COMMAND),
-	'PING': new MessageEmbed()
+	'PING': new EmbedBuilder()
 		.setTitle(`Command Info: "${BOT_PREFIX}ping"`)
 		.setDescription('Views Mr Wholesome\'s ping both to Discord\'s API and you.')
 		.setFields([
@@ -86,7 +77,7 @@ export const COMMAND_INFO: CommandInfo = {
 			}
 		])
 		.setColor(COLORS.COMMAND),
-	'HELP': new MessageEmbed()
+	'HELP': new EmbedBuilder()
 		.setTitle(`Command Info: "${BOT_PREFIX}help"`)
 		.setDescription('Displays a list of all of Mr Wholesome\'s commands separated by command type.')
 		.setFields([
@@ -102,7 +93,7 @@ export const COMMAND_INFO: CommandInfo = {
 			}
 		])
 		.setColor(COLORS.COMMAND),
-	'WATCHLIST': new MessageEmbed()
+	'WATCHLIST': new EmbedBuilder()
 		.setTitle(`Command Info: "${BOT_PREFIX}watchlist"`)
 		.setDescription('Add, remove or view all notes for a specific user or all notes within the guild.')
 		.setFields([
@@ -128,7 +119,7 @@ export const COMMAND_INFO: CommandInfo = {
 			}
 		])
 		.setColor(COLORS.COMMAND),
-	'IGNOREDCHANNEL': new MessageEmbed()
+	'IGNOREDCHANNEL': new EmbedBuilder()
 		.setTitle(`Command Info: "${BOT_PREFIX}ignoredchannel"`)
 		.setDescription('Adds, removes or resets all Ignored Channels within the guild.')
 		.setFields([
@@ -149,7 +140,7 @@ export const COMMAND_INFO: CommandInfo = {
 			}
 		])
 		.setColor(COLORS.COMMAND),
-	'LOGCHANNEL': new MessageEmbed()
+	'LOGCHANNEL': new EmbedBuilder()
 		.setTitle(`Command Info: "${BOT_PREFIX}logchannel"`)
 		.setDescription('Sets the log channel for the guild.')
 		.setFields([
@@ -160,7 +151,7 @@ export const COMMAND_INFO: CommandInfo = {
 			}
 		])
 		.setColor(COLORS.COMMAND),
-	'BIRTHDAY': new MessageEmbed()
+	'BIRTHDAY': new EmbedBuilder()
 		.setTitle(`Command Info: "${BOT_PREFIX}birthday"`)
 		.setDescription('Sets your birthday so that Mr Wholesome can ping you on your birthday! Also allows you to view upcoming birthdays.')
 		.setFields([
@@ -176,7 +167,7 @@ export const COMMAND_INFO: CommandInfo = {
 			}
 		])
 		.setColor(COLORS.COMMAND),
-	'BAN': new MessageEmbed()
+	'BAN': new EmbedBuilder()
 		.setTitle(`Command Info: "${BOT_PREFIX}ban"`)
 		.setDescription('Allows you to ban, unban or view bans within this guild.')
 		.setFields([

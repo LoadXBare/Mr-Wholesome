@@ -1,5 +1,4 @@
-import { channelMention, inlineCode } from '@discordjs/builders';
-import { Message, MessageEmbed } from 'discord.js';
+import { channelMention, EmbedBuilder, inlineCode, Message } from 'discord.js';
 import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
@@ -31,7 +30,7 @@ const addIgnoredChannel = async (message: Message, ignoredChannelIDText: string)
 		{ upsert: true }
 	);
 
-	const ignoredChannelAddedEmbed = new MessageEmbed()
+	const ignoredChannelAddedEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()
@@ -62,7 +61,7 @@ const removeIgnoredChannel = async (message: Message, ignoredChannelIDText: stri
 		{ upsert: true }
 	);
 
-	const removedIgnoredChannelEmbed = new MessageEmbed()
+	const removedIgnoredChannelEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()
@@ -81,7 +80,7 @@ const resetIgnoredChannels = async (message: Message): Promise<void> => {
 		{ upsert: true }
 	);
 
-	const resetIgnoredChannelsEmbed = new MessageEmbed()
+	const resetIgnoredChannelsEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()

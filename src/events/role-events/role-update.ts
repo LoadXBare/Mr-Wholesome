@@ -1,4 +1,4 @@
-import { MessageEmbed, Role } from 'discord.js';
+import { EmbedBuilder, inlineCode, Role } from 'discord.js';
 import { RoleChanges } from '../..';
 import { COLORS } from '../../config/constants.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
@@ -11,7 +11,7 @@ export const roleUpdate = async (oldRole: Role, newRole: Role): Promise<void> =>
 		return;
 	}
 
-	const logEntryEmbed = new MessageEmbed()
+	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: guild.name,
 			iconURL: guild.iconURL()
@@ -30,21 +30,25 @@ export const roleUpdate = async (oldRole: Role, newRole: Role): Promise<void> =>
 
 		const roleChangeUppercase = change.charAt(0).toUpperCase() + change.slice(1);
 		if (change === 'color') {
-			logEntryEmbed.addField(
-				roleChangeUppercase,
-				`\`#${oldRole[change].toString(16)}\` ➔ \`#${newRole[change].toString(16)}\``
-			);
+			logEntryEmbed.addFields([
+				{
+					name: roleChangeUppercase,
+					value: `${inlineCode(`#${oldRole[change].toString(16)}`)} ➔ ${inlineCode(`#${newRole[change].toString(16)}`)}`
+				}
+			]);
 		}
 		else {
-			logEntryEmbed.addField(
-				roleChangeUppercase,
-				`\`${oldRole[change]}\` ➔ \`${newRole[change]}\``
-			);
+			logEntryEmbed.addFields([
+				{
+					name: roleChangeUppercase,
+					value: `${inlineCode(oldRole[change].toString())} ➔ ${inlineCode(newRole[change].toString())}`
+				}
+			]);
 		}
 	});
 
 	// Don't send an embed with no changes listed, happens when only a role's position is updated
-	if (logEntryEmbed.fields.length === 0) {
+	if (logEntryEmbed.data.fields.length === 0) {
 		return;
 	}
 

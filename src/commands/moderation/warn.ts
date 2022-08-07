@@ -1,6 +1,5 @@
-import { inlineCode } from '@discordjs/builders';
 import dayjs from 'dayjs';
-import { ButtonInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder, inlineCode, Message, User } from 'discord.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
 import { BotCommand } from '../../index.js';
@@ -15,7 +14,7 @@ const addWarning = async (message: Message, warnedUser: User, warningReason: str
 	const creatorUserID = message.author.id;
 	const warnedUserID = warnedUser.id;
 
-	const warningEmbed = new MessageEmbed()
+	const warningEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: message.author.tag,
 			iconURL: message.member.displayAvatarURL()
@@ -30,19 +29,19 @@ const addWarning = async (message: Message, warnedUser: User, warningReason: str
 		])
 		.setColor(COLORS.COMMAND);
 
-	const confirmButtons = new MessageActionRow().setComponents(
-		new MessageButton()
+	const confirmButtons = new ActionRowBuilder<ButtonBuilder>().setComponents(
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'YesDM' }))
 			.setLabel('Yes')
-			.setStyle('SUCCESS'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Success),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'No' }))
 			.setLabel('No')
-			.setStyle('DANGER'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Danger),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'Yes' }))
 			.setLabel('Yes (Don\'t DM)')
-			.setStyle('SECONDARY')
+			.setStyle(ButtonStyle.Secondary)
 	);
 
 	const commandReply = await message.reply({ embeds: [warningEmbed], components: [confirmButtons] });
@@ -51,10 +50,10 @@ const addWarning = async (message: Message, warnedUser: User, warningReason: str
 		return interaction.user.id === creatorUserID;
 	};
 
-	const buttonChoice = await message.channel.awaitMessageComponent({ componentType: 'BUTTON', idle: 30_000, filter: interactionFilter }).catch(() => { });
+	const buttonChoice = await message.channel.awaitMessageComponent({ componentType: ComponentType.Button, idle: 30_000, filter: interactionFilter }).catch(() => { });
 
 	if (typeof buttonChoice === 'undefined') {
-		const warningTimeoutEmbed = new MessageEmbed(warningEmbed)
+		const warningTimeoutEmbed = EmbedBuilder.from(warningEmbed)
 			.setFooter({ text: 'Warning timed out.' })
 			.setColor(COLORS.TIMEOUT);
 
@@ -73,14 +72,14 @@ const addWarning = async (message: Message, warnedUser: User, warningReason: str
 			warningDate: dayjs().toISOString()
 		});
 
-		const warningSentEmbed = new MessageEmbed(warningEmbed)
+		const warningSentEmbed = EmbedBuilder.from(warningEmbed)
 			.setDescription('Warning added and successfully DMed to member!')
 			.setFields()
 			.setFooter({ text: `Warning ID: ${warning._id}` })
 			.setColor(COLORS.SUCCESS);
 
 		if (choice === 'YesDM') {
-			const warningDMEmbed = new MessageEmbed()
+			const warningDMEmbed = new EmbedBuilder()
 				.setDescription(`You have been warned in **${message.guild.name}**.`)
 				.setFields([
 					{
@@ -98,7 +97,7 @@ const addWarning = async (message: Message, warnedUser: User, warningReason: str
 				warningSentEmbed
 					.setDescription('Warning added!\
 						\n(However there was a problem DMing the member)')
-					.setColor('YELLOW');
+					.setColor('Yellow');
 			}
 		}
 		else {
@@ -109,7 +108,7 @@ const addWarning = async (message: Message, warnedUser: User, warningReason: str
 		commandReply.edit({ embeds: [warningSentEmbed], components: [] });
 	}
 	else {
-		const warningCancelledEmbed = new MessageEmbed(warningEmbed)
+		const warningCancelledEmbed = EmbedBuilder.from(warningEmbed)
 			.setFooter({ text: 'Warning cancelled.' })
 			.setColor(COLORS.NEGATIVE);
 
@@ -127,7 +126,7 @@ const removeWarning = async (message: Message, warningID: string): Promise<void>
 
 	const warningCreator = await message.client.users.fetch(warning.creatorUserID);
 
-	const deleteWarningEmbed = new MessageEmbed()
+	const deleteWarningEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: 'Delete Warning',
 			iconURL: message.member.displayAvatarURL()
@@ -149,15 +148,15 @@ const removeWarning = async (message: Message, warningID: string): Promise<void>
 		])
 		.setColor(COLORS.COMMAND);
 
-	const deleteWarningButtons = new MessageActionRow().setComponents(
-		new MessageButton()
+	const deleteWarningButtons = new ActionRowBuilder<ButtonBuilder>().setComponents(
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'Yes' }))
 			.setLabel('Yes')
-			.setStyle('SUCCESS'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Success),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'ignore', value: 'No' }))
 			.setLabel('No')
-			.setStyle('DANGER')
+			.setStyle(ButtonStyle.Danger)
 	);
 
 	const commandReply = await message.reply({ embeds: [deleteWarningEmbed], components: [deleteWarningButtons] });
@@ -166,10 +165,10 @@ const removeWarning = async (message: Message, warningID: string): Promise<void>
 		return interaction.user.id === message.author.id;
 	};
 
-	const buttonChoice = await message.channel.awaitMessageComponent({ filter: interactionFilter, componentType: 'BUTTON', idle: 10_000 }).catch(() => { });
+	const buttonChoice = await message.channel.awaitMessageComponent({ filter: interactionFilter, componentType: ComponentType.Button, idle: 10_000 }).catch(() => { });
 
 	if (typeof buttonChoice === 'undefined') {
-		const deleteWarningTimedoutEmbed = new MessageEmbed(deleteWarningEmbed)
+		const deleteWarningTimedoutEmbed = EmbedBuilder.from(deleteWarningEmbed)
 			.setFooter({ text: 'Warning deletion timed out.' })
 			.setColor(COLORS.TIMEOUT);
 		commandReply.edit({ embeds: [deleteWarningTimedoutEmbed], components: [] });
@@ -181,7 +180,7 @@ const removeWarning = async (message: Message, warningID: string): Promise<void>
 	if (choice === 'Yes') {
 		await mongodb.guildWarning.findByIdAndDelete(warningID);
 
-		const warningDeletedEmbed = new MessageEmbed(deleteWarningEmbed)
+		const warningDeletedEmbed = EmbedBuilder.from(deleteWarningEmbed)
 			.setDescription('Warning successfully deleted!')
 			.setFields()
 			.setColor(COLORS.SUCCESS);
@@ -189,7 +188,7 @@ const removeWarning = async (message: Message, warningID: string): Promise<void>
 		commandReply.edit({ embeds: [warningDeletedEmbed], components: [] });
 	}
 	else {
-		const deleteWarningCancelledEmbed = new MessageEmbed(deleteWarningEmbed)
+		const deleteWarningCancelledEmbed = EmbedBuilder.from(deleteWarningEmbed)
 			.setFooter({ text: 'Warning deletion cancelled.' })
 			.setColor(COLORS.NEGATIVE);
 
@@ -209,6 +208,11 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 		});
 
 		let warningsList = '';
+
+		if (warnings.length === 0) {
+			warningsList = 'This guild has no warnings! 🎉';
+		}
+
 		const userWarningsCount: WarningCount = {};
 		for (const warn of warnings) {
 			const userCount = userWarningsCount[warn.warnedUserID];
@@ -227,7 +231,7 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 			warningsList = warningsList.concat(`**${warnedUser.tag}** - ${warningCount} warning(s)\n`);
 		}
 
-		const guildWarningsEmbed = new MessageEmbed()
+		const guildWarningsEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: message.author.tag,
 				iconURL: message.member.displayAvatarURL()
@@ -247,7 +251,7 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 
 		let warningsList = '';
 		if (warnings.length === 0) {
-			warningsList = '**This user has no warnings!** 🎉';
+			warningsList = 'This user has no warnings! 🎉';
 		}
 		else {
 			for (const warn of warnings) {
@@ -257,7 +261,7 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 			}
 		}
 
-		const warningsListEmbed = new MessageEmbed()
+		const warningsListEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: message.author.tag,
 				iconURL: message.member.displayAvatarURL()
@@ -274,7 +278,7 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 		if (typeof warning === 'undefined') return; // This is required to satisfy TypeScript's engine, else it still thinks "warning" has type "void", will be removed if better alternative found
 		const creatorUser = await message.client.users.fetch(warning.creatorUserID);
 
-		const specificWarningEmbed = new MessageEmbed()
+		const specificWarningEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: message.author.tag,
 				iconURL: message.member.displayAvatarURL()

@@ -1,9 +1,9 @@
-import { inlineCode, userMention } from '@discordjs/builders';
 import dayjs from 'dayjs';
-import { GuildMember, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, GuildMember, inlineCode, userMention } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
+import { log } from '../../lib/misc/log.js';
 import { config } from '../../private/config.js';
 
 export const guildMemberAdd = async (member: GuildMember): Promise<void> => {
@@ -15,7 +15,7 @@ export const guildMemberAdd = async (member: GuildMember): Promise<void> => {
 		return;
 	}
 
-	const logEntryEmbed = new MessageEmbed()
+	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: 'Member Joined'
 		})
@@ -32,6 +32,12 @@ export const guildMemberAdd = async (member: GuildMember): Promise<void> => {
 		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
 	}
 
-	roles.add(config.roles.Akialyte, 'Joined Server');
+	try {
+		roles.add(config.roles.Akialyte, 'Joined Server');
+		log(`Successfully added role Akialyte to ${member.user.tag}!`);
+	}
+	catch (e) {
+		log(`An error occurred while adding role Akialyte to ${member.user.tag}!`, e);
+	}
 	logChannel.send({ embeds: [logEntryEmbed] });
 };

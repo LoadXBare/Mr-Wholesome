@@ -1,7 +1,7 @@
-import { Client, Collection, MessageAttachment, TextChannel } from 'discord.js';
+import { Attachment, Client, Collection, TextChannel } from 'discord.js';
 import { config } from '../../private/config.js';
 
-export const storeAttachments = async (attachments: Collection<string, MessageAttachment>, client: Client): Promise<Array<string>> => {
+export const storeAttachments = async (attachments: Collection<string, Attachment>, client: Client): Promise<Array<string>> => {
 	const imageStorageChannel = await client.channels.fetch(config.privateChannels.imageStorage) as TextChannel;
 	const imageURLs: Array<string> = [];
 

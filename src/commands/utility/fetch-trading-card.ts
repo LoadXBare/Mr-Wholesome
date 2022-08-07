@@ -1,5 +1,4 @@
-import { codeBlock, inlineCode } from '@discordjs/builders';
-import { MessageEmbed } from 'discord.js';
+import { codeBlock, EmbedBuilder, inlineCode } from 'discord.js';
 import fetch from 'node-fetch';
 import { BotCommand } from '../..';
 import { COLORS } from '../../config/constants.js';
@@ -39,7 +38,7 @@ const checkTextLength = (text: string): string => {
 	}
 };
 
-const formatSupportCardInfo = (tradingCard: TradingCard): MessageEmbed => {
+const formatSupportCardInfo = (tradingCard: TradingCard): EmbedBuilder => {
 	let references = '';
 	if (tradingCard.references.length > 0) {
 		tradingCard.references.forEach((reference) => {
@@ -51,7 +50,7 @@ const formatSupportCardInfo = (tradingCard: TradingCard): MessageEmbed => {
 		references = 'None';
 	}
 
-	const infoEmbed = new MessageEmbed()
+	const infoEmbed = new EmbedBuilder()
 		.setTitle(`Showing Card Info for ${tradingCard.displayname}`)
 		.setDescription(
 			`**Character Name:** ${tradingCard.charactername}
@@ -69,7 +68,7 @@ const formatSupportCardInfo = (tradingCard: TradingCard): MessageEmbed => {
 	return infoEmbed;
 };
 
-const formatAttackCardInfo = (tradingCard: TradingCard): MessageEmbed => {
+const formatAttackCardInfo = (tradingCard: TradingCard): EmbedBuilder => {
 	let references = '';
 	if (tradingCard.references.length > 0) {
 		for (const ref of tradingCard.references) {
@@ -81,7 +80,7 @@ const formatAttackCardInfo = (tradingCard: TradingCard): MessageEmbed => {
 		references = 'None';
 	}
 
-	const infoEmbed = new MessageEmbed()
+	const infoEmbed = new EmbedBuilder()
 		.setTitle(`Showing Card Info for ${tradingCard.displayname}`)
 		.setDescription(
 			`**Character Name:** ${tradingCard.charactername}
@@ -131,7 +130,7 @@ export const tcg = async (args: BotCommand): Promise<void> => {
 	}
 
 	if (commandFlag === '-r') {
-		const rawResponseEmbed = new MessageEmbed()
+		const rawResponseEmbed = new EmbedBuilder()
 			.setDescription(codeBlock(JSON.stringify(response)))
 			.setColor(COLORS.COMMAND);
 

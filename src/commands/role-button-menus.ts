@@ -1,5 +1,4 @@
-import { inlineCode } from '@discordjs/builders';
-import { MessageActionRow, MessageButton, MessageEmbed, TextChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, inlineCode, TextChannel } from 'discord.js';
 import { BotCommand } from '..';
 import { COLORS } from '../config/constants.js';
 import { fetchDiscordChannel } from '../lib/misc/fetch-discord-channel.js';
@@ -20,7 +19,7 @@ export const rolebuttonmenus = async (args: BotCommand): Promise<void> => {
 		return;
 	}
 
-	const rolesMenuInfo = new MessageEmbed()
+	const rolesMenuInfo = new EmbedBuilder()
 		.setAuthor({ name: guild.name, iconURL: guild.iconURL() })
 		.setTitle('Get Roles')
 		.setDescription('Click any of the buttons below to add or remove roles!\
@@ -28,66 +27,66 @@ export const rolebuttonmenus = async (args: BotCommand): Promise<void> => {
 		\nClicking on a button **while** having that role will remove it from you.')
 		.setColor(COLORS.COMMAND);
 
-	const pronounMenu = new MessageEmbed()
+	const pronounMenu = new EmbedBuilder()
 		.setImage('https://cdn.discordapp.com/attachments/868149626321141780/942885475205668894/Pronouns.png') // PLACEHOLDER IMAGE
 		.setColor(COLORS.COMMAND);
-	const pronounMenuButtons = new MessageActionRow().addComponents(
-		new MessageButton()
+	const pronounMenuButtons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['He/Him'], ID: generateId(5) }))
 			.setLabel('He/Him')
-			.setStyle('PRIMARY'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Primary),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['They/Them'], ID: generateId(5) }))
 			.setLabel('They/Them')
-			.setStyle('PRIMARY'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Primary),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['She/Her'], ID: generateId(5) }))
 			.setLabel('She/Her')
-			.setStyle('PRIMARY'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Primary),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['Any/All'], ID: generateId(5) }))
 			.setLabel('Any/All')
-			.setStyle('PRIMARY'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Primary),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['Other Pronouns (Ask Me)'], ID: generateId(5) }))
 			.setLabel('Other (Ask Me)')
-			.setStyle('PRIMARY')
+			.setStyle(ButtonStyle.Primary)
 	);
 
-	const otherMenu = new MessageEmbed()
+	const otherMenu = new EmbedBuilder()
 		.setImage('https://cdn.discordapp.com/attachments/868149626321141780/945251321794134046/Miscellaenous.png') // PLACEHOLDER IMAGE
 		.setColor(COLORS.COMMAND);
-	const otherMenuButtons = new MessageActionRow().addComponents(
-		new MessageButton()
+	const otherMenuButtons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Minecrafter, ID: generateId(5) }))
 			.setLabel('Minecrafter')
-			.setStyle('SECONDARY'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Secondary),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Crafter, ID: generateId(5) }))
 			.setLabel('Crafter')
-			.setStyle('SECONDARY'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Secondary),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Artist, ID: generateId(5) }))
 			.setLabel('Artist')
-			.setStyle('SECONDARY'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Secondary),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Writer, ID: generateId(5) }))
 			.setLabel('Writer')
-			.setStyle('SECONDARY'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Secondary),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Musician, ID: generateId(5) }))
 			.setLabel('Musician')
-			.setStyle('SECONDARY')
+			.setStyle(ButtonStyle.Secondary)
 	);
-	const otherMenuButtons2 = new MessageActionRow().addComponents(
-		new MessageButton()
+	const otherMenuButtons2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles.Streamies, ID: generateId(5) }))
 			.setLabel('Streamies')
-			.setStyle('SECONDARY'),
-		new MessageButton()
+			.setStyle(ButtonStyle.Secondary),
+		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['Server Events'], ID: generateId(5) }))
 			.setLabel('Server Events')
-			.setStyle('SECONDARY')
+			.setStyle(ButtonStyle.Secondary)
 	);
 
 	await channelToSendMenu.send({ embeds: [rolesMenuInfo] });

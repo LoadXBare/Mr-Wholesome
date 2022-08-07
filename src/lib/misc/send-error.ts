@@ -1,9 +1,9 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, Message } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { config } from '../../private/config.js';
 
 export const sendError = (message: Message, data: string): void => {
-	const replyEmbed = new MessageEmbed()
+	const replyEmbed = new EmbedBuilder()
 		.setAuthor({ name: 'Error', iconURL: config.botEmoteUrls.error })
 		.setDescription(data)
 		.setColor(COLORS.FAIL);

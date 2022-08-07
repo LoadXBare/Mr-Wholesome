@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { LOG_COLORS } from '../config/constants.js';
+import { log } from '../lib/misc/log.js';
 import { config } from '../private/config.js';
 import guildBan from './schemas/guildBan.js';
 import guildConfig from './schemas/guildConfig.js';
@@ -14,10 +14,10 @@ const connectToDatabase = async (): Promise<void> => {
 			user: config.databaseInfo.user,
 			pass: config.databaseInfo.pass
 		});
-		console.log(LOG_COLORS.SUCCESS('Successfully connected to MongoDB!'));
+		log('Successfully connected to MongoDB!');
 	}
 	catch (e) {
-		console.log(LOG_COLORS.ERROR('An error occurred while connecting to the database!'), e);
+		log('An error occurred while connecting to the database!', e);
 	}
 };
 

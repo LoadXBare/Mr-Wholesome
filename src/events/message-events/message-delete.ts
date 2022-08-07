@@ -1,5 +1,4 @@
-import { channelMention, inlineCode } from '@discordjs/builders';
-import { Message, MessageEmbed } from 'discord.js';
+import { AuditLogEvent, channelMention, EmbedBuilder, inlineCode, Message } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
@@ -26,10 +25,10 @@ export const messageDelete = async (message: Message): Promise<void> => {
 		return;
 	}
 
-	const auditLogs = await guild.fetchAuditLogs({ type: 'MESSAGE_DELETE', limit: 1 });
-	const latestAuditLog = auditLogs.entries.at(0) ?? null;
+	const auditLogs = await guild.fetchAuditLogs({ type: AuditLogEvent.MessageDelete, limit: 1 });
+	const latestAuditLog = auditLogs.entries.first();
 
-	const logEntryEmbed = new MessageEmbed()
+	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: 'Message Deleted'
 		})
@@ -45,27 +44,33 @@ export const messageDelete = async (message: Message): Promise<void> => {
 		.setColor(COLORS.NEGATIVE);
 
 	// Message was deleted by the person who sent it
-	if (latestAuditLog === null || latestAuditLog.target.id !== author.id) {
-		logEntryEmbed.addField(
-			'Deleted By',
-			author.tag,
-			true
-		);
+	if (typeof latestAuditLog === 'undefined' || latestAuditLog.target.id !== author.id) {
+		logEntryEmbed.addFields([
+			{
+				name: 'Deleted By',
+				value: author.tag,
+				inline: true
+			}
+		]);
 	}
 	else {
-		logEntryEmbed.addField(
-			'Deleted By',
-			latestAuditLog.executor.tag,
-			true
-		);
+		logEntryEmbed.addFields([
+			{
+				name: 'Deleted By',
+				value: latestAuditLog.executor.tag,
+				inline: true
+			}
+		]);
 	}
 
 	// Message contains text
 	if (content !== '') {
-		logEntryEmbed.addField(
-			'Message',
-			trimContent(content, 1024)
-		);
+		logEntryEmbed.addFields([
+			{
+				name: 'Message',
+				value: trimContent(content, 1024)
+			}
+		]);
 	}
 
 	// Message contained an image
@@ -82,24 +87,33 @@ export const messageDelete = async (message: Message): Promise<void> => {
 
 		if (imageURLs.length === 1) {
 			if (imageURLs.at(0) === 'U') {
-				logEntryEmbed.addField(
-					'Attachments',
-					'`Message contained an attachment that was either too large or not an image file.`'
-				);
+				logEntryEmbed.addFields([
+					{
+						name: 'Attachments',
+						value: inlineCode('Message contained an attachment that was either too large or not an image file.')
+					}
+				]);
 			}
 			else {
 				logEntryEmbed.setImage(imageURLs.at(0));
 			}
 		}
 		else if (imageURLs.includes('U')) {
-			logEntryEmbed.addField(
-				'Attachments',
-				`${inlineCode('Message contained one or more attachments that were either too large or not image files.')}\
-				\n\n${imageURLsList}`
-			);
+			logEntryEmbed.addFields([
+				{
+					name: 'Attachments',
+					value: `${inlineCode('Message contained one or more attachments that were either too large or not image files.')}\
+					\n\n${imageURLsList}`
+				}
+			]);
 		}
 		else {
-			logEntryEmbed.addField('Attachments', `${imageURLsList}`);
+			logEntryEmbed.addFields([
+				{
+					name: 'Attachments',
+					value: imageURLsList
+				}
+			]);
 		}
 	}
 

@@ -3,7 +3,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
 import { Client } from 'discord.js';
 import { mongodb } from '../api/mongo.js';
-import { LOG_COLORS } from '../config/constants.js';
+import { log } from '../lib/misc/log.js';
 import { startScheduler } from '../lib/scheduler.js';
 
 export const ready = async (client: Client): Promise<void> => {
@@ -14,5 +14,5 @@ export const ready = async (client: Client): Promise<void> => {
 	await mongodb.connectToDatabase();
 	// ----
 
-	console.log(LOG_COLORS.SUCCESS(`Successfully logged in as ${client.user.tag}!`));
+	log(`Successfully logged in as ${client.user.tag}!`);
 };

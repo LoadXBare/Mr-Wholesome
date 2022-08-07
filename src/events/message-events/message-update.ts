@@ -1,5 +1,4 @@
-import { channelMention, hyperlink } from '@discordjs/builders';
-import { Collection, Message, MessageAttachment, MessageEmbed } from 'discord.js';
+import { Attachment, channelMention, Collection, EmbedBuilder, hyperlink, inlineCode, Message } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
@@ -43,7 +42,7 @@ const editContent = (content: string, sliceIndex: number, maxLength: number): st
 	}
 };
 
-const contentUpdate = async (oldContent: string, newContent: string, message: Message): Promise<MessageEmbed> => {
+const contentUpdate = async (oldContent: string, newContent: string, message: Message): Promise<EmbedBuilder> => {
 	const { author, channel, member } = message;
 	const maxLength = 800;
 	const charsBeforeEdit = 10;
@@ -56,7 +55,7 @@ const contentUpdate = async (oldContent: string, newContent: string, message: Me
 	editedOldContent = editContent(oldContent, sliceIndex, maxLength);
 	editedNewContent = editContent(newContent, sliceIndex, maxLength);
 
-	const logEntryEmbed = new MessageEmbed()
+	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: 'Message Edited'
 		})
@@ -81,11 +80,11 @@ const contentUpdate = async (oldContent: string, newContent: string, message: Me
 	return logEntryEmbed;
 };
 
-const attachmentUpdate = async (oldAttachments: Collection<string, MessageAttachment>, newAttachments: Collection<string, MessageAttachment>, message: Message): Promise<MessageEmbed> => {
+const attachmentUpdate = async (oldAttachments: Collection<string, Attachment>, newAttachments: Collection<string, Attachment>, message: Message): Promise<EmbedBuilder> => {
 	const removedAttachment = oldAttachments.difference(newAttachments);
 	const imageURLs = await storeAttachments(removedAttachment, message.client);
 
-	const logEntryEmbed = new MessageEmbed()
+	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: 'Message Attachment Removed'
 		})
@@ -98,7 +97,12 @@ const attachmentUpdate = async (oldAttachments: Collection<string, MessageAttach
 		.setColor(COLORS.NEGATIVE);
 
 	if (imageURLs.at(0) === 'U') {
-		logEntryEmbed.addField('Attachment', '`Attachment that was removed was either too large or not an image file.`');
+		logEntryEmbed.addFields([
+			{
+				name: 'Attachment',
+				value: inlineCode('Attachment that was removed was either too large or not an image file.')
+			}
+		]);
 	}
 	else {
 		logEntryEmbed.setImage(imageURLs.at(0));
@@ -119,7 +123,7 @@ export const messageUpdate = async (oldMessage: Message, newMessage: Message): P
 		return;
 	}
 
-	let logEntryEmbed: MessageEmbed;
+	let logEntryEmbed: EmbedBuilder;
 	if (oldContent !== newContent) {
 		logEntryEmbed = await contentUpdate(oldContent, newContent, newMessage);
 	}
