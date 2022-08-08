@@ -7,7 +7,10 @@ import { fetchDiscordUser } from '../../lib/misc/fetch-discord-user.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
 type WarningCount = {
-	[userID: string]: number
+	[userID: string]: {
+		warningCount: number,
+		oldWarnings: boolean
+	}
 }
 
 const addWarning = async (message: Message, warnedUser: User, warningReason: string): Promise<void> => {
@@ -213,28 +216,27 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 			warningsList = 'This guild has no warnings! 🎉';
 		}
 
-		const userWarningsCount: WarningCount = {};
-		let oldWarning = false;
+		const userWarningsStats: WarningCount = {};
 		for (const warn of warnings) {
-			const userCount = userWarningsCount[warn.warnedUserID];
+			const userCount = userWarningsStats[warn.warnedUserID];
 			const warningAgeInMonths = dayjs().diff(dayjs(warn.warningDate), 'month');
 
 			if (typeof userCount === 'undefined') {
-				userWarningsCount[warn.warnedUserID] = 0;
+				userWarningsStats[warn.warnedUserID] = { oldWarnings: false, warningCount: 0 };
 			}
-			userWarningsCount[warn.warnedUserID] += 1;
+			userWarningsStats[warn.warnedUserID].warningCount += 1;
 
 			if (warningAgeInMonths >= 6) {
-				oldWarning = true;
+				userWarningsStats[warn.warnedUserID].oldWarnings = true;
 			}
 		}
 
-		for (const warnedUserID in userWarningsCount) {
+		for (const warnedUserID in userWarningsStats) {
 			const warnedUser = await fetchDiscordUser(message.client, warnedUserID);
-			const warningCount = userWarningsCount[warnedUserID];
-			const oldWarningText = oldWarning ? '⏱️' : '';
+			const warningStats = userWarningsStats[warnedUserID];
+			const oldWarningText = warningStats.oldWarnings ? '⏱️' : '';
 
-			warningsList = warningsList.concat(`**${warnedUser.tag}** - ${warningCount} warning(s) ${oldWarningText}\n`);
+			warningsList = warningsList.concat(`**${warnedUser.tag}** ${inlineCode(`[${warnedUser.id}]`)} - ${warningStats.warningCount} warning(s) ${oldWarningText}\n`);
 		}
 
 		const guildWarningsEmbed = new EmbedBuilder()
