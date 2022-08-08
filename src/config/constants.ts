@@ -15,6 +15,10 @@ export const MOD_COMMANDS = [
 	'logchannel'
 ];
 
+export const DEV_COMMANDS = [
+	'$warn'
+];
+
 export const COLORS: Colors = {
 	COMMAND: '#704f95',
 	SUCCESS: '#2f9340',

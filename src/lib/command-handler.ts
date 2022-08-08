@@ -1,7 +1,8 @@
 import { Message } from 'discord.js';
 import commands from '../commands/index.js';
-import { MOD_COMMANDS } from '../config/constants.js';
+import { DEV_COMMANDS, MOD_COMMANDS } from '../config/constants.js';
 import { BotCommand } from '../index.js';
+import { config } from '../private/config.js';
 import { isModerator } from './misc/check-moderator.js';
 import { log } from './misc/log.js';
 import { sendError } from './misc/send-error.js';
@@ -22,6 +23,11 @@ export const handleCommand = (message: Message): void => {
 		if (MOD_COMMANDS.includes(command)) {
 			if (!isModerator(message.member)) {
 				sendError(message, 'You do not have permission to perform this command!');
+				return;
+			}
+		}
+		else if (DEV_COMMANDS.includes(command)) {
+			if (message.author.id !== config.botOwnerId) {
 				return;
 			}
 		}

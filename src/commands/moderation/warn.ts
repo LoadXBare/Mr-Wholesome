@@ -214,21 +214,27 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 		}
 
 		const userWarningsCount: WarningCount = {};
+		let oldWarning = false;
 		for (const warn of warnings) {
 			const userCount = userWarningsCount[warn.warnedUserID];
+			const warningAgeInMonths = dayjs().diff(dayjs(warn.warningDate), 'month');
 
 			if (typeof userCount === 'undefined') {
 				userWarningsCount[warn.warnedUserID] = 0;
 			}
-
 			userWarningsCount[warn.warnedUserID] += 1;
+
+			if (warningAgeInMonths >= 6) {
+				oldWarning = true;
+			}
 		}
 
 		for (const warnedUserID in userWarningsCount) {
 			const warnedUser = await fetchDiscordUser(message.client, warnedUserID);
 			const warningCount = userWarningsCount[warnedUserID];
+			const oldWarningText = oldWarning ? '⏱️' : '';
 
-			warningsList = warningsList.concat(`**${warnedUser.tag}** - ${warningCount} warning(s)\n`);
+			warningsList = warningsList.concat(`**${warnedUser.tag}** - ${warningCount} warning(s) ${oldWarningText}\n`);
 		}
 
 		const guildWarningsEmbed = new EmbedBuilder()
@@ -256,8 +262,10 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 		else {
 			for (const warn of warnings) {
 				const index = warnings.indexOf(warn) + 1;
+				const warningAgeInMonths = dayjs().diff(dayjs(warn.warningDate), 'month');
+				const oldWarningText = warningAgeInMonths >= 6 ? '⏱️' : '';
 
-				warningsList = warningsList.concat(`**#${index}** - ${inlineCode(warn._id.toString())}\n`);
+				warningsList = warningsList.concat(`**#${index}** - ${inlineCode(warn.id)} ${oldWarningText}\n`);
 			}
 		}
 

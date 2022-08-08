@@ -1,12 +1,16 @@
 import dayjs from 'dayjs';
-import { Client, Guild, inlineCode, TextChannel, userMention } from 'discord.js';
+import { Client, EmbedBuilder, inlineCode, roleMention, TextChannel, userMention } from 'discord.js';
+import schedule from 'node-schedule';
 import { mongodb } from '../api/mongo.js';
+import { COLORS } from '../config/constants.js';
 import { config } from '../private/config.js';
 import { fetchDiscordChannel } from './misc/fetch-discord-channel.js';
+import { fetchDiscordUser } from './misc/fetch-discord-user.js';
 import { fetchGuildMember } from './misc/fetch-guild-member.js';
 import { log } from './misc/log.js';
 
-const checkRoles = async (guild: Guild): Promise<void> => {
+const checkRoles = async (client: Client): Promise<void> => {
+	const guild = await client.guilds.fetch(config.theAkialytesGuildId);
 	const akiasBirthday = 'September 03';
 	const currentDate = dayjs().format('MMMM DD');
 	const birthdayList = await mongodb.userBirthday.find();
@@ -52,7 +56,9 @@ const checkRoles = async (guild: Guild): Promise<void> => {
 	log(`Roles checked! (${(dayjs().valueOf() - startTime).toLocaleString()}ms)`);
 };
 
-const postBirthdayMessage = async (date: string, guild: Guild, birthdayChannel: TextChannel): Promise<void> => {
+const postBirthdayMessage = async (client: Client): Promise<void> => {
+	const guild = await client.guilds.fetch(config.theAkialytesGuildId);
+	const birthdayChannel = await fetchDiscordChannel(guild, config.birthdayChannelId) as TextChannel;
 	const currentDate = dayjs().format('MMMM DD');
 	const birthdaysToday = await mongodb.userBirthday.find({
 		birthday: currentDate
@@ -111,26 +117,68 @@ const postBirthdayMessage = async (date: string, guild: Guild, birthdayChannel: 
 	log(`Birthday message posted to #${birthdayChannel.name}!`);
 };
 
-const birthdayScheduler = async (client: Client): Promise<void> => {
-	const theAkialytesGuild = await client.guilds.fetch(config.theAkialytesGuildId);
-	const birthdayChannel = await fetchDiscordChannel(theAkialytesGuild, config.birthdayChannelId) as TextChannel;
-	const intervalMins = 30;
-	let lastRunDate = 'undefined';
+const birthday = (client: Client): void => {
+	checkRoles(client);
+	postBirthdayMessage(client);
+};
 
-	setInterval(async () => {
-		const currentDate = dayjs().format('MMMM DD');
-		const currentHour = dayjs().get('hour');
+export const warning = async (client: Client, nextRunDate: Date): Promise<void> => {
+	const warnings = await mongodb.guildWarning.find({
+		guildID: config.theAkialytesGuildId
+	});
+	const guild = await client.guilds.fetch(config.theAkialytesGuildId);
+	const warningReminderChannel = await fetchDiscordChannel(guild, config.warningReminderChannelId) as TextChannel;
 
-		checkRoles(theAkialytesGuild);
-		if (currentDate === lastRunDate || currentHour > 1) {
-			return;
+	const warnedUsersIDList: Array<string> = [];
+	for (const warning of warnings) {
+		if (!warnedUsersIDList.includes(warning.warnedUserID)) {
+			warnedUsersIDList.push(warning.warnedUserID);
 		}
-		lastRunDate = currentDate;
+	}
 
-		postBirthdayMessage(currentDate, theAkialytesGuild, birthdayChannel);
-	}, intervalMins * 60 * 1000);
+	let warningsList = '';
+	for (const warnedUserID of warnedUsersIDList) {
+		const latestWarning = await mongodb.guildWarning.findOne({
+			warnedUserID: warnedUserID,
+			guildID: config.theAkialytesGuildId
+		}).sort({
+			warningDate: 'descending'
+		});
+
+		const warningAgeInMonths = dayjs().diff(dayjs(latestWarning.warningDate), 'month');
+		if (warningAgeInMonths >= 6) {
+			const warnedUser = await fetchDiscordUser(client, latestWarning.warnedUserID);
+			warningsList = warningsList.concat(`\n**${warningAgeInMonths} months ago** - **${warnedUser.tag}** (${inlineCode(latestWarning.id)})`);
+		}
+	}
+
+	let rolePing = roleMention(config.roles.Mods);
+	if (warningsList.length === 0) {
+		warningsList = 'There are no users that were last warned 6 or more months ago!';
+		rolePing = null;
+	}
+
+	const warningReminderEmbed = new EmbedBuilder()
+		.setTitle('The following users were last warned 6 or more months ago')
+		.setDescription(warningsList)
+		.setFooter({ text: `Next Reminder: ${dayjs(nextRunDate).format('MMMM DD, YYYY')}` })
+		.setColor(COLORS.NEUTRAL);
+
+	warningReminderChannel.send({ content: rolePing, embeds: [warningReminderEmbed] });
 };
 
 export const startScheduler = (client: Client): void => {
-	birthdayScheduler(client);
+	// Runs at 12:00am UTC each day
+	const birthdayScheduler = schedule.scheduleJob('* 0 * * * ', () => {
+		birthday(client);
+		log(`Birthday scheduler ran! Next run date: ${dayjs(birthdayScheduler.nextInvocation()).format('MMMM DD, YYYY')}`);
+	});
+	log(`Birthday scheduler will run on ${dayjs(birthdayScheduler.nextInvocation()).format('MMMM DD, YYYY')}!`);
+
+	// Runs at 12:00am UTC on the first day of each month
+	const warningScheduler = schedule.scheduleJob('* * 1 * *', () => {
+		warning(client, warningScheduler.nextInvocation());
+		log(`Warning scheduler ran! Next run date: ${dayjs(warningScheduler.nextInvocation()).format('MMMM DD, YYYY')}`);
+	});
+	log(`Warning scheduler will run on ${dayjs(warningScheduler.nextInvocation()).format('MMMM DD, YYYY')}!`);
 };

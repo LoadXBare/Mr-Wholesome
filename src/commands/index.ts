@@ -1,4 +1,6 @@
 import { Commands } from '../index.js';
+import { stop } from './dev/stop.js';
+import { warningReminder } from './dev/warning-reminder.js';
 import { birthday } from './fun/birthday.js';
 import { cat, dog, fox } from './fun/random-animal.js';
 import { help } from './information/help.js';
@@ -12,6 +14,8 @@ import { ignoredchannel } from './utility/ignored-channel.js';
 import { logchannel } from './utility/log-channel.js';
 
 const commands: Commands = {
+	'$stop': stop,
+	'$warn': warningReminder,
 	'birthday': birthday,
 	'cat': cat,
 	'dog': dog,
