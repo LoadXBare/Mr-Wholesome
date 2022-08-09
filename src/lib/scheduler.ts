@@ -19,7 +19,7 @@ const checkRoles = async (client: Client): Promise<void> => {
 	const startTime = dayjs().valueOf();
 
 	if (currentDate !== akiasBirthday) {
-		const member = await fetchGuildMember(guild, config.theAkialytesOwnerId);
+		const member = await fetchGuildMember(guild, config.userIDs.Akialyne);
 		member.roles.add(config.roles['Birthday Role'], 'Definitely Akia\'s birthday');
 	}
 
@@ -40,7 +40,7 @@ const checkRoles = async (client: Client): Promise<void> => {
 		const memberHasBirthdayRole = memberRoles.has(config.roles['Birthday Role']);
 		const isMembersBirthday = memberBirthday === currentDate;
 
-		if (userID === config.theAkialytesOwnerId) {
+		if (userID === config.userIDs.Akialyne) {
 			continue;
 		}
 		else if (memberHasBirthdayRole && !isMembersBirthday) {
@@ -77,7 +77,7 @@ const postBirthdayMessage = async (client: Client): Promise<void> => {
 			return;
 		}
 
-		if (userID === config.theAkialytesOwnerId) {
+		if (userID === config.userIDs.Akialyne) {
 			birthdayMessage = `Today is *definitely not* ${userMention(userID)}'s birthday, please continue your day as normal! ${config.emotes.akiaLaugh}`;
 			member.roles.remove(config.roles['Birthday Role'], 'Definitely not Akia\'s birthday');
 		}
@@ -169,14 +169,14 @@ export const warning = async (client: Client, nextRunDate: Date): Promise<void> 
 
 export const startScheduler = (client: Client): void => {
 	// Runs at 12:00am UTC each day
-	const birthdayScheduler = schedule.scheduleJob('* 0 * * * ', () => {
+	const birthdayScheduler = schedule.scheduleJob('0 0 * * * ', () => {
 		birthday(client);
 		log(`Birthday scheduler ran! Next run date: ${dayjs(birthdayScheduler.nextInvocation()).format('MMMM DD, YYYY')}`);
 	});
 	log(`Birthday scheduler will run on ${dayjs(birthdayScheduler.nextInvocation()).format('MMMM DD, YYYY')}!`);
 
 	// Runs at 12:00am UTC on the first day of each month
-	const warningScheduler = schedule.scheduleJob('* * 1 * *', () => {
+	const warningScheduler = schedule.scheduleJob('0 0 1 * *', () => {
 		warning(client, warningScheduler.nextInvocation());
 		log(`Warning scheduler ran! Next run date: ${dayjs(warningScheduler.nextInvocation()).format('MMMM DD, YYYY')}`);
 	});

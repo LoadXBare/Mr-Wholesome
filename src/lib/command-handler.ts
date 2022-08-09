@@ -27,7 +27,7 @@ export const handleCommand = (message: Message): void => {
 			}
 		}
 		else if (DEV_COMMANDS.includes(command)) {
-			if (message.author.id !== config.botOwnerId) {
+			if (message.author.id !== config.userIDs.LoadXBare) {
 				return;
 			}
 		}
