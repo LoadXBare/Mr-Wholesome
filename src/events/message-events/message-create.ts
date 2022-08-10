@@ -12,7 +12,7 @@ export const messageCreate = (message: Message): void => {
 	const authorIsIchi = message.author.id === config.userIDs.Ichi;
 	const messageContainsSorry = content.search(/[s]+[o]+[r]+[y]+/mi) !== -1;
 	const messageContainsArson = content.search(/(?<!\S)[a]+[r]+[s]+[o]+[n]+/mi) !== -1;
-	const messageContainsKnockKnock = content.toLowerCase() === 'knock knock';
+	const messageContainsKnockKnock = content.search(/([k]+[n]+[o]+[c]+[k]+(.|$)){2}/mi) !== -1;
 	const channelName = message.channel.type === ChannelType.DM ? message.author.username : message.channel.name;
 
 	if (message.author.bot) {

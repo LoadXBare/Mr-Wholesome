@@ -1,5 +1,6 @@
 import { EmbedBuilder } from 'discord.js';
 import schedule from 'node-schedule';
+import { client } from '../../bot.js';
 import { COLORS } from '../../config/constants.js';
 import { BotCommand } from '../../index.js';
 
@@ -14,5 +15,6 @@ export const stop = async (args: BotCommand): Promise<void> => {
 		.setColor(COLORS.FAIL);
 	await message.reply({ embeds: [botStoppedEmbed] });
 
+	client.destroy();
 	process.exit(0);
 };

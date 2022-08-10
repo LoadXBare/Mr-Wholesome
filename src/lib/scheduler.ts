@@ -10,7 +10,7 @@ import { fetchGuildMember } from './misc/fetch-guild-member.js';
 import { log } from './misc/log.js';
 
 const checkRoles = async (client: Client): Promise<void> => {
-	const guild = await client.guilds.fetch(config.theAkialytesGuildId);
+	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
 	const akiasBirthday = 'September 03';
 	const currentDate = dayjs().format('MMMM DD');
 	const birthdayList = await mongodb.userBirthday.find();
@@ -57,8 +57,8 @@ const checkRoles = async (client: Client): Promise<void> => {
 };
 
 const postBirthdayMessage = async (client: Client): Promise<void> => {
-	const guild = await client.guilds.fetch(config.theAkialytesGuildId);
-	const birthdayChannel = await fetchDiscordChannel(guild, config.birthdayChannelId) as TextChannel;
+	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
+	const birthdayChannel = await fetchDiscordChannel(guild, config.channelIDs.birthdayAnnouncements) as TextChannel;
 	const currentDate = dayjs().format('MMMM DD');
 	const birthdaysToday = await mongodb.userBirthday.find({
 		birthday: currentDate
@@ -124,10 +124,10 @@ const birthday = (client: Client): void => {
 
 export const warning = async (client: Client, nextRunDate: Date): Promise<void> => {
 	const warnings = await mongodb.guildWarning.find({
-		guildID: config.theAkialytesGuildId
+		guildID: config.guildIDs['The Akialytes']
 	});
-	const guild = await client.guilds.fetch(config.theAkialytesGuildId);
-	const warningReminderChannel = await fetchDiscordChannel(guild, config.warningReminderChannelId) as TextChannel;
+	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
+	const warningReminderChannel = await fetchDiscordChannel(guild, config.channelIDs.warningReminders) as TextChannel;
 
 	const warnedUsersIDList: Array<string> = [];
 	for (const warning of warnings) {
@@ -140,7 +140,7 @@ export const warning = async (client: Client, nextRunDate: Date): Promise<void> 
 	for (const warnedUserID of warnedUsersIDList) {
 		const latestWarning = await mongodb.guildWarning.findOne({
 			warnedUserID: warnedUserID,
-			guildID: config.theAkialytesGuildId
+			guildID: config.guildIDs['The Akialytes']
 		}).sort({
 			warningDate: 'descending'
 		});
