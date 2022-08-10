@@ -13,6 +13,7 @@ import { rolebuttonmenus } from './role-button-menus.js';
 import { tcg } from './utility/fetch-trading-card.js';
 import { ignoredchannel } from './utility/ignored-channel.js';
 import { logchannel } from './utility/log-channel.js';
+import { ticketPanel } from './utility/ticket-panel.js';
 
 const commands: Commands = {
 	'$stop': stop,
@@ -30,7 +31,8 @@ const commands: Commands = {
 	'rolebuttonmenus': rolebuttonmenus,
 	'tcg': tcg,
 	'ignoredchannel': ignoredchannel,
-	'logchannel': logchannel
+	'logchannel': logchannel,
+	'ticketpanel': ticketPanel
 };
 
 export default commands;

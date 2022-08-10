@@ -1,7 +1,4 @@
 node_modules
 private
 dist
-.env
-prisma/migrations
-backlog
-assets
+.todo

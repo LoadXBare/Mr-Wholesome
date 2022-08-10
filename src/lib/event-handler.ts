@@ -1,4 +1,5 @@
 import { Client } from 'discord.js';
+import schedule from 'node-schedule';
 import events from '../events/index.js';
 
 export const initializeEventHandler = async (client: Client): Promise<void> => {
@@ -9,4 +10,10 @@ export const initializeEventHandler = async (client: Client): Promise<void> => {
 			events[event](...args);
 		});
 	}
+
+	process.on('SIGINT', () => {
+		schedule.gracefulShutdown();
+		client.destroy();
+		process.exit();
+	});
 };

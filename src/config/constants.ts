@@ -12,7 +12,8 @@ export const MOD_COMMANDS = [
 	'rolebuttonmenus',
 	'tcg',
 	'ignoredchannel',
-	'logchannel'
+	'logchannel',
+	'ticketpanel'
 ];
 
 export const DEV_COMMANDS = [
@@ -199,6 +200,32 @@ export const COMMAND_INFO: CommandInfo = {
 				name: 'Example 5',
 				value: `${inlineCode(`${BOT_PREFIX}ban view`)}\
 				\n┗ Displays all bans within the guild.`
+			}
+		])
+		.setColor(COLORS.COMMAND),
+	'TICKETPANEL': new EmbedBuilder()
+		.setTitle(`Command Info: "${BOT_PREFIX}ticketpanel"`)
+		.setDescription('Allows you to create, post and delete Ticket Panels.')
+		.setFields([
+			{
+				name: 'Example 1',
+				value: `${inlineCode(`${BOT_PREFIX}ticketpanel create`)}\
+				\n┗ Begins the Ticket Panel creation process.`
+			},
+			{
+				name: 'Example 2',
+				value: `${inlineCode(`${BOT_PREFIX}ticketpanel delete Mod Mail`)}\
+				\n┗ Deletes the Ticket Panel named "Mod Mail".`
+			},
+			{
+				name: 'Example 3',
+				value: `${inlineCode(`${BOT_PREFIX}ticketpanel list`)}\
+				\n┗ Lists all Ticket Panels within the guild.`
+			},
+			{
+				name: 'Example 4',
+				value: `${inlineCode(`${BOT_PREFIX}ticketpanel post #mod-mail Mod Mail`)}\
+				\n┗ Posts the Ticket Panel "Mod Mail" in the "#mod-mail" channel.`
 			}
 		])
 		.setColor(COLORS.COMMAND)
