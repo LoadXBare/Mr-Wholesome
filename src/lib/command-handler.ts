@@ -1,6 +1,5 @@
 import { Message } from 'discord.js';
 import commands from '../commands/index.js';
-import { DEV_COMMANDS, MOD_COMMANDS } from '../config/constants.js';
 import { BotCommand } from '../index.js';
 import { config } from '../private/config.js';
 import { isModerator } from './misc/check-moderator.js';
@@ -20,19 +19,16 @@ export const handleCommand = (message: Message): void => {
 	const args: BotCommand = { message, commandArgs };
 
 	if (commandsList.includes(command)) {
-		if (MOD_COMMANDS.includes(command)) {
-			if (!isModerator(message.member)) {
-				sendError(message, 'You do not have permission to perform this command!');
-				return;
-			}
+		if (commands[command].modOnly && !isModerator(message.member)) {
+			sendError(message, 'You do not have permission to perform this command!');
+			return;
 		}
-		else if (DEV_COMMANDS.includes(command)) {
-			if (message.author.id !== config.userIDs.LoadXBare) {
-				return;
-			}
+		else if (commands[command].devOnly && message.author.id !== config.userIDs.LoadXBare) {
+			sendError(message, 'You do not have permission to perform this command!');
+			return;
 		}
 
-		commands[command](args);
+		commands[command].run(args);
 		log(`Handled Command: ${command}`);
 	}
 	else {

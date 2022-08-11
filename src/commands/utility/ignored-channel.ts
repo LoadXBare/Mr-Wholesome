@@ -1,17 +1,17 @@
 import { channelMention, EmbedBuilder, inlineCode, Message } from 'discord.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
-import { fetchDiscordChannel } from '../../lib/misc/fetch-discord-channel.js';
+import { BotCommand, Command } from '../../index.js';
+import { fetchDiscordTextChannel } from '../../lib/misc/fetch-discord-text-channel.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
 const addIgnoredChannel = async (message: Message, ignoredChannelIDText: string): Promise<void> => {
 	const ignoredChannelID = ignoredChannelIDText.replace(/\D/g, '');
-	const ignoredChannel = await fetchDiscordChannel(message.guild, ignoredChannelID);
+	const ignoredChannel = await fetchDiscordTextChannel(message.guild, ignoredChannelID);
 
 	if (ignoredChannel === null) {
-		sendError(message, `${inlineCode(ignoredChannelIDText)} is not a valid Channel!`);
+		sendError(message, `${inlineCode(ignoredChannelIDText)} is not a valid Text Channel!`);
 		return;
 	}
 
@@ -44,7 +44,7 @@ const addIgnoredChannel = async (message: Message, ignoredChannelIDText: string)
 
 const removeIgnoredChannel = async (message: Message, ignoredChannelIDText: string): Promise<void> => {
 	const ignoredChannelID = ignoredChannelIDText.replace(/\D/g, '');
-	const ignoredChannel = await fetchDiscordChannel(message.guild, ignoredChannelID);
+	const ignoredChannel = await fetchDiscordTextChannel(message.guild, ignoredChannelID);
 	const ignoredChannels = await fetchIgnoredChannels(message.guildId);
 
 	if (!ignoredChannels.includes(ignoredChannelID)) {
@@ -92,7 +92,7 @@ const resetIgnoredChannels = async (message: Message): Promise<void> => {
 	message.reply({ embeds: [resetIgnoredChannelsEmbed] });
 };
 
-export const ignoredchannel = async (args: BotCommand): Promise<void> => {
+const ignoredChannelCommand = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
 	const operation = (commandArgs.shift() ?? 'undefined').toLowerCase();
 
@@ -113,4 +113,11 @@ export const ignoredchannel = async (args: BotCommand): Promise<void> => {
 		sendError(message, `${inlineCode(operation)} is not a valid operation!\
 		\n*For help, run ${inlineCode(`${BOT_PREFIX}help ignoredchannel`)}*`);
 	}
+};
+
+export const ignoredChannel: Command = {
+	devOnly: false,
+	modOnly: true,
+	run: ignoredChannelCommand,
+	type: 'Utility'
 };

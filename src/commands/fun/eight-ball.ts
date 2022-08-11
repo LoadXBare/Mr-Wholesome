@@ -1,9 +1,9 @@
 import { EmbedBuilder } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
+import { BotCommand, Command } from '../../index.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
-export const eightBall = (args: BotCommand): void => {
+const eightBallCommand = (args: BotCommand): void => {
 	const { commandArgs, message } = args;
 	const question = commandArgs.join(' ');
 	const positive = {
@@ -87,4 +87,11 @@ export const eightBall = (args: BotCommand): void => {
 	}
 
 	message.reply({ embeds: [responseEmbed] });
+};
+
+export const eightBall: Command = {
+	devOnly: false,
+	modOnly: false,
+	run: eightBallCommand,
+	type: 'Fun'
 };

@@ -5,21 +5,6 @@ import { config } from '../private/config.js';
 
 export const BOT_PREFIX = config.botPrefix;
 
-export const MOD_COMMANDS = [
-	'ban',
-	'warn',
-	'watchlist',
-	'rolebuttonmenus',
-	'tcg',
-	'ignoredchannel',
-	'logchannel',
-	'ticketpanel'
-];
-
-export const DEV_COMMANDS = [
-	'$warn'
-];
-
 export const COLORS: Colors = {
 	COMMAND: '#704f95',
 	SUCCESS: '#2f9340',

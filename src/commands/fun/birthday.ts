@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { EmbedBuilder, inlineCode, Message } from 'discord.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
+import { BotCommand, Command } from '../../index.js';
 import { fetchDiscordUser } from '../../lib/misc/fetch-discord-user.js';
 import { numSuffix } from '../../lib/misc/number-suffix.js';
 import { sendError } from '../../lib/misc/send-error.js';
@@ -71,7 +71,7 @@ const upcomingBirthdays = async (message: Message): Promise<void> => {
 	message.reply({ embeds: [upcomingBirthdaysEmbed] });
 };
 
-export const birthday = async (args: BotCommand): Promise<void> => {
+const birthdayCommand = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
 	const operation = (commandArgs.shift() ?? 'undefined').toLowerCase();
 
@@ -87,4 +87,11 @@ export const birthday = async (args: BotCommand): Promise<void> => {
 		sendError(message, `${inlineCode(operation)} is not a valid operation!\
 		\n*For help, run ${inlineCode(`${BOT_PREFIX}help birthday`)}*`);
 	}
+};
+
+export const birthday: Command = {
+	devOnly: false,
+	modOnly: false,
+	run: birthdayCommand,
+	type: 'Fun'
 };

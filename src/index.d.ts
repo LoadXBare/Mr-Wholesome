@@ -2,12 +2,12 @@ import { Attachment, Collection, ColorResolvable, EmbedBuilder, Message } from '
 
 export type InteractionTypes =
 	| 'ignore'
-	| 'role';
+	| 'role'
 
 export type BotInteractionInfo = {
 	type: string,
 	[index: string]: string
-};
+}
 
 export type ButtonChoice = {
 	type: InteractionTypes,
@@ -22,15 +22,36 @@ export type CommandInfo = {
 	[command: string]: EmbedBuilder
 }
 
+export type BotCommand = {
+	message: Message,
+	commandArgs: Array<string>
+}
+
+export type CommandTypes =
+	| 'Dev'
+	| 'Fun'
+	| 'Information'
+	| 'Moderation'
+	| 'Ranking'
+	| 'Utility'
+	| 'Other'
+
+export type Command = {
+	type: CommandTypes,
+	devOnly: boolean,
+	modOnly: boolean,
+	run: (args: BotCommand) => Promise<void> | void
+}
+
 export type Commands = {
-	[command: string]: Function
+	[command: string]: Command
 }
 
 export type RoleChanges =
 	| 'name'
 	| 'color'
 	| 'hoist'
-	| 'mentionable';
+	| 'mentionable'
 
 export type Colors = {
 	COMMAND: ColorResolvable,
@@ -41,12 +62,7 @@ export type Colors = {
 	TIMEOUT: ColorResolvable,
 	NEGATIVE: ColorResolvable,
 	POSITIVE: ColorResolvable
-};
-
-export type BotCommand = {
-	message: Message,
-	commandArgs: Array<string>
-};
+}
 
 export type AttachmentUpdate = {
 	oldAttachments: Collection<string, Attachment>,
@@ -116,7 +132,7 @@ export type TradingCard = {
 	move1name: string,
 	chardesc: string,
 	subbed: boolean
-};
+}
 
 export type Variables = {
 	[variable: string]: string
@@ -141,3 +157,7 @@ export type Uptime = {
 	minutes: number,
 	seconds: number
 }
+
+export type CommandsList = {
+	[type in CommandTypes]: string;
+};

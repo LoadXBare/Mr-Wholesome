@@ -1,10 +1,10 @@
 import dayjs from 'dayjs';
-import { Client, EmbedBuilder, inlineCode, roleMention, TextChannel, userMention } from 'discord.js';
+import { Client, EmbedBuilder, inlineCode, roleMention, userMention } from 'discord.js';
 import schedule from 'node-schedule';
 import { mongodb } from '../api/mongo.js';
 import { COLORS } from '../config/constants.js';
 import { config } from '../private/config.js';
-import { fetchDiscordChannel } from './misc/fetch-discord-channel.js';
+import { fetchDiscordTextChannel } from './misc/fetch-discord-text-channel.js';
 import { fetchDiscordUser } from './misc/fetch-discord-user.js';
 import { fetchGuildMember } from './misc/fetch-guild-member.js';
 import { log } from './misc/log.js';
@@ -58,7 +58,7 @@ const checkRoles = async (client: Client): Promise<void> => {
 
 const postBirthdayMessage = async (client: Client): Promise<void> => {
 	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
-	const birthdayChannel = await fetchDiscordChannel(guild, config.channelIDs.birthdayAnnouncements) as TextChannel;
+	const birthdayChannel = await fetchDiscordTextChannel(guild, config.channelIDs.birthdayAnnouncements);
 	const currentDate = dayjs().format('MMMM DD');
 	const birthdaysToday = await mongodb.userBirthday.find({
 		birthday: currentDate
@@ -127,7 +127,7 @@ export const warning = async (client: Client, nextRunDate: Date): Promise<void> 
 		guildID: config.guildIDs['The Akialytes']
 	});
 	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
-	const warningReminderChannel = await fetchDiscordChannel(guild, config.channelIDs.warningReminders) as TextChannel;
+	const warningReminderChannel = await fetchDiscordTextChannel(guild, config.channelIDs.warningReminders);
 
 	const warnedUsersIDList: Array<string> = [];
 	for (const warning of warnings) {

@@ -2,9 +2,9 @@ import { EmbedBuilder } from 'discord.js';
 import schedule from 'node-schedule';
 import { client } from '../../bot.js';
 import { COLORS } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
+import { BotCommand, Command } from '../../index.js';
 
-export const stop = async (args: BotCommand): Promise<void> => {
+const stopCommand = async (args: BotCommand): Promise<void> => {
 	const { message } = args;
 
 	await schedule.gracefulShutdown();
@@ -17,4 +17,11 @@ export const stop = async (args: BotCommand): Promise<void> => {
 
 	client.destroy();
 	process.exit(0);
+};
+
+export const stop: Command = {
+	devOnly: true,
+	modOnly: false,
+	run: stopCommand,
+	type: 'Dev'
 };

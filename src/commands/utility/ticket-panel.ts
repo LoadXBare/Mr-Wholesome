@@ -1,7 +1,7 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, channelMention, codeBlock, Collection, EmbedBuilder, inlineCode, Message, TextChannel, time } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, channelMention, ChannelType, codeBlock, Collection, EmbedBuilder, inlineCode, Message, TextChannel, time } from 'discord.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
+import { BotCommand, Command } from '../../index.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
 const embedPrompt = async (message: Message, commandReply: Message, prompt: string): Promise<string> => {
@@ -24,7 +24,7 @@ const embedPrompt = async (message: Message, commandReply: Message, prompt: stri
 		return msg.author.id === message.author.id;
 	};
 
-	const collectedMessages = await message.channel.awaitMessages({ filter: filter, max: 1, time: awaitTime }).catch(() => { }) as Collection<string, Message<boolean>>;
+	const collectedMessages = await message.channel.awaitMessages({ filter: filter, max: 1, time: awaitTime }).catch(() => { }) as Collection<string, Message>;
 
 	if (collectedMessages.size === 0) {
 		sendError(message, `No messages sent within ${awaitTime / 1000} seconds, panel creation cancelled.`);
@@ -77,7 +77,7 @@ const channelPrompt = async (message: Message, commandReply: Message, prompt: st
 		return msg.author.id === message.author.id;
 	};
 
-	const collectedMessages = await message.channel.awaitMessages({ filter: filter, max: 1, time: awaitTime }).catch(() => { }) as Collection<string, Message<boolean>>;
+	const collectedMessages = await message.channel.awaitMessages({ filter: filter, max: 1, time: awaitTime }).catch(() => { }) as Collection<string, Message>;
 
 	if (collectedMessages.size === 0) {
 		sendError(message, `No messages sent within ${awaitTime / 1000} seconds, panel creation cancelled.`);
@@ -87,10 +87,14 @@ const channelPrompt = async (message: Message, commandReply: Message, prompt: st
 	const channelIDString = collectedMessages.at(0).content;
 
 	try {
-		await message.guild.channels.fetch(channelIDString);
+		const category = await message.guild.channels.fetch(channelIDString);
+		if (category.type !== ChannelType.GuildCategory) {
+			sendError(message, `${inlineCode(channelIDString)} is not a valid Category ID!`);
+			return null;
+		}
 	}
 	catch {
-		sendError(message, `${inlineCode(channelIDString)} is not a valid Channel ID!`);
+		sendError(message, `${inlineCode(channelIDString)} is not a valid Category ID!`);
 		return null;
 	}
 	finally {
@@ -119,7 +123,7 @@ const textPrompt = async (message: Message, commandReply: Message, prompt: strin
 		return msg.author.id === message.author.id;
 	};
 
-	const collectedMessages = await message.channel.awaitMessages({ filter: filter, max: 1, time: awaitTime }).catch(() => { }) as Collection<string, Message<boolean>>;
+	const collectedMessages = await message.channel.awaitMessages({ filter: filter, max: 1, time: awaitTime }).catch(() => { }) as Collection<string, Message>;
 
 	if (collectedMessages.size === 0) {
 		sendError(message, `No messages sent within ${awaitTime / 1000} seconds, panel creation cancelled.`);
@@ -276,7 +280,7 @@ const listPanels = async (message: Message): Promise<void> => {
 	message.reply({ embeds: [panelsListEmbed] });
 };
 
-export const ticketPanel = async (args: BotCommand): Promise<void> => {
+const ticketPanelCommand = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
 	const operation = commandArgs.shift();
 
@@ -299,4 +303,11 @@ export const ticketPanel = async (args: BotCommand): Promise<void> => {
 		sendError(message, `${inlineCode(operation)} is not a valid operation!\
 		\n*For help, run ${inlineCode(`${BOT_PREFIX}help ticketpanel`)}*`);
 	}
+};
+
+export const ticketPanel: Command = {
+	devOnly: false,
+	modOnly: true,
+	run: ticketPanelCommand,
+	type: 'Utility'
 };

@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { EmbedBuilder, inlineCode, Message, User } from 'discord.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { BotCommand, NoteCount } from '../../index.js';
+import { BotCommand, Command, NoteCount } from '../../index.js';
 import { fetchDiscordUser } from '../../lib/misc/fetch-discord-user.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
@@ -181,7 +181,7 @@ const viewNotes = async (message: Message, data: string): Promise<void> => {
 	}
 };
 
-export const watchlist = async (args: BotCommand): Promise<void> => {
+const watchlistCommand = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
 
 	const operation = commandArgs.shift() ?? 'undefined';
@@ -216,4 +216,11 @@ export const watchlist = async (args: BotCommand): Promise<void> => {
 		sendError(message, `${inlineCode(operation)} is not a valid operation!\
 		\n*For help, run ${inlineCode(`${BOT_PREFIX}help watchlist`)}*`);
 	}
+};
+
+export const watchlist: Command = {
+	devOnly: false,
+	modOnly: true,
+	run: watchlistCommand,
+	type: 'Moderation'
 };

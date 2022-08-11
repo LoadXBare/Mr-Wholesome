@@ -1,7 +1,7 @@
 import { codeBlock, EmbedBuilder, inlineCode } from 'discord.js';
 import fetch from 'node-fetch';
 import { COLORS } from '../../config/constants.js';
-import { BotCommand, TradingCard } from '../../index.js';
+import { BotCommand, Command, TradingCard } from '../../index.js';
 
 const checkTextLength = (text: string): string => {
 	const maxTextLength = 1024;
@@ -85,7 +85,7 @@ const formatAttackCardInfo = (tradingCard: TradingCard): EmbedBuilder => {
 	return infoEmbed;
 };
 
-export const tcg = async (args: BotCommand): Promise<void> => {
+const tradingCardGameCommand = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
 
 	const userToLookup = commandArgs.shift() ?? 'undefined';
@@ -127,4 +127,11 @@ export const tcg = async (args: BotCommand): Promise<void> => {
 	else {
 		commandReply.edit({ content: `User ${inlineCode(userToLookup)} either doesn't exist or doesn't have a database entry.` });
 	}
+};
+
+export const tradingCardGame: Command = {
+	devOnly: false,
+	modOnly: true,
+	run: tradingCardGameCommand,
+	type: 'Utility'
 };

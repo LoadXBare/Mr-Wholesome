@@ -8,7 +8,5 @@ export const checkWatchlist = async (userID: string): Promise<boolean> => {
 	if (notes.length === 0) {
 		return false;
 	}
-	else {
-		return true;
-	}
+	return true;
 };

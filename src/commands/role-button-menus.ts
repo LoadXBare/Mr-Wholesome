@@ -1,21 +1,21 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, inlineCode, TextChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, inlineCode } from 'discord.js';
 import { COLORS } from '../config/constants.js';
-import { BotCommand } from '../index.js';
-import { fetchDiscordChannel } from '../lib/misc/fetch-discord-channel.js';
+import { BotCommand, Command } from '../index.js';
+import { fetchDiscordTextChannel } from '../lib/misc/fetch-discord-text-channel.js';
 import { generateId } from '../lib/misc/generate-id.js';
 import { sendError } from '../lib/misc/send-error.js';
 import { config } from '../private/config.js';
 
-export const rolebuttonmenus = async (args: BotCommand): Promise<void> => {
+const roleButtonMenusCommand = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
 	const { guild } = message;
 
 	const channelIDText = commandArgs.shift() ?? 'undefined';
 	const channelID = channelIDText.replace(/\D/g, '');
-	const channelToSendMenu = await fetchDiscordChannel(message.guild, channelID) as TextChannel;
+	const channelToSendMenu = await fetchDiscordTextChannel(message.guild, channelID);
 
 	if (channelToSendMenu === null) {
-		sendError(message, `${inlineCode(channelIDText)} is not a valid Channel!`);
+		sendError(message, `${inlineCode(channelIDText)} is not a valid Text Channel!`);
 		return;
 	}
 
@@ -92,4 +92,11 @@ export const rolebuttonmenus = async (args: BotCommand): Promise<void> => {
 	await channelToSendMenu.send({ embeds: [rolesMenuInfo] });
 	await channelToSendMenu.send({ embeds: [pronounMenu], components: [pronounMenuButtons] });
 	channelToSendMenu.send({ embeds: [otherMenu], components: [otherMenuButtons, otherMenuButtons2] });
+};
+
+export const roleButtonMenus: Command = {
+	devOnly: false,
+	modOnly: true,
+	run: roleButtonMenusCommand,
+	type: 'Other'
 };

@@ -1,9 +1,9 @@
 import { EmbedBuilder, inlineCode } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
+import { BotCommand, Command } from '../../index.js';
 import { fetchUptime } from '../../lib/misc/fetch-uptime.js';
 
-export const ping = async (args: BotCommand): Promise<void> => {
+const pingCommand = async (args: BotCommand): Promise<void> => {
 	const { message } = args;
 	const uptime = fetchUptime();
 	const uptimeText = `${uptime.days} days, ${uptime.hours} hours, ${uptime.minutes} minutes & ${uptime.seconds} seconds`;
@@ -17,4 +17,11 @@ export const ping = async (args: BotCommand): Promise<void> => {
 		.setColor(COLORS.COMMAND);
 
 	reply.edit({ content: null, embeds: [pingCommand] });
+};
+
+export const ping: Command = {
+	devOnly: false,
+	modOnly: false,
+	run: pingCommand,
+	type: 'Information'
 };

@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, codeBlock, ComponentType, EmbedBuilder, inlineCode, Message, User } from 'discord.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
+import { BotCommand, Command } from '../../index.js';
 import { fetchDiscordUser } from '../../lib/misc/fetch-discord-user.js';
 import { sendError } from '../../lib/misc/send-error.js';
 import { sleep } from '../../lib/misc/sleep.js';
@@ -330,7 +330,7 @@ const handleBanAdd = (commandArgs: Array<string>, message: Message, user: User):
 	addBan(message, user, banReason, daysNumber);
 };
 
-export const ban = async (args: BotCommand): Promise<void> => {
+const banCommand = async (args: BotCommand): Promise<void> => {
 	const { message, commandArgs } = args;
 	const operation = (commandArgs.shift() ?? 'undefined').toLowerCase();
 	const user = await fetchDiscordUser(message.client, operation.replace(/\D/g, ''));
@@ -363,4 +363,11 @@ export const ban = async (args: BotCommand): Promise<void> => {
 		sendError(message, `${inlineCode(operation)} is not a valid User or operation!\
 		\n*For help, run ${inlineCode(`${BOT_PREFIX}help ban`)}*`);
 	}
+};
+
+export const ban: Command = {
+	devOnly: false,
+	modOnly: true,
+	run: banCommand,
+	type: 'Moderation'
 };

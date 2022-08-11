@@ -1,10 +1,10 @@
 import { EmbedBuilder, inlineCode } from 'discord.js';
 import { BOT_PREFIX, COLORS, COMMAND_INFO } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
+import { BotCommand, Command, CommandsList } from '../../index.js';
 import { sendError } from '../../lib/misc/send-error.js';
 import commands from '../index.js';
 
-export const help = (args: BotCommand): Promise<void> => {
+const helpCommand = (args: BotCommand): Promise<void> => {
 	const { message, commandArgs } = args;
 	const P = BOT_PREFIX;
 
@@ -13,14 +13,13 @@ export const help = (args: BotCommand): Promise<void> => {
 		const command = commandArgs.shift();
 
 		if (commandsList.includes(command)) {
-			const commandInfoEmbed = COMMAND_INFO[command.toUpperCase()];
+			if (!(command.toUpperCase() in COMMAND_INFO)) {
+				sendError(message, `The command "${inlineCode(`${P}${command}`)}" does not seem to have any additional help information.`);
+				return;
+			}
 
-			if (typeof commandInfoEmbed === 'undefined') {
-				sendError(message, `The command "${inlineCode(`${BOT_PREFIX}${command}`)}" does not seem to have any additional help information.`);
-			}
-			else {
-				message.reply({ embeds: [COMMAND_INFO[command.toUpperCase()]] });
-			}
+			const commandInfoEmbed = COMMAND_INFO[command.toUpperCase()];
+			message.reply({ embeds: [commandInfoEmbed] });
 		}
 		else {
 			sendError(message, `${inlineCode(command)} is not a valid command!`);
@@ -29,29 +28,21 @@ export const help = (args: BotCommand): Promise<void> => {
 		return;
 	}
 
-	// -- This section will be re-written at a later date to remove hard-coded values --
-	const informationCommands = ['help', 'ping'];
-	const moderationCommands = ['ban', 'warn', 'watchlist'];
-	const utilityCommands = ['tcg', 'ignoredchannel', 'logchannel'];
-	const funCommands = ['8ball', 'birthday', 'dog', 'cat', 'fox'];
+	const commandsList: CommandsList = {
+		Dev: '',
+		Fun: '',
+		Information: '',
+		Moderation: '',
+		Ranking: '',
+		Utility: '',
+		Other: ''
+	};
+	for (const cmd in commands) {
+		const commandType = commands[cmd].type;
+		const modOnlyCommand = commands[cmd].modOnly ? '🛡️' : '';
 
-	let informationCommandsList = '';
-	let moderationCommandsList = '';
-	let utilityCommandsList = '';
-	let funCommandsList = '';
-	for (const cmd of informationCommands) {
-		informationCommandsList = informationCommandsList.concat(`${inlineCode(`${P}${cmd}`)} `);
+		commandsList[commandType] = commandsList[commandType].concat(`${inlineCode(`${modOnlyCommand}${P}${cmd}`)} `);
 	}
-	for (const cmd of moderationCommands) {
-		moderationCommandsList = moderationCommandsList.concat(`${inlineCode(`${P}${cmd}`)} `);
-	}
-	for (const cmd of utilityCommands) {
-		utilityCommandsList = utilityCommandsList.concat(`${inlineCode(`${P}${cmd}`)} `);
-	}
-	for (const cmd of funCommands) {
-		funCommandsList = funCommandsList.concat(`${inlineCode(`${P}${cmd}`)} `);
-	}
-	// ----
 
 	const helpMenuEmbed = new EmbedBuilder()
 		.setTitle('Available Commands')
@@ -59,26 +50,34 @@ export const help = (args: BotCommand): Promise<void> => {
 		.setFields([
 			{
 				name: '📋 Information',
-				value: informationCommandsList
+				value: commandsList.Information
 			},
 			{
 				name: '🛡️ Moderation',
-				value: moderationCommandsList
+				value: commandsList.Moderation
 			},
 			{
 				name: '🛠️ Utility',
-				value: utilityCommandsList
+				value: commandsList.Utility
 			},
 			{
 				name: '🎉 Fun',
-				value: funCommandsList
+				value: commandsList.Fun
 			},
 			{
 				name: '🏆 Ranking',
 				value: '`soon™️`'
 			}
 		])
+		.setFooter({ text: '🛡️ = Moderator command' })
 		.setColor(COLORS.COMMAND);
 
 	message.reply({ embeds: [helpMenuEmbed] });
+};
+
+export const help: Command = {
+	devOnly: false,
+	modOnly: false,
+	run: helpCommand,
+	type: 'Information'
 };

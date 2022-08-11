@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder, inlineCode, Message, User } from 'discord.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { BotCommand, WarningCount } from '../../index.js';
+import { BotCommand, Command, WarningCount } from '../../index.js';
 import { fetchDiscordUser } from '../../lib/misc/fetch-discord-user.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
@@ -320,7 +320,7 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 	}
 };
 
-export const warn = async (args: BotCommand): Promise<void> => {
+const warnCommand = async (args: BotCommand): Promise<void> => {
 	const { message, commandArgs } = args;
 	const operation = (commandArgs.shift() ?? 'undefined').toLowerCase();
 	const user = await fetchDiscordUser(message.client, operation.replace(/\D/g, ''));
@@ -362,4 +362,11 @@ export const warn = async (args: BotCommand): Promise<void> => {
 		sendError(message, `${inlineCode(operation)} is not a valid operation!\
 		\n*For help, run ${inlineCode(`${BOT_PREFIX}help warn`)}*`);
 	}
+};
+
+export const warn: Command = {
+	devOnly: false,
+	modOnly: true,
+	run: warnCommand,
+	type: 'Moderation'
 };

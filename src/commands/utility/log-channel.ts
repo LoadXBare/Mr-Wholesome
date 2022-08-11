@@ -1,18 +1,17 @@
 import { channelMention, EmbedBuilder, inlineCode, Message } from 'discord.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
+import { BotCommand, Command } from '../../index.js';
+import { fetchDiscordTextChannel } from '../../lib/misc/fetch-discord-text-channel.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
 const setLogChannel = async (message: Message, channelID: string): Promise<void> => {
-	let logChannelID = channelID.replace(/\D/g, '');
-	if (logChannelID.length === 0) {
-		logChannelID = 'undefined';
-	}
+	const logChannelID = channelID.replace(/\D/g, '');
 
-	const logChannel = await message.guild.channels.fetch(logChannelID).catch(() => { });
-	if (typeof logChannel === 'undefined') {
-		sendError(message, `${inlineCode(channelID)} is not a valid Channel!`);
+	const logChannel = await fetchDiscordTextChannel(message.guild, logChannelID);
+
+	if (logChannel === null) {
+		sendError(message, `${channelMention(logChannelID)} is not a valid Text Channel!`);
 		return;
 	}
 
@@ -41,7 +40,7 @@ const setLogChannel = async (message: Message, channelID: string): Promise<void>
 
 };
 
-export const logchannel = async (args: BotCommand): Promise<void> => {
+const logChannelCommand = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
 	const operation = commandArgs.shift() ?? 'undefined';
 
@@ -54,4 +53,11 @@ export const logchannel = async (args: BotCommand): Promise<void> => {
 		sendError(message, `${inlineCode(operation)} is not a valid operation!\
 		\n*For help, run ${inlineCode(`${BOT_PREFIX}help logchannel`)}*`);
 	}
+};
+
+export const logChannel: Command = {
+	devOnly: false,
+	modOnly: true,
+	run: logChannelCommand,
+	type: 'Utility'
 };
