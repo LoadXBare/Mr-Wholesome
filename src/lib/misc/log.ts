@@ -4,17 +4,13 @@ import { client } from '../../bot.js';
 import { COLORS } from '../../config/constants.js';
 import { config } from '../../private/config.js';
 import { fetchDiscordChannel } from './fetch-discord-channel.js';
+import { fetchUptime } from './fetch-uptime.js';
 
 export const log = async (...content: Array<unknown>): Promise<void> => {
 	const guild = await client.guilds.fetch(config.guildIDs['Load\'s Lounge']);
 	const logChannel = await fetchDiscordChannel(guild, config.channelIDs.botLogs) as TextChannel;
-	const currentTime = dayjs();
-	const clientReadyTime = dayjs(client.readyTimestamp);
-	const daysUptime = currentTime.diff(clientReadyTime, 'day');
-	const hoursUptime = currentTime.diff(clientReadyTime, 'hour');
-	const minutesUptime = currentTime.diff(clientReadyTime, 'minute');
-	const secondsUptime = currentTime.diff(clientReadyTime, 'second');
-	const uptime = `${daysUptime} days, ${hoursUptime} hours, ${minutesUptime} minutes & ${secondsUptime} seconds`;
+	const uptime = fetchUptime();
+	const uptimeText = `${uptime.days} days, ${uptime.hours} hours, ${uptime.minutes} minutes & ${uptime.seconds} seconds`;
 
 	const logEmbed = new EmbedBuilder()
 		.setAuthor({
@@ -22,7 +18,7 @@ export const log = async (...content: Array<unknown>): Promise<void> => {
 			iconURL: client.user.displayAvatarURL()
 		})
 		.setDescription(content.join(' '))
-		.setFooter({ text: `Uptime: ${uptime}` })
+		.setFooter({ text: `Uptime: ${uptimeText}` })
 		.setColor(COLORS.NEUTRAL);
 
 	console.log(`[${dayjs().format('DD/MM/YYYY HH:mm:ss.SSS')}]`, ...content);

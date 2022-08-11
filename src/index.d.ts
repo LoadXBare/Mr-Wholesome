@@ -134,3 +134,10 @@ export type ButtonInteract = {
 export type Suffixes = {
 	[num: number]: string
 }
+
+export type Uptime = {
+	days: number,
+	hours: number,
+	minutes: number,
+	seconds: number
+}
