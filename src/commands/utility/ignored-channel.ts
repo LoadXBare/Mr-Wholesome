@@ -1,7 +1,7 @@
 import { channelMention, EmbedBuilder, inlineCode, Message } from 'discord.js';
-import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
+import { BotCommand } from '../../index.js';
 import { fetchDiscordChannel } from '../../lib/misc/fetch-discord-channel.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
 import { sendError } from '../../lib/misc/send-error.js';

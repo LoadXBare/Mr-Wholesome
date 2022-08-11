@@ -1,33 +1,7 @@
 import { codeBlock, EmbedBuilder, inlineCode } from 'discord.js';
 import fetch from 'node-fetch';
-import { BotCommand } from '../..';
 import { COLORS } from '../../config/constants.js';
-
-type TradingCard = {
-	saveOnly: boolean,
-	type1: string,
-	type2: string,
-	displayname: string,
-	fulltext: string,
-	move2effect: string,
-	supporteffect: string,
-	references: Array<string>,
-	cardtitle: string,
-	hp: string,
-	move1dmg: string,
-	passive: string,
-	trellocard: string,
-	move2dmg: string,
-	move1type: string,
-	cardclass: string,
-	move2name: string,
-	move1effect: string,
-	move2type: string,
-	charactername: string,
-	move1name: string,
-	chardesc: string,
-	subbed: boolean
-};
+import { BotCommand, TradingCard } from '../../index.js';
 
 const checkTextLength = (text: string): string => {
 	const maxTextLength = 1024;

@@ -1,10 +1,6 @@
 import { ButtonInteraction, Interaction } from 'discord.js';
+import { ButtonInteract } from '../index.js';
 import interactions from '../interactions/index.js';
-
-type ButtonInteract = {
-	type: string,
-	[data: string]: string
-}
 
 export const handleInteraction = async (interaction: Interaction): Promise<void> => {
 	// Currently unused

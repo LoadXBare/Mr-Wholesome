@@ -59,3 +59,78 @@ export type ContentUpdate = {
 	newContent: string,
 	message: Message
 }
+
+export type Cat = Array<{
+	breeds: Array<string>,
+	id: string,
+	url: string,
+	width: number,
+	height: number
+}>
+
+export type Dog = Array<{
+	breeds: Array<string>,
+	id: string,
+	url: string,
+	width: number,
+	height: number
+}>
+
+export type Fox = {
+	image: string,
+	link: string
+}
+
+export type WarningCount = {
+	[userID: string]: {
+		warningCount: number,
+		oldWarnings: boolean
+	}
+}
+
+export type NoteCount = {
+	[userID: string]: number
+}
+
+export type TradingCard = {
+	saveOnly: boolean,
+	type1: string,
+	type2: string,
+	displayname: string,
+	fulltext: string,
+	move2effect: string,
+	supporteffect: string,
+	references: Array<string>,
+	cardtitle: string,
+	hp: string,
+	move1dmg: string,
+	passive: string,
+	trellocard: string,
+	move2dmg: string,
+	move1type: string,
+	cardclass: string,
+	move2name: string,
+	move1effect: string,
+	move2type: string,
+	charactername: string,
+	move1name: string,
+	chardesc: string,
+	subbed: boolean
+};
+
+export type Variables = {
+	[variable: string]: string
+}
+
+export type Interactions = {
+	[interaction: string]: Function
+}
+
+export type ButtonInteract = {
+	type: string,
+	[data: string]: string
+}
+
+export type Suffixes = {
+	[num: number]: string
+}

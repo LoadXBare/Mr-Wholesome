@@ -2,16 +2,9 @@ import dayjs from 'dayjs';
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder, inlineCode, Message, User } from 'discord.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { BotCommand } from '../../index.js';
+import { BotCommand, WarningCount } from '../../index.js';
 import { fetchDiscordUser } from '../../lib/misc/fetch-discord-user.js';
 import { sendError } from '../../lib/misc/send-error.js';
-
-type WarningCount = {
-	[userID: string]: {
-		warningCount: number,
-		oldWarnings: boolean
-	}
-}
 
 const addWarning = async (message: Message, warnedUser: User, warningReason: string): Promise<void> => {
 	const creatorUserID = message.author.id;

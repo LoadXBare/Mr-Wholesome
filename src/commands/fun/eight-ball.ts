@@ -1,6 +1,6 @@
 import { EmbedBuilder } from 'discord.js';
-import { BotCommand } from '../..';
 import { COLORS } from '../../config/constants.js';
+import { BotCommand } from '../../index.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
 export const eightBall = (args: BotCommand): void => {

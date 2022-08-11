@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { AuditLogEvent, channelMention, EmbedBuilder, inlineCode, Message } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
@@ -44,7 +45,10 @@ export const messageDelete = async (message: Message): Promise<void> => {
 		.setColor(COLORS.NEGATIVE);
 
 	// Message was deleted by the person who sent it
-	if (typeof latestAuditLog === 'undefined' || latestAuditLog.target.id !== author.id) {
+	if (typeof latestAuditLog === 'undefined'
+		|| latestAuditLog.target.id !== author.id
+		|| (dayjs().valueOf() - 10000) > latestAuditLog.createdTimestamp // was the audit log created in the last 10 seconds?
+	) {
 		logEntryEmbed.addFields([
 			{
 				name: 'Deleted By',

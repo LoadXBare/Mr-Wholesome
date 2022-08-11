@@ -1,11 +1,8 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, channelMention, ChannelType, PermissionFlagsBits, userMention } from 'discord.js';
 import { mongodb } from '../api/mongo.js';
+import { Variables } from '../index.js';
 import { fetchGuildMember } from '../lib/misc/fetch-guild-member.js';
 import { config } from '../private/config.js';
-
-type Variables = {
-	[variable: string]: string
-}
 
 export const createTicket = async (interaction: ButtonInteraction): Promise<void> => {
 	await interaction.deferReply({ ephemeral: true });

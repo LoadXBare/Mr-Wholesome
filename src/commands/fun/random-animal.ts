@@ -1,28 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
 import fetch from 'node-fetch';
-import { BotCommand } from '../..';
 import { COLORS } from '../../config/constants.js';
-
-type Cat = Array<{
-	breeds: Array<string>,
-	id: string,
-	url: string,
-	width: number,
-	height: number
-}>
-
-type Dog = Array<{
-	breeds: Array<string>,
-	id: string,
-	url: string,
-	width: number,
-	height: number
-}>
-
-type Fox = {
-	image: string,
-	link: string
-}
+import { BotCommand, Cat, Dog, Fox } from '../../index.js';
 
 export const cat = async (args: BotCommand): Promise<void> => {
 	const { message } = args;

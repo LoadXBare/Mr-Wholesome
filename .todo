@@ -1,6 +1,5 @@
 Todos:
 	New:
-		☐ Ticket system
 		☐ Random animal command
 			✔ Fox
 			✔ Cat
@@ -36,6 +35,7 @@ Done:
 	✔ Re-write all existing files for Version 1.0
 	✔ Add the ability to view all warnings within a guild
 	✔ Simplify command names
+	✔ Ticket system
 
 Cancelled:
 	✘ Remove hardcoded roles from `role-button-menu.ts`

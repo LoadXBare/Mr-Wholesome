@@ -1,5 +1,5 @@
 import { EmbedBuilder, GatewayIntentBits, inlineCode } from 'discord.js';
-import { Colors, CommandInfo } from '..';
+import { Colors, CommandInfo } from '../index.js';
 import { numSuffix } from '../lib/misc/number-suffix.js';
 import { config } from '../private/config.js';
 

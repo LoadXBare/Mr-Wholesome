@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, inlineCode, TextChannel } from 'discord.js';
-import { BotCommand } from '..';
 import { COLORS } from '../config/constants.js';
+import { BotCommand } from '../index.js';
 import { fetchDiscordChannel } from '../lib/misc/fetch-discord-channel.js';
 import { generateId } from '../lib/misc/generate-id.js';
 import { sendError } from '../lib/misc/send-error.js';

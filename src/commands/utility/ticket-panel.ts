@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, channelMention, codeBlock, Collection, EmbedBuilder, inlineCode, Message, TextChannel, time } from 'discord.js';
-import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
+import { BotCommand } from '../../index.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
 const embedPrompt = async (message: Message, commandReply: Message, prompt: string): Promise<string> => {

@@ -1,14 +1,10 @@
 import dayjs from 'dayjs';
 import { EmbedBuilder, inlineCode, Message, User } from 'discord.js';
-import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
+import { BotCommand, NoteCount } from '../../index.js';
 import { fetchDiscordUser } from '../../lib/misc/fetch-discord-user.js';
 import { sendError } from '../../lib/misc/send-error.js';
-
-type NoteCount = {
-	[userID: string]: number
-}
 
 const addNote = async (creatorUser: User, watchedUser: User, noteText: string, message: Message): Promise<void> => {
 	const note = await mongodb.userWatchlist.create({

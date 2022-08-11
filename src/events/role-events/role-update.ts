@@ -1,6 +1,6 @@
 import { EmbedBuilder, inlineCode, Role } from 'discord.js';
-import { RoleChanges } from '../..';
 import { COLORS } from '../../config/constants.js';
+import { RoleChanges } from '../../index.js';
 import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 
 export const roleUpdate = async (oldRole: Role, newRole: Role): Promise<void> => {
@@ -23,9 +23,9 @@ export const roleUpdate = async (oldRole: Role, newRole: Role): Promise<void> =>
 
 	const roleChanges: Array<RoleChanges> = ['name', 'color', 'hoist', 'mentionable'];
 
-	roleChanges.forEach((change) => {
+	for (const change of roleChanges) {
 		if (oldRole[change] === newRole[change]) {
-			return;
+			continue;
 		}
 
 		const roleChangeUppercase = change.charAt(0).toUpperCase() + change.slice(1);
@@ -45,10 +45,10 @@ export const roleUpdate = async (oldRole: Role, newRole: Role): Promise<void> =>
 				}
 			]);
 		}
-	});
+	}
 
-	// Don't send an embed with no changes listed, happens when only a role's position is updated
-	if (logEntryEmbed.data.fields.length === 0) {
+	// Don't send an embed with no changes listed, happens when a role's position or permissions are updated
+	if (typeof logEntryEmbed.data.fields === 'undefined') {
 		return;
 	}
 

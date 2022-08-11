@@ -1,6 +1,4 @@
-type Suffixes = {
-	[num: number]: string
-}
+import { Suffixes } from '../../index.js';
 
 export const numSuffix = (num: number): string => {
 	const numStr = num.toString();

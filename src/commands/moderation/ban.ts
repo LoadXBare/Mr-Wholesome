@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, codeBlock, ComponentType, EmbedBuilder, inlineCode, Message, User } from 'discord.js';
-import { BotCommand } from '../..';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
+import { BotCommand } from '../../index.js';
 import { fetchDiscordUser } from '../../lib/misc/fetch-discord-user.js';
 import { sendError } from '../../lib/misc/send-error.js';
 import { sleep } from '../../lib/misc/sleep.js';

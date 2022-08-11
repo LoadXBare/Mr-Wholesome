@@ -1,4 +1,4 @@
-import { BotCommand } from '../..';
+import { BotCommand } from '../../index.js';
 import { warning } from '../../lib/scheduler.js';
 
 export const warningReminder = (args: BotCommand): void => {
