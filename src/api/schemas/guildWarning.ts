@@ -8,4 +8,4 @@ const guildWarningSchema = new mongoose.Schema({
 	warningDate: { type: String, required: true }
 });
 
-export default mongoose.model('guild-warning', guildWarningSchema);
+export const guildWarning = mongoose.model('guild-warning', guildWarningSchema);

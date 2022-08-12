@@ -71,7 +71,7 @@ const upcomingBirthdays = async (message: Message): Promise<void> => {
 	message.reply({ embeds: [upcomingBirthdaysEmbed] });
 };
 
-const birthdayCommand = async (args: BotCommand): Promise<void> => {
+const birthdayCommand = (args: BotCommand): void => {
 	const { commandArgs, message } = args;
 	const operation = (commandArgs.shift() ?? 'undefined').toLowerCase();
 

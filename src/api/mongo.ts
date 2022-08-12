@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 import { log } from '../lib/misc/log.js';
 import { config } from '../private/config.js';
-import guildBan from './schemas/guildBan.js';
-import guildConfig from './schemas/guildConfig.js';
-import guildTicket from './schemas/guildTicket.js';
-import guildTicketPanel from './schemas/guildTicketPanel.js';
-import guildWarning from './schemas/guildWarning.js';
-import userBirthday from './schemas/userBirthday.js';
-import userWatchlist from './schemas/userWatchlist.js';
+import { guildBan } from './schemas/guildBan.js';
+import { guildConfig } from './schemas/guildConfig.js';
+import { guildTicket } from './schemas/guildTicket.js';
+import { guildTicketPanel } from './schemas/guildTicketPanel.js';
+import { guildWarning } from './schemas/guildWarning.js';
+import { userBirthday } from './schemas/userBirthday.js';
+import { userWatchlist } from './schemas/userWatchlist.js';
 
 const connectToDatabase = async (): Promise<void> => {
 	try {

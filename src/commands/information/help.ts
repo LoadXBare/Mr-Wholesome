@@ -2,7 +2,7 @@ import { EmbedBuilder, inlineCode } from 'discord.js';
 import { BOT_PREFIX, COLORS, COMMAND_INFO } from '../../config/constants.js';
 import { BotCommand, Command, CommandsList } from '../../index.js';
 import { sendError } from '../../lib/misc/send-error.js';
-import commands from '../index.js';
+import { commands } from '../index.js';
 
 const helpCommand = (args: BotCommand): Promise<void> => {
 	const { message, commandArgs } = args;
@@ -37,11 +37,9 @@ const helpCommand = (args: BotCommand): Promise<void> => {
 		Utility: '',
 		Other: ''
 	};
-	for (const cmd in commands) {
-		const commandType = commands[cmd].type;
-		const modOnlyCommand = commands[cmd].modOnly ? '🛡️' : '';
-
-		commandsList[commandType] = commandsList[commandType].concat(`${inlineCode(`${modOnlyCommand}${P}${cmd}`)} `);
+	for (const [cmd, cmdConfig] of Object.entries(commands)) {
+		const modOnlyCommand = cmdConfig.modOnly ? '🛡️' : '';
+		commandsList[cmdConfig.type] = commandsList[cmdConfig.type].concat(`${inlineCode(`${modOnlyCommand}${P}${cmd}`)} `);
 	}
 
 	const helpMenuEmbed = new EmbedBuilder()

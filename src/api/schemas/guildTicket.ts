@@ -5,4 +5,4 @@ const guildTicketSchema = new mongoose.Schema({
 	ticketOpen: { type: Boolean, require: true }
 });
 
-export default mongoose.model('guild-ticket', guildTicketSchema);
+export const guildTicket = mongoose.model('guild-ticket', guildTicketSchema);

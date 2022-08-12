@@ -92,7 +92,7 @@ const resetIgnoredChannels = async (message: Message): Promise<void> => {
 	message.reply({ embeds: [resetIgnoredChannelsEmbed] });
 };
 
-const ignoredChannelCommand = async (args: BotCommand): Promise<void> => {
+const ignoredChannelCommand = (args: BotCommand): void => {
 	const { commandArgs, message } = args;
 	const operation = (commandArgs.shift() ?? 'undefined').toLowerCase();
 

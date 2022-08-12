@@ -1,18 +1,8 @@
-import { Attachment, Collection, ColorResolvable, EmbedBuilder, Message } from 'discord.js';
+import { ColorResolvable, EmbedBuilder, Message } from 'discord.js';
 
 export type InteractionTypes =
 	| 'ignore'
 	| 'role'
-
-export type BotInteractionInfo = {
-	type: string,
-	[index: string]: string
-}
-
-export type ButtonChoice = {
-	type: InteractionTypes,
-	value: string
-}
 
 export type Events = {
 	[event: string]: Function
@@ -62,18 +52,6 @@ export type Colors = {
 	TIMEOUT: ColorResolvable,
 	NEGATIVE: ColorResolvable,
 	POSITIVE: ColorResolvable
-}
-
-export type AttachmentUpdate = {
-	oldAttachments: Collection<string, Attachment>,
-	newAttachments: Collection<string, Attachment>,
-	message: Message
-}
-
-export type ContentUpdate = {
-	oldContent: string,
-	newContent: string,
-	message: Message
 }
 
 export type Cat = Array<{

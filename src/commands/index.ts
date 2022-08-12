@@ -17,7 +17,7 @@ import { ignoredChannel } from './utility/ignored-channel.js';
 import { logChannel } from './utility/log-channel.js';
 import { ticketPanel } from './utility/ticket-panel.js';
 
-const commands: Commands = {
+export const commands: Commands = {
 	'$stop': stop,
 	'$warn': warningReminder,
 	'birthday': birthday,
@@ -36,5 +36,3 @@ const commands: Commands = {
 	'logchannel': logChannel,
 	'ticketpanel': ticketPanel
 };
-
-export default commands;

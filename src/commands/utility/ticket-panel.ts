@@ -280,7 +280,7 @@ const listPanels = async (message: Message): Promise<void> => {
 	message.reply({ embeds: [panelsListEmbed] });
 };
 
-const ticketPanelCommand = async (args: BotCommand): Promise<void> => {
+const ticketPanelCommand = (args: BotCommand): void => {
 	const { commandArgs, message } = args;
 	const operation = commandArgs.shift();
 

@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import commands from '../commands/index.js';
+import { commands } from '../commands/index.js';
 import { BotCommand } from '../index.js';
 import { config } from '../private/config.js';
 import { isModerator } from './misc/check-moderator.js';

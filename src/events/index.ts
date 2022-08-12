@@ -13,7 +13,7 @@ import { roleCreate } from './role-events/role-create.js';
 import { roleDelete } from './role-events/role-delete.js';
 import { roleUpdate } from './role-events/role-update.js';
 
-const events: Events = {
+export const events: Events = {
 	'guildBanAdd': guildBanAdd,
 	'guildBanRemove': guildBanRemove,
 	'guildMemberAdd': guildMemberAdd,
@@ -28,5 +28,3 @@ const events: Events = {
 	'roleDelete': roleDelete,
 	'roleUpdate': roleUpdate
 };
-
-export default events;

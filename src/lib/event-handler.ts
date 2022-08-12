@@ -1,8 +1,8 @@
 import { Client } from 'discord.js';
 import schedule from 'node-schedule';
-import events from '../events/index.js';
+import { events } from '../events/index.js';
 
-export const initializeEventHandler = async (client: Client): Promise<void> => {
+export const initializeEventHandler = (client: Client): void => {
 	const eventsArray = Object.keys(events);
 
 	for (const event of eventsArray) {

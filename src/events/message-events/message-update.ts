@@ -42,7 +42,7 @@ const editContent = (content: string, sliceIndex: number, maxLength: number): st
 	}
 };
 
-const contentUpdate = async (oldContent: string, newContent: string, message: Message): Promise<EmbedBuilder> => {
+const contentUpdate = (oldContent: string, newContent: string, message: Message): EmbedBuilder => {
 	const { author, channel, member } = message;
 	const maxLength = 800;
 	const charsBeforeEdit = 10;

@@ -9,4 +9,4 @@ const guildBanSchema = new mongoose.Schema({
 	unbanned: { type: Boolean, required: true }
 });
 
-export default mongoose.model('guild-ban', guildBanSchema);
+export const guildBan = mongoose.model('guild-ban', guildBanSchema);

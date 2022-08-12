@@ -40,7 +40,7 @@ const setLogChannel = async (message: Message, channelID: string): Promise<void>
 
 };
 
-const logChannelCommand = async (args: BotCommand): Promise<void> => {
+const logChannelCommand = (args: BotCommand): void => {
 	const { commandArgs, message } = args;
 	const operation = commandArgs.shift() ?? 'undefined';
 

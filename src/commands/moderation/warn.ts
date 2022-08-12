@@ -224,12 +224,12 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 			}
 		}
 
-		for (const warnedUserID in userWarningsStats) {
-			const warnedUser = await fetchDiscordUser(message.client, warnedUserID);
-			const warningStats = userWarningsStats[warnedUserID];
+		for (const [userID, warningStats] of Object.entries(userWarningsStats)) {
+			const warnedUser = await fetchDiscordUser(message.client, userID);
 			const oldWarningText = warningStats.oldWarnings ? '⏱️' : '';
+			const warningCount = warningStats.warningCount === 1 ? `${warningStats.warningCount} warning` : `${warningStats.warningCount} warnings`;
 
-			warningsList = warningsList.concat(`**${warnedUser.tag}** ${inlineCode(`[${warnedUser.id}]`)} - ${warningStats.warningCount} warning(s) ${oldWarningText}\n`);
+			warningsList = warningsList.concat(`**${warnedUser.tag}** ${inlineCode(`[${warnedUser.id}]`)} - ${warningCount} ${oldWarningText}\n`);
 		}
 
 		const guildWarningsEmbed = new EmbedBuilder()

@@ -5,12 +5,10 @@ import { deleteTicket } from './delete-ticket.js';
 import { openTicket } from './open-ticket.js';
 import { updateRole } from './update-role.js';
 
-const interactions: Interactions = {
+export const interactions: Interactions = {
 	'closeTicket': closeTicket,
 	'createTicket': createTicket,
 	'deleteTicket': deleteTicket,
 	'openTicket': openTicket,
 	'role': updateRole
 };
-
-export default interactions;

@@ -8,4 +8,4 @@ const userWatchlistSchema = new mongoose.Schema({
 	noteText: { type: String, default: 'None provided.' }
 });
 
-export default mongoose.model('user-watchlist', userWatchlistSchema);
+export const userWatchlist = mongoose.model('user-watchlist', userWatchlistSchema);

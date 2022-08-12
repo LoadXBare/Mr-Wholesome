@@ -6,4 +6,4 @@ const guildConfigSchema = new mongoose.Schema({
 	ignoredChannelIDs: { type: [String], default: null }
 });
 
-export default mongoose.model('guild-config', guildConfigSchema);
+export const guildConfig = mongoose.model('guild-config', guildConfigSchema);

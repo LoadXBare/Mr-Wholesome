@@ -1,23 +1,17 @@
 import { ButtonInteraction, Interaction } from 'discord.js';
 import { ButtonInteract } from '../index.js';
-import interactions from '../interactions/index.js';
+import { interactions } from '../interactions/index.js';
 
-export const handleInteraction = async (interaction: Interaction): Promise<void> => {
-	// Currently unused
-};
+export const handleInteraction = (interaction: Interaction): void => {
+	if (interaction.isButton) {
+		const buttonInteraction = interaction as ButtonInteraction;
+		const buttonData: ButtonInteract = JSON.parse(buttonInteraction.customId);
 
-export const handleButtonInteraction = async (interaction: ButtonInteraction): Promise<void> => {
-	const data: ButtonInteract = JSON.parse(interaction.customId);
-	const type = data.type;
-
-	if (type === 'ignore') {
-		return;
-	}
-
-	try {
-		interactions[type](interaction);
-	}
-	catch {
-		// interaction type does not exist
+		try {
+			interactions[buttonData.type](buttonInteraction);
+		}
+		catch {
+			return;
+		}
 	}
 };

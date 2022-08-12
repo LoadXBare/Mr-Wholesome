@@ -5,4 +5,4 @@ const userBirthdaySchema = new mongoose.Schema({
 	birthday: { type: String, required: true }
 });
 
-export default mongoose.model('user-birthday', userBirthdaySchema);
+export const userBirthday = mongoose.model('user-birthday', userBirthdaySchema);

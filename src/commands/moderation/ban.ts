@@ -224,7 +224,7 @@ const removeBan = async (banID: string, message: Message): Promise<void> => {
 	}
 };
 
-const viewBans = async (banID: string, message: Message): Promise<void> => {
+const viewBans = (banID: string, message: Message): void => {
 	const viewGuildBans = async (): Promise<void> => {
 		const guildBansList = await mongodb.guildBan.find({
 			guildID: message.guildId

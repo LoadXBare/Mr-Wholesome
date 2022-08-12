@@ -8,4 +8,4 @@ const guildTicketPanelSchema = new mongoose.Schema({
 	panelName: { type: String, required: true }
 });
 
-export default mongoose.model('guild-ticket-panel', guildTicketPanelSchema);
+export const guildTicketPanel = mongoose.model('guild-ticket-panel', guildTicketPanelSchema);

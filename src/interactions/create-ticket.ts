@@ -50,9 +50,9 @@ export const createTicket = async (interaction: ButtonInteraction): Promise<void
 	};
 
 	let ticketEmbedData = panel.ticketEmbedJSON;
-	for (const variable in variables) {
+	for (const [variable, value] of Object.entries(variables)) {
 		const regex = new RegExp(`${variable}`, 'g');
-		ticketEmbedData = ticketEmbedData.replace(regex, variables[variable]);
+		ticketEmbedData = ticketEmbedData.replace(regex, value);
 	}
 
 	const databaseEntry = await mongodb.guildTicket.create({
