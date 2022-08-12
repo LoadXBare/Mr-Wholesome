@@ -13,7 +13,7 @@ export const deleteTicket = async (interaction: ButtonInteraction): Promise<void
 		.setColor(COLORS.NEGATIVE);
 
 	await interaction.reply({ embeds: [deletingTicketEmbed] });
-	await sleep(deletionDelay);
 	await mongodb.guildTicket.findByIdAndDelete(data.ticketID);
-	await interaction.channel.delete();
+	await sleep(deletionDelay);
+	interaction.channel.delete();
 };

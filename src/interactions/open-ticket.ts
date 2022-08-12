@@ -17,7 +17,7 @@ export const openTicket = async (interaction: ButtonInteraction): Promise<void> 
 	const ticketChannel = interaction.channel as TextChannel;
 	const ticketCreator = await fetchGuildMember(interaction.guild, ticketInfo.creatorID);
 
-	await ticketChannel.permissionOverwrites.edit(ticketCreator.id, {
+	await ticketChannel.permissionOverwrites.create(ticketCreator.id, {
 		ViewChannel: true
 	});
 	ticketChannel.setName(`❌${ticketCreator.displayName}`);

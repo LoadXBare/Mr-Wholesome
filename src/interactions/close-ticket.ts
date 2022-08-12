@@ -17,9 +17,7 @@ export const closeTicket = async (interaction: ButtonInteraction): Promise<void>
 	const ticketChannel = interaction.channel as TextChannel;
 	const ticketCreator = await fetchGuildMember(interaction.guild, ticketInfo.creatorID);
 
-	await ticketChannel.permissionOverwrites.edit(ticketCreator.id, {
-		ViewChannel: false
-	});
+	await ticketChannel.permissionOverwrites.delete(ticketCreator.id);
 	ticketChannel.setName(`✅${ticketCreator.displayName}`);
 	await ticketInfo.updateOne({
 		$set: { ticketOpen: false }
