@@ -1,4 +1,4 @@
-import { Attachment, Client, Collection, TextChannel } from 'discord.js';
+import { Attachment, AttachmentBuilder, Client, Collection, TextChannel } from 'discord.js';
 import { config } from '../../private/config.js';
 
 export const storeAttachments = async (attachments: Collection<string, Attachment>, client: Client): Promise<Array<string>> => {
@@ -22,4 +22,20 @@ export const storeAttachments = async (attachments: Collection<string, Attachmen
 	}
 
 	return imageURLs;
+};
+
+export const storeAttachment = async (attachment: AttachmentBuilder, client: Client): Promise<string> => {
+	const imageStorageChannel = await client.channels.fetch(config.channelIDs.botImageStorage) as TextChannel;
+
+	try {
+		const storedImage = await imageStorageChannel.send({
+			files: [attachment]
+		});
+
+		const attachmentURL = storedImage.attachments.at(0).url;
+		return attachmentURL;
+	}
+	catch {
+		return null;
+	}
 };

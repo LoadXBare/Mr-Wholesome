@@ -167,6 +167,8 @@ export const warning = async (client: Client, nextRunDate: Date): Promise<void> 
 	warningReminderChannel.send({ content: rolePing, embeds: [warningReminderEmbed] });
 };
 
+export const wsPingHistory: Array<number> = [];
+
 export const startScheduler = (client: Client): void => {
 	// Runs at 12:00am UTC each day
 	const birthdayScheduler = schedule.scheduleJob('0 0 * * * ', () => {
@@ -181,4 +183,11 @@ export const startScheduler = (client: Client): void => {
 		log(`Warning scheduler ran! Next run date: ${dayjs(warningScheduler.nextInvocation()).format('MMMM DD, YYYY')}`);
 	});
 	log(`Warning scheduler will run on ${dayjs(warningScheduler.nextInvocation()).format('MMMM DD, YYYY')}!`);
+
+	schedule.scheduleJob('*/5 * * * *', () => {
+		wsPingHistory.push(client.ws.ping);
+		if (wsPingHistory.length > 500) {
+			wsPingHistory.shift();
+		}
+	});
 };
