@@ -55,6 +55,13 @@ const contentUpdate = (oldContent: string, newContent: string, message: Message)
 	editedOldContent = editContent(oldContent, sliceIndex, maxLength);
 	editedNewContent = editContent(newContent, sliceIndex, maxLength);
 
+	if (editedOldContent.length === 0) {
+		editedOldContent = inlineCode('None');
+	}
+	if (editedNewContent.length === 0) {
+		editedNewContent = inlineCode('None');
+	}
+
 	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: 'Message Edited'
@@ -135,7 +142,7 @@ export const messageUpdate = async (oldMessage: Message, newMessage: Message): P
 	}
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.warning);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

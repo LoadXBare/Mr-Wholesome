@@ -25,12 +25,10 @@ const pingCommand = async (args: BotCommand): Promise<void> => {
 		.chtt('Latency')
 		.chts('969696,20');
 
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	//@ts-ignore .toFile() does exist, just not within image-charts' index.d.ts file
-	await historyGraph.toFile('./temp.png');
+	const buffer = await historyGraph.toBuffer();
 
 	const reply = await message.reply({ content: 'uwu' });
-	const historyGraphURL = await storeAttachment(new AttachmentBuilder('./temp.png'), message.client);
+	const historyGraphURL = await storeAttachment(new AttachmentBuilder(buffer), message.client);
 
 	const pingCommand = new EmbedBuilder()
 		.setTitle('Tweet!')

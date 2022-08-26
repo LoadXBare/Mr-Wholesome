@@ -28,7 +28,7 @@ export const guildBanRemove = async (ban: GuildBan): Promise<void> => {
 		.setColor(COLORS.POSITIVE);
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.warning);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

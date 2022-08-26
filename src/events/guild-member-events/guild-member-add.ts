@@ -29,7 +29,7 @@ export const guildMemberAdd = async (member: GuildMember): Promise<void> => {
 		.setColor(COLORS.POSITIVE);
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.warning);
 	}
 
 	try {

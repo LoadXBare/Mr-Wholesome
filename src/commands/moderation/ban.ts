@@ -66,7 +66,7 @@ const addBan = async (message: Message, bannedUser: User, reason: string, days: 
 
 	if (choice === 'YesDM' || choice === 'Yes') {
 		const ban = await mongodb.guildBan.create({
-			banDate: dayjs().toISOString(),
+			banDate: dayjs().utc().toISOString(),
 			bannedUserID: bannedUserID,
 			banReason: reason,
 			creatorUserID: creatorUserID,
@@ -287,7 +287,7 @@ const viewBans = (banID: string, message: Message): void => {
 				},
 				{
 					name: 'Banned On',
-					value: dayjs(ban.banDate).format('MMMM DD, YYYY [at] hh:mma UTC')
+					value: dayjs(ban.banDate).utc().format('MMMM DD, YYYY [at] hh:mma UTC')
 				},
 				{
 					name: 'Ban Reason',

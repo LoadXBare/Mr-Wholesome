@@ -3,7 +3,7 @@ import { client } from '../../bot.js';
 import { Uptime } from '../../index.js';
 
 export const fetchUptime = (): Uptime => {
-	const currentTime = dayjs();
+	const currentTime = dayjs().utc();
 	const clientReadyTime = dayjs(client.readyTimestamp);
 	const daysUptime = currentTime.diff(clientReadyTime, 'day');
 	const hoursUptime = currentTime.diff(clientReadyTime, 'hour') % 24;

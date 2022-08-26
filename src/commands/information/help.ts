@@ -64,7 +64,7 @@ const helpCommand = (args: BotCommand): Promise<void> => {
 			},
 			{
 				name: '🏆 Ranking',
-				value: '`soon™️`'
+				value: commandsList.Ranking
 			}
 		])
 		.setFooter({ text: '🛡️ = Moderator command' })

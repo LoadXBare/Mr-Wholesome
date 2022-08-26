@@ -11,7 +11,7 @@ const addNote = async (creatorUser: User, watchedUser: User, noteText: string, m
 		creatorUserID: creatorUser.id,
 		watchedUserID: watchedUser.id,
 		guildID: message.guildId,
-		creationDate: dayjs().toISOString(),
+		creationDate: dayjs().utc().toISOString(),
 		noteText: noteText
 	});
 
@@ -29,7 +29,7 @@ const addNote = async (creatorUser: User, watchedUser: User, noteText: string, m
 			},
 			{
 				name: 'Added On',
-				value: dayjs(note.creationDate).format('MMMM DD, YYYY [at] hh:mma UTC')
+				value: dayjs(note.creationDate).utc().format('MMMM DD, YYYY [at] hh:mma UTC')
 			},
 			{
 				name: 'Note Text',

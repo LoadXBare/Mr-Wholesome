@@ -47,7 +47,7 @@ const upcomingBirthdays = async (message: Message): Promise<void> => {
 	let birthdaysList = '';
 	let birthdayCount = 0;
 	for (let i = 0; i < upcomingBirthdayDayLimit; i++) {
-		const dayToCheck = dayjs().add(i, 'day').format('MMMM DD');
+		const dayToCheck = dayjs().utc().add(i, 'day').format('MMMM DD');
 
 		for (const birthday of birthdays) {
 			if (birthday.birthday === dayToCheck) {

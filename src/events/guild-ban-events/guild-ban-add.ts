@@ -29,7 +29,7 @@ export const guildBanAdd = async (ban: GuildBan): Promise<void> => {
 		.setColor(COLORS.NEGATIVE);
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.warning);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

@@ -3,9 +3,11 @@ import { log } from '../lib/misc/log.js';
 import { config } from '../private/config.js';
 import { guildBan } from './schemas/guildBan.js';
 import { guildConfig } from './schemas/guildConfig.js';
+import { guildRanking } from './schemas/guildRanking.js';
 import { guildTicket } from './schemas/guildTicket.js';
 import { guildTicketPanel } from './schemas/guildTicketPanel.js';
 import { guildWarning } from './schemas/guildWarning.js';
+import { memberStats } from './schemas/memberStats.js';
 import { userBirthday } from './schemas/userBirthday.js';
 import { userWatchlist } from './schemas/userWatchlist.js';
 
@@ -27,9 +29,11 @@ export const mongodb = {
 	connectToDatabase,
 	guildBan,
 	guildConfig,
+	guildRanking,
 	guildTicket,
 	guildTicketPanel,
 	guildWarning,
+	memberStats,
 	userBirthday,
 	userWatchlist
 };

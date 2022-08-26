@@ -122,7 +122,7 @@ export const messageDelete = async (message: Message): Promise<void> => {
 	}
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.warning);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

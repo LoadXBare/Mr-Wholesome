@@ -12,11 +12,11 @@ import { log } from './misc/log.js';
 const checkRoles = async (client: Client): Promise<void> => {
 	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
 	const akiasBirthday = 'September 03';
-	const currentDate = dayjs().format('MMMM DD');
+	const currentDate = dayjs().utc().format('MMMM DD');
 	const birthdayList = await mongodb.userBirthday.find();
 
 	log('Checking roles...');
-	const startTime = dayjs().valueOf();
+	const startTime = dayjs().utc().valueOf();
 
 	if (currentDate !== akiasBirthday) {
 		const member = await fetchGuildMember(guild, config.userIDs.Akialyne);
@@ -53,13 +53,13 @@ const checkRoles = async (client: Client): Promise<void> => {
 		}
 	}
 
-	log(`Roles checked! (${(dayjs().valueOf() - startTime).toLocaleString()}ms)`);
+	log(`Roles checked! (${(dayjs().utc().valueOf() - startTime).toLocaleString()}ms)`);
 };
 
 const postBirthdayMessage = async (client: Client): Promise<void> => {
 	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
 	const birthdayChannel = await fetchDiscordTextChannel(guild, config.channelIDs.birthdayAnnouncements);
-	const currentDate = dayjs().format('MMMM DD');
+	const currentDate = dayjs().utc().format('MMMM DD');
 	const birthdaysToday = await mongodb.userBirthday.find({
 		birthday: currentDate
 	});
@@ -145,7 +145,7 @@ export const warning = async (client: Client, nextRunDate: Date): Promise<void> 
 			warningDate: 'descending'
 		});
 
-		const warningAgeInMonths = dayjs().diff(dayjs(latestWarning.warningDate), 'month');
+		const warningAgeInMonths = dayjs().utc().diff(dayjs(latestWarning.warningDate), 'month');
 		if (warningAgeInMonths >= 6) {
 			const warnedUser = await fetchDiscordUser(client, latestWarning.warnedUserID);
 			warningsList = warningsList.concat(`\n**${warningAgeInMonths} months ago** - **${warnedUser.tag}** (${inlineCode(latestWarning.id)})`);

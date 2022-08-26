@@ -139,3 +139,25 @@ export type Uptime = {
 export type CommandsList = {
 	[type in CommandTypes]: string;
 };
+
+export interface GuildRanking {
+	guildID: string,
+	memberID: string,
+	xp: number,
+	xpLevel: number,
+	credits: number
+}
+
+export interface XPLevelBounds {
+	lower: number,
+	upper: number
+}
+
+export interface MemberStats {
+	guildID: string,
+	memberID: string,
+	messageCount: number,
+	messageCountByHour: {
+		[hour: string]: number
+	}
+}

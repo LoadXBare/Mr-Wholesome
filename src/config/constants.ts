@@ -5,6 +5,16 @@ import { config } from '../private/config.js';
 
 export const BOT_PREFIX = config.botPrefix;
 
+export const xpPerMessage = {
+	min: 5,
+	max: 15
+};
+
+export const creditsPerMessage = {
+	min: 1,
+	max: 5
+};
+
 export const COLORS: Colors = {
 	COMMAND: '#704f95',
 	SUCCESS: '#2f9340',
@@ -31,13 +41,13 @@ export const COMMAND_INFO: CommandInfo = {
 		.setFields([
 			{
 				name: 'Example 1',
-				value: `${inlineCode(`${BOT_PREFIX}warn @LoadXBare#7156`)}\
-				\n┗ Warns @LoadXBare#7156 without a reason.`
+				value: `${inlineCode(`${BOT_PREFIX}warn @Akialyne#6260`)}\
+				\n┗ Warns @Akialyne#6260 without a reason.`
 			},
 			{
 				name: 'Example 2',
-				value: `${inlineCode(`${BOT_PREFIX}warn add @LoadXBare#7156 Spamming!`)}\
-				\n┗ Warns @LoadXBare#7156 with the reason "Spamming!".`
+				value: `${inlineCode(`${BOT_PREFIX}warn add @Akialyne#6260 Spamming!`)}\
+				\n┗ Warns @Akialyne#6260 with the reason "Spamming!".`
 			},
 			{
 				name: 'Example 3',
@@ -51,8 +61,8 @@ export const COMMAND_INFO: CommandInfo = {
 			},
 			{
 				name: 'Example 5',
-				value: `${inlineCode(`${BOT_PREFIX}warn view @LoadXBare#7156`)}\
-				\n┗ Displays all warnings for LoadXBare#7156.`
+				value: `${inlineCode(`${BOT_PREFIX}warn view @Akialyne#6260`)}\
+				\n┗ Displays all warnings for @Akialyne#6260.`
 			}
 		])
 		.setColor(COLORS.COMMAND),
@@ -89,8 +99,8 @@ export const COMMAND_INFO: CommandInfo = {
 		.setFields([
 			{
 				name: 'Example 1',
-				value: `${inlineCode(`${BOT_PREFIX}watchlist add @LoadXBare#7156 Not taking a break!`)}\
-				\n┗ Adds a note to @LoadXBare#7156 with the text "Not taking a break!".`
+				value: `${inlineCode(`${BOT_PREFIX}watchlist add @Akialyne#6260 Not taking a break!`)}\
+				\n┗ Adds a note to @Akialyne#6260 with the text "Not taking a break!".`
 			},
 			{
 				name: 'Example 2',
@@ -99,8 +109,8 @@ export const COMMAND_INFO: CommandInfo = {
 			},
 			{
 				name: 'Example 3',
-				value: `${inlineCode(`${BOT_PREFIX}watchlist view @LoadXBare#7156`)}\
-				\n┗ Displays all notes for @LoadXBare#7156.`
+				value: `${inlineCode(`${BOT_PREFIX}watchlist view @Akialyne#6260`)}\
+				\n┗ Displays all notes for @Akialyne#6260.`
 			},
 			{
 				name: 'Example 4',
@@ -163,18 +173,18 @@ export const COMMAND_INFO: CommandInfo = {
 		.setFields([
 			{
 				name: 'Example 1',
-				value: `${inlineCode(`${BOT_PREFIX}ban @LoadXBare#7156 1 Excessive spamming`)}\
-				\n┗ Bans the user @LoadXBare#7156 with the reason "Excessive spamming" and deletes their messages less than 1 day old.`
+				value: `${inlineCode(`${BOT_PREFIX}ban @Akialyne#6260 1 Excessive spamming`)}\
+				\n┗ Bans the user @Akialyne#6260 with the reason "Excessive spamming" and deletes their messages less than 1 day old.`
 			},
 			{
 				name: 'Example 2',
-				value: `${inlineCode(`${BOT_PREFIX}ban add @LoadXBare#7156 Spamming`)}\
-				\n┗ Bans @LoadXBare#7156 with the reason "Spamming" but does not delete any of their messages.`
+				value: `${inlineCode(`${BOT_PREFIX}ban add @Akialyne#6260 Spamming`)}\
+				\n┗ Bans @Akialyne#6260 with the reason "Spamming" but does not delete any of their messages.`
 			},
 			{
 				name: 'Example 3',
-				value: `${inlineCode(`${BOT_PREFIX}ban @LoadXBare#7156`)}\
-				\n┗ Bans @LoadXBare#7156 without reason and without deleting any of their messages.`
+				value: `${inlineCode(`${BOT_PREFIX}ban @Akialyne#6260`)}\
+				\n┗ Bans @Akialyne#6260 without reason and without deleting any of their messages.`
 			},
 			{
 				name: 'Example 4',
@@ -211,6 +221,49 @@ export const COMMAND_INFO: CommandInfo = {
 				name: 'Example 4',
 				value: `${inlineCode(`${BOT_PREFIX}ticketpanel post #mod-mail Mod Mail`)}\
 				\n┗ Posts the Ticket Panel "Mod Mail" in the "#mod-mail" channel.`
+			}
+		])
+		.setColor(COLORS.COMMAND),
+	'TOP': new EmbedBuilder()
+		.setTitle(`Command Info: "${BOT_PREFIX}top"`)
+		.setDescription('Allows you to view the member leaderboards.')
+		.setFields([
+			{
+				name: 'Example 1',
+				value: `${inlineCode(`${BOT_PREFIX}top`)}\
+				\n┗ Displays the top 10 members within the guild.`
+			},
+			{
+				name: 'Example 2',
+				value: `${inlineCode(`${BOT_PREFIX}top 4`)}\
+				\n┗ Displays the 4th page of the member leaderboards (31st to 40th place).`
+			}
+		])
+		.setColor(COLORS.COMMAND),
+	'RANK': new EmbedBuilder()
+		.setTitle(`Command Info: "${BOT_PREFIX}rank"`)
+		.setDescription('Allows you to view a user\'s rank.')
+		.setFields([
+			{
+				name: 'Example 1',
+				value: `${inlineCode(`${BOT_PREFIX}rank`)}\
+				\n┗ Displays your rank within the guild.`
+			},
+			{
+				name: 'Example 2',
+				value: `${inlineCode(`${BOT_PREFIX}rank @Akialyne#6260`)}\
+				\n┗ Displays the rank for @Akialyne#6260 within the guild.`
+			}
+		])
+		.setColor(COLORS.COMMAND),
+	'MYSTATS': new EmbedBuilder()
+		.setTitle(`Command Info: "${BOT_PREFIX}mystats"`)
+		.setDescription('Allows you to view __your__ various member statistics within the guild.')
+		.setFields([
+			{
+				name: 'Example 1',
+				value: `${inlineCode(`${BOT_PREFIX}mystats`)}\
+				\n┗ Displays your member statistics.`
 			}
 		])
 		.setColor(COLORS.COMMAND)

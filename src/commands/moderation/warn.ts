@@ -65,7 +65,7 @@ const addWarning = async (message: Message, warnedUser: User, warningReason: str
 			guildID: message.guildId,
 			warnedUserID: warnedUserID,
 			warningReason: warningReason,
-			warningDate: dayjs().toISOString()
+			warningDate: dayjs().utc().toISOString()
 		});
 
 		const warningSentEmbed = EmbedBuilder.from(warningEmbed)
@@ -212,7 +212,7 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 		const userWarningsStats: WarningCount = {};
 		for (const warn of warnings) {
 			const userCount = userWarningsStats[warn.warnedUserID];
-			const warningAgeInMonths = dayjs().diff(dayjs(warn.warningDate), 'month');
+			const warningAgeInMonths = dayjs().utc().diff(dayjs(warn.warningDate), 'month');
 
 			if (typeof userCount === 'undefined') {
 				userWarningsStats[warn.warnedUserID] = { oldWarnings: false, warningCount: 0 };
@@ -257,7 +257,7 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 		else {
 			for (const warn of warnings) {
 				const index = warnings.indexOf(warn) + 1;
-				const warningAgeInMonths = dayjs().diff(dayjs(warn.warningDate), 'month');
+				const warningAgeInMonths = dayjs().utc().diff(dayjs(warn.warningDate), 'month');
 				const oldWarningText = warningAgeInMonths >= 6 ? '⏱️' : '';
 
 				warningsList = warningsList.concat(`**#${index}** - ${inlineCode(warn.id)} ${oldWarningText}\n`);
@@ -294,7 +294,7 @@ const viewWarnings = async (message: Message, data: string): Promise<void> => {
 				},
 				{
 					name: 'Warned On',
-					value: dayjs(warning.warningDate).format('MMMM DD, YYYY [at] hh:mma UTC')
+					value: dayjs(warning.warningDate).utc().format('MMMM DD, YYYY [at] hh:mma UTC')
 				},
 				{
 					name: 'Reason',

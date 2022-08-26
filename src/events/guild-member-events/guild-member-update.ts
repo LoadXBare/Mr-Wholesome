@@ -30,7 +30,7 @@ export const guildMemberUpdate = async (oldMember: GuildMember, newMember: Guild
 		.setColor(COLORS.NEUTRAL);
 
 	if (onWatchlist) {
-		logEntryEmbed.setThumbnail(config.botEmoteUrls.watchlist);
+		logEntryEmbed.setThumbnail(config.botEmoteUrls.warning);
 	}
 
 	logChannel.send({ embeds: [logEntryEmbed] });

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
+import utc from 'dayjs/plugin/utc.js';
 import { Client } from 'discord.js';
 import { mongodb } from '../api/mongo.js';
 import { log } from '../lib/misc/log.js';
@@ -12,6 +13,7 @@ export const ready = async (client: Client): Promise<void> => {
 	startScheduler(client);
 	dayjs.extend(relativeTime);
 	dayjs.extend(customParseFormat);
+	dayjs.extend(utc);
 	await mongodb.connectToDatabase();
 	// ----
 
