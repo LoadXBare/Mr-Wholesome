@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { Client, EmbedBuilder, inlineCode, roleMention, userMention } from 'discord.js';
 import schedule from 'node-schedule';
 import { mongodb } from '../api/mongo.js';
+import { cache } from '../config/cache.js';
 import { COLORS } from '../config/constants.js';
 import { config } from '../private/config.js';
 import { fetchDiscordTextChannel } from './misc/fetch-discord-text-channel.js';
@@ -167,8 +168,6 @@ export const warning = async (client: Client, nextRunDate: Date): Promise<void> 
 	warningReminderChannel.send({ content: rolePing, embeds: [warningReminderEmbed] });
 };
 
-export const wsPingHistory: Array<number> = [];
-
 export const startScheduler = (client: Client): void => {
 	// Runs at 12:00am UTC each day
 	const birthdayScheduler = schedule.scheduleJob('0 0 * * * ', () => {
@@ -184,10 +183,14 @@ export const startScheduler = (client: Client): void => {
 	});
 	log(`Warning scheduler will run on ${dayjs(warningScheduler.nextInvocation()).format('MMMM DD, YYYY')}!`);
 
-	schedule.scheduleJob('*/5 * * * *', () => {
+	schedule.scheduleJob('*/5 * * * *', async () => {
+		const wsPingHistory = await cache.fetch('wsPingHistory');
+
 		wsPingHistory.push(client.ws.ping);
 		if (wsPingHistory.length > 500) {
 			wsPingHistory.shift();
 		}
+
+		await cache.update('wsPingHistory', wsPingHistory);
 	});
 };

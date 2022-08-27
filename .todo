@@ -13,18 +13,16 @@ Todos:
 			☐ Fish command
 			☐ Cookie command
 			☐ Slots command
-		☐ Levelling system
-			☐ Level leaderboards
 		☐ Transnate command
 
 	Potential:
 		☐ Pat command
 
 	Changes:
-		☐ 
+
 
 	Backlog:
-		☐ 
+		
 
 Done:
 	✔ Convert all JavaScript files to TypeScript
@@ -37,6 +35,7 @@ Done:
 	✔ Add the ability to view all warnings within a guild
 	✔ Simplify command names
 	✔ Ticket system
+	✔ Levelling system
 
 Cancelled:
 	✘ Remove hardcoded roles from `role-button-menu.ts`

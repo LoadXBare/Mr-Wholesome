@@ -1,6 +1,6 @@
 {
   "name": "mr-wholesome-bot",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "A general purpose Discord bot for The Akialytes Discord server programmed in the Discord.JS library.",
   "main": "dist/bot.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "discord-api-types": "^0.37.1",
     "discord.js": "^14.2.0",
     "image-charts": "^6.1.19",
+    "keyv": "^4.4.1",
     "mongoose": "^6.4.0",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.1.0"

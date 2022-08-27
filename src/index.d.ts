@@ -161,3 +161,7 @@ export interface MemberStats {
 		[hour: string]: number
 	}
 }
+
+export interface Cache {
+	'wsPingHistory': Array<number>
+}

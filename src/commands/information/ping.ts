@@ -1,15 +1,17 @@
 import { AttachmentBuilder, EmbedBuilder, inlineCode } from 'discord.js';
 import ImageCharts from 'image-charts';
+import { cache } from '../../config/cache.js';
 import { COLORS } from '../../config/constants.js';
 import { BotCommand, Command } from '../../index.js';
 import { fetchUptime } from '../../lib/misc/fetch-uptime.js';
 import { storeAttachment } from '../../lib/misc/store-attachments.js';
-import { wsPingHistory } from '../../lib/scheduler.js';
+import { config } from '../../private/config.js';
 
 const pingCommand = async (args: BotCommand): Promise<void> => {
 	const { message } = args;
 	const uptime = fetchUptime();
 	const uptimeText = `${uptime.days} days, ${uptime.hours} hours, ${uptime.minutes} minutes & ${uptime.seconds} seconds`;
+	const wsPingHistory = await cache.fetch('wsPingHistory');
 
 	const historyGraph = new ImageCharts()
 		.cht('lc')
@@ -34,7 +36,8 @@ const pingCommand = async (args: BotCommand): Promise<void> => {
 		.setTitle('Tweet!')
 		.setDescription(`⌛ ⇒ ${inlineCode(`${reply.createdTimestamp - message.createdTimestamp}ms`)}\
 		\n☁️ ⇒ ${inlineCode(`${message.client.ws.ping}ms`)}\
-		\n⏱️ ⇒ ${inlineCode(uptimeText)}`)
+		\n⏱️ ⇒ ${inlineCode(uptimeText)}\
+		\n${config.botEmotes.memory} ⇒ ${inlineCode(`${(process.memoryUsage().heapUsed / (1024 * 1024)).toFixed(2)} MB`)}`)
 		.setImage(historyGraphURL)
 		.setFooter({ text: 'Latency graph updated every 5 minutes.' })
 		.setColor(COLORS.COMMAND);
