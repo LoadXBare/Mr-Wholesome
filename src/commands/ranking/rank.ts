@@ -8,6 +8,18 @@ import { fetchXPLevelBounds } from '../../lib/guild-ranking/xp-level.js';
 import { fetchGuildMember } from '../../lib/misc/fetch-guild-member.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
+const findFontSize = (canvas: Canvas.Canvas, text: string, maxFontSize: number, maxTextWidth: number): string => {
+	const ctx = canvas.getContext('2d');
+	let fontSize = maxFontSize;
+
+	do {
+		ctx.font = `${fontSize}px ubuntu-medium`;
+		fontSize = parseFloat((fontSize - 0.05).toFixed(2));
+	} while (ctx.measureText(text).width > maxTextWidth);
+
+	return ctx.font;
+};
+
 const checkRankCommand = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
 
@@ -49,21 +61,29 @@ const checkRankCommand = async (args: BotCommand): Promise<void> => {
 	const { body } = await request(member.displayAvatarURL({ extension: 'png' }));
 	const avatar = await Canvas.loadImage(await body.arrayBuffer());
 	ctx.beginPath();
-	ctx.arc(136, 136, 110, 0, Math.PI * 2, true);
+	ctx.arc(160, 135, 110, 0, Math.PI * 2, true);
 	ctx.closePath();
 	ctx.save();
+	ctx.clip();
+	ctx.fillStyle = '#FFFFFF55';
+	ctx.fillRect(50, 25, 220, 220);
+	ctx.drawImage(avatar, 50, 25, 220, 220);
 	ctx.lineWidth = 8;
 	ctx.strokeStyle = '#FFFFFF';
 	ctx.stroke();
-	ctx.clip();
-	ctx.drawImage(avatar, 25, 25, 220, 220);
 	ctx.restore();
 
-	// Draw text
+	// Draw progress bar
 	const progressPercent = Math.round(((memberRanking.xp - xpLevelBounds.lower) / (xpLevelBounds.upper - xpLevelBounds.lower)) * 100);
+	const progressBar = await Canvas.loadImage('./assets/rank-card-progress-bar.png');
+	ctx.fillStyle = '#00FF66';
+	ctx.fillRect(337, 172, progressPercent * 4, 33);
+	ctx.drawImage(progressBar, 0, 0, canvas.width, canvas.height);
+
+	// Draw text
 	ctx.fillStyle = '#FFFFFF';
-	ctx.font = `${member.displayName.length > 16 ? 40 - ((member.displayName.length - 16) * 1.0625) : '40'}px ubuntu-medium`;
-	ctx.fillText(member.displayName, 270, 75);
+	ctx.font = findFontSize(canvas, member.displayName, 40, 341);
+	ctx.fillText(member.displayName, 340, 75);
 	ctx.font = '40px ubuntu-medium';
 	ctx.fillText(`#${memberLeaderboardPos}`, 700, 75);
 	ctx.font = '30px ubuntu-medium';
@@ -73,12 +93,6 @@ const checkRankCommand = async (args: BotCommand): Promise<void> => {
 	ctx.fillText(`${memberRanking.xp - xpLevelBounds.lower} / ${xpLevelBounds.upper - xpLevelBounds.lower} XP`, 340, 155);
 	ctx.fillText(`Level ${memberRanking.xpLevel}`, 675 - 10 * memberRanking.xpLevel.toString().length, 155);
 	ctx.fillText(`Total XP${' '.repeat(66 - memberRanking.xp.toString().length * 2)}${memberRanking.xp}`, 340, 235);
-
-	// Draw progress bar
-	const progressBar = await Canvas.loadImage('./assets/rank-card-progress-bar.png');
-	ctx.fillStyle = '#00FF66';
-	ctx.fillRect(337, 172, progressPercent * 4, 33);
-	ctx.drawImage(progressBar, 0, 0, canvas.width, canvas.height);
 
 	const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'rank-card.png' });
 
