@@ -6,6 +6,7 @@ const guildRankingSchema = new mongoose.Schema<GuildRanking>({
 	memberID: String,
 	xp: Number,
 	xpLevel: Number,
+	levelUpNotifications: Boolean,
 	credits: Number
 });
 

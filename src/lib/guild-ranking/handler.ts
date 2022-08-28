@@ -43,6 +43,7 @@ export const handleGuildRanking = async (message: Message): Promise<void> => {
 		memberID: message.author.id,
 		xp: newMemberXP,
 		xpLevel: newMemberLevel,
+		levelUpNotifications: memberRanking.levelUpNotifications,
 		credits: newMemberCredits
 	};
 

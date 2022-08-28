@@ -13,6 +13,7 @@ export const fetchMemberRanking = async (guildID: string, memberID: string): Pro
 			memberID: memberID,
 			xp: 0,
 			xpLevel: 0,
+			levelUpNotifications: true,
 			credits: 0
 		};
 
@@ -24,6 +25,7 @@ export const fetchMemberRanking = async (guildID: string, memberID: string): Pro
 		memberID: memberRanking.memberID,
 		xp: memberRanking.xp,
 		xpLevel: memberRanking.xpLevel,
+		levelUpNotifications: memberRanking.levelUpNotifications,
 		credits: memberRanking.credits
 	};
 

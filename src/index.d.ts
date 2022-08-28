@@ -145,6 +145,7 @@ export interface GuildRanking {
 	memberID: string,
 	xp: number,
 	xpLevel: number,
+	levelUpNotifications: boolean,
 	credits: number
 }
 
