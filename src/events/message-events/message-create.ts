@@ -15,6 +15,7 @@ export const messageCreate = async (message: Message): Promise<void> => {
 	const messageContainsSorry = content.search(/[s]+[o]+[r]+[y]+/mi) !== -1;
 	const messageContainsArson = content.search(/(?<!\S)[a]+[r]+[s]+[o]+[n]+/mi) !== -1;
 	const messageContainsKnockKnock = content.search(/([k]+[n]+[o]+[c]+[k]+(.|$)){2}/mi) !== -1;
+	const messageEndsWithPain = content.search(/\bpain\W{0,}$/i) !== -1;
 	const channelName = message.channel.type === ChannelType.DM ? message.author.username : message.channel.name;
 
 	if (message.author.bot) {
@@ -55,6 +56,12 @@ export const messageCreate = async (message: Message): Promise<void> => {
 			message.react('😶‍🌫️');
 			log(`Reacted to Ichi's Knock Knock joke in #${channelName}!`);
 		}
+	}
+
+	// Reply with 'au chocolat?' if a message ends with the word 'pain'
+	if (messageEndsWithPain) {
+		message.reply('au chocolat?');
+		log(`Replied to message ending in "pain" in #${channelName}!`);
 	}
 
 	// Handle all things related to Mr Wholesome's Guild Ranking and Member Stats systems

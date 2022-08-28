@@ -81,18 +81,36 @@ const checkRankCommand = async (args: BotCommand): Promise<void> => {
 	ctx.drawImage(progressBar, 0, 0, canvas.width, canvas.height);
 
 	// Draw text
+	const leftBoundary = 336;
+	const centerBoundary = 536;
+	const rightBoundary = 736;
+	const buffer = 20;
+
 	ctx.fillStyle = '#FFFFFF';
-	ctx.font = findFontSize(canvas, member.displayName, 40, 341);
-	ctx.fillText(member.displayName, 340, 75);
 	ctx.font = '40px ubuntu-medium';
-	ctx.fillText(`#${memberLeaderboardPos}`, 700, 75);
+	ctx.textAlign = 'right';
+	ctx.fillText(`#${memberLeaderboardPos}`, rightBoundary, 75);
+
+	ctx.textAlign = 'left';
+	ctx.font = findFontSize(canvas, member.displayName, 40, rightBoundary - leftBoundary - ctx.measureText(`#${memberLeaderboardPos}`).width - buffer);
+	ctx.fillText(member.displayName, leftBoundary, 75);
+
 	ctx.font = '30px ubuntu-medium';
-	ctx.fillStyle = '#FFFFFF';
-	ctx.fillText(`${progressPercent}%`, 506, 200);
+	ctx.textAlign = 'center';
+	ctx.fillText(`${progressPercent}%`, centerBoundary, 200);
+
 	ctx.font = '20px ubuntu-medium';
-	ctx.fillText(`${memberRanking.xp - xpLevelBounds.lower} / ${xpLevelBounds.upper - xpLevelBounds.lower} XP`, 340, 155);
-	ctx.fillText(`Level ${memberRanking.xpLevel}`, 675 - 10 * memberRanking.xpLevel.toString().length, 155);
-	ctx.fillText(`Total XP${' '.repeat(66 - memberRanking.xp.toString().length * 2)}${memberRanking.xp}`, 340, 235);
+	ctx.textAlign = 'left';
+	ctx.fillText(`${memberRanking.xp - xpLevelBounds.lower} / ${xpLevelBounds.upper - xpLevelBounds.lower} XP`, leftBoundary, 155);
+
+	ctx.textAlign = 'right';
+	ctx.fillText(`Level ${memberRanking.xpLevel}`, rightBoundary, 155);
+
+	ctx.textAlign = 'left';
+	ctx.fillText('Total XP', leftBoundary, 235);
+
+	ctx.textAlign = 'right';
+	ctx.fillText(memberRanking.xp.toString(), rightBoundary, 235);
 
 	const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'rank-card.png' });
 

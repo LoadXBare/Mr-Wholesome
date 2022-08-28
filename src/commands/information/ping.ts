@@ -28,7 +28,6 @@ const pingCommand = async (args: BotCommand): Promise<void> => {
 		.chts('969696,20');
 
 	const buffer = await historyGraph.toBuffer();
-
 	const reply = await message.reply({ content: 'uwu' });
 	const historyGraphURL = await storeAttachment(new AttachmentBuilder(buffer), message.client);
 
@@ -37,7 +36,7 @@ const pingCommand = async (args: BotCommand): Promise<void> => {
 		.setDescription(`⌛ ⇒ ${inlineCode(`${reply.createdTimestamp - message.createdTimestamp}ms`)}\
 		\n☁️ ⇒ ${inlineCode(`${message.client.ws.ping}ms`)}\
 		\n⏱️ ⇒ ${inlineCode(uptimeText)}\
-		\n${config.botEmotes.memory} ⇒ ${inlineCode(`${(process.memoryUsage().heapUsed / (1024 * 1024)).toFixed(2)} MB`)}`)
+		\n${config.botEmotes.memory} ⇒ ${inlineCode(`${(process.memoryUsage().rss / (1024 * 1024)).toFixed(2)} MB`)}`)
 		.setImage(historyGraphURL)
 		.setFooter({ text: 'Latency graph updated every 5 minutes.' })
 		.setColor(COLORS.COMMAND);
