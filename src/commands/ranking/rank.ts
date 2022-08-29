@@ -8,7 +8,7 @@ import { fetchXPLevelBounds } from '../../lib/guild-ranking/xp-level.js';
 import { fetchGuildMember } from '../../lib/misc/fetch-guild-member.js';
 import { sendError } from '../../lib/misc/send-error.js';
 
-const findFontSize = (canvas: Canvas.Canvas, text: string, maxFontSize: number, maxTextWidth: number): string => {
+export const findFontSize = (canvas: Canvas.Canvas, text: string, maxFontSize: number, maxTextWidth: number): string => {
 	const ctx = canvas.getContext('2d');
 	let fontSize = maxFontSize;
 
@@ -112,9 +112,9 @@ const checkRankCommand = async (args: BotCommand): Promise<void> => {
 	ctx.textAlign = 'right';
 	ctx.fillText(memberRanking.xp.toString(), rightBoundary, 235);
 
-	const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'rank-card.png' });
+	const rankCardAttachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'rank-card.png' });
 
-	message.reply({ content: quote(`Viewing rank card • [ ${member.user.tag} ]`), files: [attachment] });
+	message.reply({ content: quote(`Viewing rank card • [ ${member.user.tag} ]`), files: [rankCardAttachment] });
 };
 
 export const checkRank: Command = {

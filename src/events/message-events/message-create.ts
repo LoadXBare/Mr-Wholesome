@@ -17,6 +17,7 @@ export const messageCreate = async (message: Message): Promise<void> => {
 	const messageContainsKnockKnock = content.search(/([k]+[n]+[o]+[c]+[k]+(.|$)){2}/mi) !== -1;
 	const messageEndsWithPain = content.search(/\bpain\W{0,}$/i) !== -1;
 	const channelName = message.channel.type === ChannelType.DM ? message.author.username : message.channel.name;
+	const channelIsMemes = channelName === '🤡-memes-🤡';
 
 	if (message.author.bot) {
 		return;
@@ -59,7 +60,7 @@ export const messageCreate = async (message: Message): Promise<void> => {
 	}
 
 	// Reply with 'au chocolat?' if a message ends with the word 'pain'
-	if (messageEndsWithPain) {
+	if (messageEndsWithPain && channelIsMemes) {
 		message.reply('au chocolat?');
 		log(`Replied to message ending in "pain" in #${channelName}!`);
 	}
