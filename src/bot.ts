@@ -9,8 +9,7 @@ export const client = new Client({
 	intents: INTENTS,
 	presence: {
 		activities: [{ name: 'over The Akialytes', type: ActivityType.Watching }]
-	},
-	allowedMentions: { repliedUser: false }
+	}
 });
 
 initializeEventHandler(client);

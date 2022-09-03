@@ -64,7 +64,7 @@ export const handleLevelUp = async (message: Message, level: number): Promise<vo
 	const xpLevelUpEmbed = new EmbedBuilder()
 		.setThumbnail(message.member.displayAvatarURL())
 		.setTitle('Level Up!')
-		.setDescription(`You have leveled up to **Level ${level}**!`)
+		.setDescription(`${userMention(message.member.id)} has leveled up to **Level ${level}**!`)
 		.setFooter({ text: `For more info, type "${BOT_PREFIX}rank"` })
 		.setColor(COLORS.POSITIVE);
 

@@ -7,10 +7,10 @@ export const handleInteraction = (interaction: Interaction): void => {
 		const buttonInteraction = interaction as ButtonInteraction;
 		const buttonData: ButtonInteract = JSON.parse(buttonInteraction.customId);
 
-		try {
+		if (buttonData.type in interactions) {
 			interactions[buttonData.type](buttonInteraction);
 		}
-		catch {
+		else {
 			return;
 		}
 	}

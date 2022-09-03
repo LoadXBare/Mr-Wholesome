@@ -20,6 +20,7 @@ const leaderboardCommand = async (args: BotCommand): Promise<void> => {
 	}).sort({ xp: 'descending' });
 
 	let page = 1;
+	const maxPages = Math.ceil(allMemberRankings.length / 10);
 	if (!isNaN(userEnteredPage)) {
 		page = userEnteredPage;
 	}
@@ -85,7 +86,7 @@ const leaderboardCommand = async (args: BotCommand): Promise<void> => {
 		.setDescription(`**Your Rank**\
 			\nYou are rank **#${authorLeaderboardPos}** on this server with a total of **${authorRanking.xp} XP**`)
 		.setImage('attachment://leaderboard.png')
-		.setFooter({ text: `Page ${page} • Type "${BOT_PREFIX}top ${page + 1}" to go to page ${page + 1} of the leaderboard` })
+		.setFooter({ text: `Page ${page} / ${maxPages} • Type "${BOT_PREFIX}top ${page + 1}" to go to page ${page + 1} of the leaderboard` })
 		.setColor(COLORS.COMMAND);
 
 	message.reply({ embeds: [leaderboardEmbed], files: [leaderboardAttachment] });
