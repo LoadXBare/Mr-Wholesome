@@ -32,12 +32,10 @@ export const guildMemberAdd = async (member: GuildMember): Promise<void> => {
 		logEntryEmbed.setThumbnail(config.botEmoteUrls.warning);
 	}
 
-	try {
-		roles.add(config.roles.Akialyte, 'Joined Server');
-		log(`Successfully added role Akialyte to ${member.user.tag}!`);
-	}
-	catch (e) {
-		log(`An error occurred while adding role Akialyte to ${member.user.tag}!`, e);
-	}
+	log(`Adding role Akialyte to ${member.user.tag}...`);
+	roles.add(config.roles.Akialyte, 'Joined Server').catch((e) => {
+		log(`An error occurred while adding role Akialyte to ${member.user.tag}!\n`, e);
+	});
+
 	logChannel.send({ embeds: [logEntryEmbed] });
 };

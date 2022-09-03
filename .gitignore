@@ -1,4 +1,5 @@
 node_modules
 private
 dist
-.todo
+.env
+package-lock.json

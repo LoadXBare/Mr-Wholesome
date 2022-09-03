@@ -4,7 +4,6 @@ import { cache } from '../../config/cache.js';
 import { COLORS } from '../../config/constants.js';
 import { BotCommand, Command } from '../../index.js';
 import { fetchUptime } from '../../lib/misc/fetch-uptime.js';
-import { storeAttachment } from '../../lib/misc/store-attachments.js';
 import { config } from '../../private/config.js';
 
 const pingCommand = async (args: BotCommand): Promise<void> => {
@@ -29,7 +28,7 @@ const pingCommand = async (args: BotCommand): Promise<void> => {
 
 	const buffer = await historyGraph.toBuffer();
 	const reply = await message.reply({ content: 'uwu' });
-	const historyGraphURL = await storeAttachment(new AttachmentBuilder(buffer), message.client);
+	const historyGraphAttachment = new AttachmentBuilder(buffer, { name: 'history-graph.png' });
 
 	const pingCommand = new EmbedBuilder()
 		.setTitle('Tweet!')
@@ -37,11 +36,11 @@ const pingCommand = async (args: BotCommand): Promise<void> => {
 		\n☁️ ⇒ ${inlineCode(`${message.client.ws.ping}ms`)}\
 		\n⏱️ ⇒ ${inlineCode(uptimeText)}\
 		\n${config.botEmotes.memory} ⇒ ${inlineCode(`${(process.memoryUsage().rss / (1024 * 1024)).toFixed(2)} MB`)}`)
-		.setImage(historyGraphURL)
+		.setImage('attachment://history-graph.png')
 		.setFooter({ text: 'Latency graph updated every 5 minutes.' })
 		.setColor(COLORS.COMMAND);
 
-	reply.edit({ content: null, embeds: [pingCommand] });
+	reply.edit({ content: null, embeds: [pingCommand], files: [historyGraphAttachment] });
 };
 
 export const ping: Command = {

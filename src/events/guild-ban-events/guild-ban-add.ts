@@ -5,8 +5,9 @@ import { fetchLogChannel } from '../../lib/misc/fetch-log-channel.js';
 import { config } from '../../private/config.js';
 
 export const guildBanAdd = async (ban: GuildBan): Promise<void> => {
-	const { user, reason } = ban;
+	const { user } = ban;
 	const onWatchlist = await checkWatchlist(user.id);
+	const banReason = (await ban.guild.bans.fetch(user.id)).reason;
 
 	const logChannel = await fetchLogChannel(ban.guild.id, ban.client);
 	if (logChannel === null) {
@@ -22,7 +23,7 @@ export const guildBanAdd = async (ban: GuildBan): Promise<void> => {
 		.setThumbnail(user.displayAvatarURL())
 		.setFields([
 			{ name: 'Member', value: userMention(user.id) },
-			{ name: 'Reason', value: reason === undefined ? 'None' : reason }
+			{ name: 'Reason', value: banReason === null ? 'No reason provided' : banReason }
 		])
 		.setFooter({ text: `User ID: ${user.id}` })
 		.setTimestamp()
