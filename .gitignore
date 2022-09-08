@@ -3,3 +3,4 @@ private
 dist
 .env
 package-lock.json
+.todo

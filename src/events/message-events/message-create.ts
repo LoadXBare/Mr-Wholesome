@@ -54,8 +54,8 @@ export const messageCreate = async (message: Message): Promise<void> => {
 			log(`Replied to Ichi's Knock Knock joke in #${channelName}!`);
 		}
 		else {
-			message.react('😶‍🌫️');
-			log(`Reacted to Ichi's Knock Knock joke in #${channelName}!`);
+			message.reply('Get off my property!');
+			log(`Replied to Ichi's Knock Knock joke in #${channelName}!`);
 		}
 	}
 
