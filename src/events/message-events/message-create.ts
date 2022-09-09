@@ -17,7 +17,7 @@ export const messageCreate = async (message: Message): Promise<void> => {
 	const messageContainsKnockKnock = content.search(/([k]+[n]+[o]+[c]+[k]+(.|$)){2}/mi) !== -1;
 	const messageEndsWithPain = content.search(/\bpain\W{0,}$/i) !== -1;
 	const channelName = message.channel.type === ChannelType.DM ? message.author.username : message.channel.name;
-	const channelIsMemes = channelName === '🤡-memes-🤡';
+	const channelIsMemes = message.channelId === config.channelIDs.memes;
 
 	if (message.author.bot) {
 		return;
@@ -47,15 +47,20 @@ export const messageCreate = async (message: Message): Promise<void> => {
 		log(`Reacted with arson to message by ${message.author.tag} in #${channelName}!`);
 	}
 
-	// Reply to Ichi's 'Knock Knock' jokes with 'Come in!' (50% chance)
+	// Reply to Ichi's 'Knock Knock' jokes with various responses
 	if (authorIsIchi && messageContainsKnockKnock) {
-		if (Math.round(Math.random()) === 1) {
+		const randomNumber = Math.ceil(Math.random() * 3);
+		if (randomNumber === 1) {
 			message.reply('Come in!');
 			log(`Replied to Ichi's Knock Knock joke in #${channelName}!`);
 		}
-		else {
+		else if (randomNumber === 2) {
 			message.reply('Get off my property!');
 			log(`Replied to Ichi's Knock Knock joke in #${channelName}!`);
+		}
+		else {
+			message.react('😶‍🌫️');
+			log(`Reacted to Ichi's Knock Knock joke in #${channelName}!`);
 		}
 	}
 
