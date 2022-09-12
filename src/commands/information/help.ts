@@ -39,7 +39,8 @@ const helpCommand = (args: BotCommand): Promise<void> => {
 	};
 	for (const [cmd, cmdConfig] of Object.entries(commands)) {
 		const modOnlyCommand = cmdConfig.modOnly ? '🛡️' : '';
-		commandsList[cmdConfig.type] = commandsList[cmdConfig.type].concat(`${inlineCode(`${modOnlyCommand}${P}${cmd}`)} `);
+		const devOnlyCommand = cmdConfig.devOnly ? '🚫' : '';
+		commandsList[cmdConfig.type] = commandsList[cmdConfig.type].concat(`${inlineCode(`${modOnlyCommand}${devOnlyCommand}${P}${cmd}`)} `);
 	}
 
 	const helpMenuEmbed = new EmbedBuilder()
@@ -67,7 +68,7 @@ const helpCommand = (args: BotCommand): Promise<void> => {
 				value: commandsList.Ranking
 			}
 		])
-		.setFooter({ text: '🛡️ = Moderator command' })
+		.setFooter({ text: '🛡️ = Moderator Command, 🚫 = Developer Command' })
 		.setColor(COLORS.COMMAND);
 
 	message.reply({ embeds: [helpMenuEmbed] });

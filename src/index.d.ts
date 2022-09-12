@@ -166,3 +166,9 @@ export interface MemberStats {
 export interface Cache {
 	'wsPingHistory': Array<number>
 }
+
+interface UserCookies {
+	userID: string,
+	cookiesGiven: number,
+	cookiesReceived: number
+}

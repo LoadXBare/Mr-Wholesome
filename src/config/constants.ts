@@ -5,6 +5,8 @@ import { config } from '../private/config.js';
 
 export const BOT_PREFIX = config.botPrefix;
 
+export const ZERO_WIDTH_SPACE = '​';
+
 export const xpPerMessage = {
 	min: 5,
 	max: 15
