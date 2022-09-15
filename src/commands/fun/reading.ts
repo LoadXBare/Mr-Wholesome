@@ -42,7 +42,7 @@ const dailyReadingCommand = async (args: BotCommand): Promise<void> => {
 		})
 		.setTitle(`Daily Reading for ${message.member.displayName}`)
 		.setDescription('**Please Wait**\
-		\nContacing spirits...')
+		\nContacting spirits...')
 		.setThumbnail(config.botEmoteUrls.loading)
 		.setColor(COLORS.COMMAND);
 
