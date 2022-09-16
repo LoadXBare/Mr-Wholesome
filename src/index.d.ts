@@ -55,7 +55,6 @@ export type Colors = {
 }
 
 export type Cat = Array<{
-	breeds: Array<string>,
 	id: string,
 	url: string,
 	width: number,
