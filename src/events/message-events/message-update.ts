@@ -1,4 +1,4 @@
-import { Attachment, channelMention, Collection, EmbedBuilder, hyperlink, inlineCode, Message } from 'discord.js';
+import { ActionRowBuilder, Attachment, ButtonBuilder, ButtonStyle, channelMention, Collection, EmbedBuilder, inlineCode, Message } from 'discord.js';
 import { COLORS } from '../../config/constants.js';
 import { checkWatchlist } from '../../lib/misc/check-watchlist.js';
 import { fetchIgnoredChannels } from '../../lib/misc/fetch-ignored-channels.js';
@@ -64,13 +64,11 @@ const contentUpdate = (oldContent: string, newContent: string, message: Message)
 
 	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
-			name: 'Message Edited'
+			name: 'Message Edited',
+			iconURL: member.displayAvatarURL()
 		})
+		.setDescription(`*in ${channelMention(channel.id)}*`)
 		.setFields([
-			{
-				name: 'Channel',
-				value: `${channelMention(channel.id)} ${hyperlink('Jump to message', message.url)}`
-			},
 			{
 				name: 'Before',
 				value: editedOldContent
@@ -80,7 +78,7 @@ const contentUpdate = (oldContent: string, newContent: string, message: Message)
 				value: editedNewContent
 			}
 		])
-		.setFooter({ text: `${author.tag} • Author ID: ${author.id}`, iconURL: member.displayAvatarURL() })
+		.setFooter({ text: `Author: ${author.tag} • Author ID: ${author.id}` })
 		.setTimestamp()
 		.setColor(COLORS.NEUTRAL);
 
@@ -93,14 +91,10 @@ const attachmentUpdate = async (oldAttachments: Collection<string, Attachment>, 
 
 	const logEntryEmbed = new EmbedBuilder()
 		.setAuthor({
-			name: 'Message Attachment Removed'
+			name: 'Message Attachment Removed',
+			iconURL: message.member.displayAvatarURL()
 		})
-		.setFields([
-			{
-				name: 'Channel',
-				value: `${channelMention(message.channelId)} ${hyperlink('Jump to Message', message.url)}`
-			}
-		])
+		.setDescription(`*in ${channelMention(message.channel.id)}*`)
 		.setColor(COLORS.NEGATIVE);
 
 	if (imageURLs.at(0) === 'U') {
@@ -132,7 +126,7 @@ export const messageUpdate = async (oldMessage: Message, newMessage: Message): P
 
 	let logEntryEmbed: EmbedBuilder;
 	if (oldContent !== newContent) {
-		logEntryEmbed = await contentUpdate(oldContent, newContent, newMessage);
+		logEntryEmbed = contentUpdate(oldContent, newContent, newMessage);
 	}
 	else if (!oldAttachments.equals(newAttachments)) {
 		logEntryEmbed = await attachmentUpdate(oldAttachments, newAttachments, newMessage);
@@ -141,9 +135,16 @@ export const messageUpdate = async (oldMessage: Message, newMessage: Message): P
 		return;
 	}
 
+	const logEntryButtons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
+			.setLabel('Jump to message')
+			.setStyle(ButtonStyle.Link)
+			.setURL(newMessage.url)
+	);
+
 	if (onWatchlist) {
 		logEntryEmbed.setThumbnail(config.botEmoteUrls.warning);
 	}
 
-	logChannel.send({ embeds: [logEntryEmbed] });
+	logChannel.send({ embeds: [logEntryEmbed], components: [logEntryButtons] });
 };
