@@ -47,6 +47,8 @@ const leaderboardCommand = async (args: BotCommand): Promise<void> => {
 		const guildMember = await fetchGuildMember(message.guild, member.memberID);
 		const positionLengthInPixels = ctx.measureText(`#${leaderboardPos}`).width + 10;
 
+		if (!guildMember) continue;
+
 		// Draw leaderboard bar
 		let bar: Canvas.Image;
 		if (guildMember.id === message.author.id)
