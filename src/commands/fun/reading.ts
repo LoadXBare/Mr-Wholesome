@@ -5,6 +5,7 @@ import { BotCommand, Command } from '../..';
 import { COLORS, ZERO_WIDTH_SPACE } from '../../config/constants.js';
 import { sleep } from '../../lib/misc/sleep.js';
 import { config } from '../../private/config.js';
+import { channelIsBotSpam } from '../ranking/leaderboard.js';
 
 const generateStarRating = (authorIsIchi: boolean, starRating: number, starCount: number): string => {
 	const rating = Math.round(starRating * 2) / 2;
@@ -24,6 +25,8 @@ const generateStarRating = (authorIsIchi: boolean, starRating: number, starCount
 
 const dailyReadingCommand = async (args: BotCommand): Promise<void> => {
 	const { message } = args;
+	if (!channelIsBotSpam(message)) return;
+
 	const authorIsIchi = message.author.id === config.userIDs.Ichi;
 	const dateToday = dayjs().format('DDMMYYYY');
 	const seed = `${dateToday}${message.author.id}`;
