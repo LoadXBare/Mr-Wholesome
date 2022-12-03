@@ -232,10 +232,19 @@ const viewBans = (banID: string, message: Message): void => {
 
 		let bansList = '';
 
-		if (guildBansList.length === 0) {
-			bansList = 'There are no bans within this guild! 🎉';
+		const guildBansListDiscord = await message.guild.bans.fetch(); // Fetch bans made using Discord's built-in ban feature
+		if (guildBansListDiscord.size > 0) {
+			bansList = '**__Banned via Discord__**\n';
 		}
+		guildBansListDiscord.forEach((ban) => {
+			if (!guildBansList.find((b) => b.bannedUserID === ban.user.id && !b.unbanned)) {
+				bansList = bansList.concat(`• ${inlineCode(ban.user.tag)} - ${ban.user.id}\n`);
+			}
+		});
 
+		if (guildBansList.length > 0) {
+			bansList = bansList.concat('\n**__Banned via Mr Wholesome__**\n');
+		}
 		for (const ban of guildBansList) {
 			const currentUser = await fetchDiscordUser(message.client, ban.bannedUserID);
 			let banText = '';
@@ -247,6 +256,10 @@ const viewBans = (banID: string, message: Message): void => {
 				banText = `• ${inlineCode(currentUser.tag)} - ${ban._id}\n`;
 			}
 			bansList = bansList.concat(banText);
+		}
+
+		if (bansList.length === 0) {
+			bansList = 'There are no bans within this guild! 🎉';
 		}
 
 		const bansListEmbed = new EmbedBuilder()
@@ -262,39 +275,64 @@ const viewBans = (banID: string, message: Message): void => {
 	};
 
 	const viewUserBan = async (): Promise<void> => {
-		const ban = await mongodb.guildBan.findById(banID).catch(() => { });
-
-		if (typeof ban === 'undefined') {
-			sendError(message, `${inlineCode(banID)} is not a valid Ban ID!`);
-			return;
-		}
-
-		const bannedUser = await fetchDiscordUser(message.client, ban.bannedUserID);
-		const creatorUser = await fetchDiscordUser(message.client, ban.creatorUserID);
-		const unbannedNotice = '__**This member has since been unbanned!**__';
-
+		const botBan = await mongodb.guildBan.findById(banID).catch(() => { });
+		const discordBan = await message.guild.bans.fetch(banID).catch(() => { });
 		const banEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: message.author.tag,
 				iconURL: message.member.displayAvatarURL()
 			})
-			.setTitle(`Displaying ban information for ${inlineCode(bannedUser.tag)}`)
-			.setDescription(ban.unbanned ? unbannedNotice : null)
-			.setFields([
-				{
-					name: 'Banned By',
-					value: creatorUser.tag
-				},
-				{
-					name: 'Banned On',
-					value: dayjs(ban.banDate).utc().format('MMMM DD, YYYY [at] hh:mma UTC')
-				},
-				{
-					name: 'Ban Reason',
-					value: ban.banReason
-				}
-			])
 			.setColor(COLORS.COMMAND);
+
+		const bannedByBot = async (): Promise<void> => {
+			if (!botBan) {
+				return;
+			}
+
+			const bannedUser = await fetchDiscordUser(message.client, botBan.bannedUserID);
+			const creatorUser = await fetchDiscordUser(message.client, botBan.creatorUserID);
+			const unbannedNotice = '__**This member has since been unbanned!**__';
+
+			banEmbed
+				.setTitle(`Displaying ban information for ${inlineCode(bannedUser.tag)}`)
+				.setDescription(botBan.unbanned ? unbannedNotice : null)
+				.setFields([
+					{
+						name: 'Banned By',
+						value: creatorUser.tag
+					},
+					{
+						name: 'Banned On',
+						value: dayjs(botBan.banDate).utc().format('MMMM DD, YYYY [at] hh:mma UTC')
+					},
+					{
+						name: 'Ban Reason',
+						value: botBan.banReason
+					}
+				]);
+		};
+
+		const bannedByDiscord = async (): Promise<void> => {
+			if (!discordBan) {
+				return;
+			}
+
+			banEmbed
+				.setTitle(`Displaying ban information for ${inlineCode(discordBan.user.tag)}`)
+				.setDescription('*Additional information unavailable for bans done via Discord*')
+				.setFields({
+					name: 'Ban Reason',
+					value: discordBan.reason ?? 'No reason provided.'
+				});
+		};
+
+		if (!botBan && !discordBan) {
+			sendError(message, `${inlineCode(banID)} is not a valid Ban or User ID!`);
+			return;
+		}
+
+		await bannedByBot();
+		await bannedByDiscord();
 
 		message.reply({ embeds: [banEmbed] });
 	};
