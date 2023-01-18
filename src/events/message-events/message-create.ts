@@ -1,4 +1,4 @@
-import { ChannelType, EmbedBuilder, ForumChannel, GuildForumTag, Message, roleMention, ThreadChannel } from 'discord.js';
+import { AttachmentBuilder, ChannelType, EmbedBuilder, ForumChannel, GuildForumTag, Message, roleMention, ThreadChannel } from 'discord.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
 import { handleCommand } from '../../lib/command-handler.js';
 import { handleGuildRanking } from '../../lib/guild-ranking/handler.js';
@@ -30,8 +30,10 @@ export const messageCreate = async (message: Message): Promise<void> => {
 	const messageContainsArson = content.search(/(?<!\S)[a]+[r]+[s]+[o]+[n]+/mi) !== -1;
 	const messageContainsKnockKnock = content.search(/([k]+[n]+[o]+[c]+[k]+(.|$)){2}/mi) !== -1;
 	const messageEndsWithPain = content.search(/\bpain\W{0,}$/i) !== -1;
+	const messageContainsSno = content.search(/[s]+[n]+[o]+/mi) !== -1;
 	const channelName = message.channel.type === ChannelType.DM ? message.author.username : message.channel.name;
 	const channelIsMemes = message.channelId === config.channelIDs.memes;
+	const channelIsIRLStuff = message.channelId === config.channelIDs.irlStuff;
 	const isThreadChannel = message.channel.isThread();
 
 	if (message.author.bot) {
@@ -106,6 +108,11 @@ export const messageCreate = async (message: Message): Promise<void> => {
 				await reply.delete();
 			}
 		}
+	}
+
+	if (messageContainsSno && (channelIsIRLStuff || channelIsMemes)) {
+		const attachment = new AttachmentBuilder('./assets/SNO.gif');
+		message.reply({ files: [attachment] });
 	}
 
 	// Handle all things related to Mr Wholesome's Guild Ranking and Member Stats systems

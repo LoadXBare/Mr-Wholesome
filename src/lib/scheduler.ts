@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Client, EmbedBuilder, inlineCode, roleMention, userMention } from 'discord.js';
+import { Client, EmbedBuilder, inlineCode, userMention } from 'discord.js';
 import schedule from 'node-schedule';
 import { mongodb } from '../api/mongo.js';
 import { cache } from '../config/cache.js';
@@ -153,10 +153,8 @@ export const warning = async (client: Client, nextRunDate: Date): Promise<void> 
 		}
 	}
 
-	let rolePing = roleMention(config.roles.Mods);
 	if (warningsList.length === 0) {
 		warningsList = 'There are no users that were last warned 6 or more months ago!';
-		rolePing = null;
 	}
 
 	const warningReminderEmbed = new EmbedBuilder()
@@ -165,7 +163,7 @@ export const warning = async (client: Client, nextRunDate: Date): Promise<void> 
 		.setFooter({ text: `Next Reminder: ${dayjs(nextRunDate).format('MMMM DD, YYYY')}` })
 		.setColor(COLORS.NEUTRAL);
 
-	warningReminderChannel.send({ content: rolePing, embeds: [warningReminderEmbed] });
+	warningReminderChannel.send({ embeds: [warningReminderEmbed] });
 };
 
 export const startScheduler = (client: Client): void => {
