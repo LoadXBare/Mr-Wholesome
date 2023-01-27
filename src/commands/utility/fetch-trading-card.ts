@@ -1,5 +1,5 @@
 import { codeBlock, EmbedBuilder, inlineCode } from 'discord.js';
-import fetch from 'node-fetch';
+import { fetch } from 'undici';
 import { COLORS } from '../../config/constants.js';
 import { BotCommand, Command, TradingCard } from '../../index.js';
 
@@ -93,19 +93,15 @@ const tradingCardGameCommand = async (args: BotCommand): Promise<void> => {
 	const requestURL = `http://akialytes-tcg.glitch.me/query?username=${userToLookup}`;
 
 	const commandReply = await message.reply('Fetching data, please wait...');
-	let response: TradingCard;
-
-	try {
-		response = await (await fetch(requestURL)).json() as TradingCard;
-	}
-	catch (e) {
-		commandReply.edit({ content: `There was an error when fetching from the database! ${codeBlock(e)}` });
+	const response = await fetch(requestURL);
+	const responseJSON = await response.json().catch((e) => {
+		commandReply.edit(`An error occurred while attempting to fetch from the database! ${codeBlock(e)}`);
 		return;
-	}
+	}) as TradingCard;
 
 	if (commandFlag === '-r') {
 		const rawResponseEmbed = new EmbedBuilder()
-			.setDescription(codeBlock(JSON.stringify(response)))
+			.setDescription(codeBlock(JSON.stringify(responseJSON)))
 			.setColor(COLORS.COMMAND);
 
 		try {
@@ -118,11 +114,11 @@ const tradingCardGameCommand = async (args: BotCommand): Promise<void> => {
 		return;
 	}
 
-	if (response.cardclass === 'support') {
-		commandReply.edit({ content: null, embeds: [formatSupportCardInfo(response)] });
+	if (responseJSON.cardclass === 'support') {
+		commandReply.edit({ content: null, embeds: [formatSupportCardInfo(responseJSON)] });
 	}
-	else if (response.cardclass === 'attack') {
-		commandReply.edit({ content: null, embeds: [formatAttackCardInfo(response)] });
+	else if (responseJSON.cardclass === 'attack') {
+		commandReply.edit({ content: null, embeds: [formatAttackCardInfo(responseJSON)] });
 	}
 	else {
 		commandReply.edit({ content: `User ${inlineCode(userToLookup)} either doesn't exist or doesn't have a database entry.` });

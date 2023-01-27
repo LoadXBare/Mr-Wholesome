@@ -1,5 +1,5 @@
 import * as Canvas from '@napi-rs/canvas';
-import { AttachmentBuilder, EmbedBuilder } from 'discord.js';
+import { AttachmentBuilder, EmbedBuilder, Message } from 'discord.js';
 import { fetchMemberRanking } from '../../api/guild-ranking.js';
 import { mongodb } from '../../api/mongo.js';
 import { BOT_PREFIX, COLORS } from '../../config/constants.js';
@@ -9,8 +9,11 @@ import { fetchGuildMember } from '../../lib/misc/fetch-guild-member.js';
 import { sendError } from '../../lib/misc/send-error.js';
 import { findFontSize } from './rank.js';
 
+export const channelIsBotSpam = (message: Message): boolean => message.channelId === '821974301598285836';
+
 const leaderboardCommand = async (args: BotCommand): Promise<void> => {
 	const { message, commandArgs } = args;
+	if (!channelIsBotSpam(message)) return;
 
 	const userEnteredPage = parseInt(commandArgs.shift() ?? 'undefined');
 	const authorRanking = await fetchMemberRanking(message.guildId, message.author.id);
@@ -46,6 +49,8 @@ const leaderboardCommand = async (args: BotCommand): Promise<void> => {
 		const leaderboardPos = memberRankingsList.indexOf(member) + (page - 1) * 10 + 1;
 		const guildMember = await fetchGuildMember(message.guild, member.memberID);
 		const positionLengthInPixels = ctx.measureText(`#${leaderboardPos}`).width + 10;
+
+		if (!guildMember) continue;
 
 		// Draw leaderboard bar
 		let bar: Canvas.Image;

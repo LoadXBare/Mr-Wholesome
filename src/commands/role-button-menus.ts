@@ -25,6 +25,7 @@ const roleButtonMenusCommand = async (args: BotCommand): Promise<void> => {
 		.setDescription('Click any of the buttons below to add or remove roles!\
 		\n\nClicking on a button **without** having that role will give it to you.\
 		\nClicking on a button **while** having that role will remove it from you.')
+		.setFooter({ text: 'You do not need to re-apply roles if you already have them!' })
 		.setColor(COLORS.COMMAND);
 
 	const pronounMenu = new EmbedBuilder()
@@ -86,6 +87,10 @@ const roleButtonMenusCommand = async (args: BotCommand): Promise<void> => {
 		new ButtonBuilder()
 			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['Server Events'], ID: generateId(5) }))
 			.setLabel('Server Events')
+			.setStyle(ButtonStyle.Secondary),
+		new ButtonBuilder()
+			.setCustomId(JSON.stringify({ type: 'role', roleID: config.roles['Vibe & Work'], ID: generateId(5) }))
+			.setLabel('Vibe & Work')
 			.setStyle(ButtonStyle.Secondary)
 	);
 

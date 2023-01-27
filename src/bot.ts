@@ -1,5 +1,4 @@
 import { config } from './private/config.js';
-import './private/set-env.js';
 
 import { ActivityType, Client } from 'discord.js';
 import { INTENTS } from './config/constants.js';

@@ -9,6 +9,7 @@ import { guildTicketPanel } from './schemas/guildTicketPanel.js';
 import { guildWarning } from './schemas/guildWarning.js';
 import { memberStats } from './schemas/memberStats.js';
 import { userBirthday } from './schemas/userBirthday.js';
+import { userCookies } from './schemas/userCookies.js';
 import { userWatchlist } from './schemas/userWatchlist.js';
 
 const connectToDatabase = async (): Promise<void> => {
@@ -35,5 +36,6 @@ export const mongodb = {
 	guildWarning,
 	memberStats,
 	userBirthday,
+	userCookies,
 	userWatchlist
 };

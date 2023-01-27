@@ -9,16 +9,32 @@ import { log } from '../lib/misc/log.js';
 import { startScheduler } from '../lib/scheduler.js';
 import { config } from '../private/config.js';
 
-export const ready = async (client: Client): Promise<void> => {
-	// -- initialise various things --
-	await mongodb.connectToDatabase();
-	dayjs.extend(relativeTime);
-	dayjs.extend(customParseFormat);
-	dayjs.extend(utc);
-	await cache.initialise();
-	startScheduler(client);
-	// ----
+export class Ready {
+	private client: Client;
 
-	console.log(`Bot Environment: ${config.environment}`);
-	log(`Successfully logged in as ${client.user.tag}!`);
+	constructor(client: Client) {
+		this.client = client;
+		this.init();
+	}
+
+	private async init(): Promise<void> {
+		await mongodb.connectToDatabase();
+		dayjs.extend(relativeTime);
+		dayjs.extend(customParseFormat);
+		dayjs.extend(utc);
+		await cache.initialise();
+		startScheduler(this.client);
+
+		this.ready();
+	}
+
+	private ready(): void {
+		const { tag, id } = this.client.user;
+		console.log(`Bot Environment: ${config.environment}`);
+		log(`Successfully logged in as ${tag}! (${id})`);
+	}
+}
+
+export const ready = (client: Client): void => {
+	new Ready(client);
 };

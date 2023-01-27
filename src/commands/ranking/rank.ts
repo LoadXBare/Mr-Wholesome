@@ -7,6 +7,7 @@ import { fetchMemberLeaderboardPosition } from '../../lib/guild-ranking/handler.
 import { fetchXPLevelBounds } from '../../lib/guild-ranking/xp-level.js';
 import { fetchGuildMember } from '../../lib/misc/fetch-guild-member.js';
 import { sendError } from '../../lib/misc/send-error.js';
+import { channelIsBotSpam } from './leaderboard.js';
 
 export const findFontSize = (canvas: Canvas.Canvas, text: string, maxFontSize: number, maxTextWidth: number): string => {
 	const ctx = canvas.getContext('2d');
@@ -22,6 +23,7 @@ export const findFontSize = (canvas: Canvas.Canvas, text: string, maxFontSize: n
 
 const checkRankCommand = async (args: BotCommand): Promise<void> => {
 	const { commandArgs, message } = args;
+	if (!channelIsBotSpam(message)) return;
 
 	let memberRanking: GuildRanking;
 	let xpLevelBounds: XPLevelBounds;

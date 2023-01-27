@@ -1,13 +1,15 @@
 import { EmbedBuilder } from 'discord.js';
-import fetch from 'node-fetch';
+import { fetch } from 'undici';
 import { COLORS } from '../../config/constants.js';
 import { BotCommand, Command, Fox } from '../../index.js';
 
 const foxCommand = async (args: BotCommand): Promise<void> => {
 	const { message } = args;
-	const response: Fox = await (await fetch('https://randomfox.ca/floof/')).json();
+	const response = await fetch('https://randomfox.ca/floof/');
+	const responseJSON = await response.json() as Fox;
+
 	const foxImageEmbed = new EmbedBuilder()
-		.setImage(response.image)
+		.setImage(responseJSON.image)
 		.setColor(COLORS.COMMAND);
 
 	message.reply({ embeds: [foxImageEmbed] });
