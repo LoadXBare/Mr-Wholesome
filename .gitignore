@@ -1,6 +1,4 @@
 node_modules
-private
-dist
 .env
-package-lock.json
-.todo
+.wakatime-project
+tsconfig.tsbuildinfo

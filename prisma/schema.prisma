@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- USER MODELS --- //
+
+model User {
+  userID   String    @id
+  Birthday Birthday?
+  Cookie   Cookie?
+}
+
+model Birthday {
+  birthdayID String @id @default(uuid())
+  userID     String @unique
+  date       String
+  user       User   @relation(fields: [userID], references: [userID])
+}
+
+model Cookie {
+  cookieID String @id @default(uuid())
+  userID   String @unique
+  given    Int
+  received Int
+  user     User   @relation(fields: [userID], references: [userID])
+}
+
+// --- GUILD MODELS --- //
+
+model Guild {
+  guildID     String        @id
+  GuildConfig GuildConfig?
+  Ban         Ban[]
+  Rank        Rank[]
+  TicketPanel TicketPanel[]
+  Warning     Warning[]
+  Notes       Notes[]
+  MemberStats MemberStats[]
+}
+
+model GuildConfig {
+  configID                String   @id @default(uuid())
+  guildID                 String   @unique
+  logChannelID            String   @default("")
+  cmdIgnoredChannelIDs    String[] @default([])
+  eventIgnoredChannelIDs  String[] @default([])
+  rankedIgnoredChannelIDs String[] @default([])
+  guild                   Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+}
+
+model Ban {
+  banID    String   @id @default(uuid())
+  guildID  String
+  authorID String
+  bannedID String
+  date     DateTime @default(now())
+  reason   String
+  unbanned Boolean  @default(false)
+  guild    Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+}
+
+model Rank {
+  rankID      String  @id @default(uuid())
+  userID      String
+  guildID     String
+  xp          Int
+  xpLevel     Int
+  levelNotifs Boolean @default(true)
+  credits     Int
+  guild       Guild   @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+}
+
+model Ticket {
+  ticketID      String      @id @default(uuid())
+  ticketPanelID String
+  authorID      String
+  open          Boolean     @default(true)
+  TicketPanel   TicketPanel @relation(fields: [ticketPanelID], references: [ticketPanelID], onDelete: Cascade)
+}
+
+model TicketPanel {
+  ticketPanelID   String   @id @default(uuid())
+  guildID         String
+  categoryID      String
+  panelEmbedJSON  Json
+  ticketEmbedJSON Json
+  name            String   @unique
+  tickets         Ticket[]
+  guild           Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+}
+
+model Warning {
+  warningID String   @id @default(uuid())
+  guildID   String
+  authorID  String
+  warnedID  String
+  reason    String
+  date      DateTime @default(now())
+  guild     Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+}
+
+model Notes {
+  noteID    String   @id @default(uuid())
+  authorID  String
+  watchedID String
+  guildID   String
+  date      DateTime @default(now())
+  noteText  String
+  guild     Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+}
+
+model MemberStats {
+  statsID            String @id @default(uuid())
+  userID             String
+  guildID            String
+  messageCount       Int
+  messageCountByHour Json
+  guild              Guild  @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+}

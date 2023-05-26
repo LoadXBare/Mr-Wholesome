@@ -1,11 +1,13 @@
-FROM node:16-buster-slim
+FROM node:18.16.0-slim
 
-WORKDIR /app
+ENV HOME /home/mr-wholesome/
+WORKDIR $HOME
 
-COPY package.json /app
+COPY ["package.json", "yarn.lock", "tsconfig.json", "prisma", "$HOME"]
+RUN yarn --frozen-lockfile --link-duplicates
+RUN npx prisma generate
 
-RUN npm install
+COPY ["src", "$HOME/src"]
+RUN npx tsc
 
-COPY . /app
-
-CMD ["npm","start"]
+CMD ["npm", "start"]
