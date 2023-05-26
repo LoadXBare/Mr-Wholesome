@@ -70,6 +70,6 @@ const commands = [
 		.setDescription('View Mr Wholesome\'s ping')
 ].map(command => command.toJSON());
 
-const rest = new REST({ version: '9' }).setToken('MTA2ODQ2MjgyNjY5NzUzMTQ0Mw.GA84dN.W3qqNRRFQbExLUc05HkClJAp6AkcJ6wNqas0xk');
+const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');
 rest.put(Routes.applicationGuildCommands('1068462826697531443', '1010933712084537414'), { body: commands })
 	.then(() => console.log(`Successfully registered ${commands.length} application commands!`));
