@@ -17,6 +17,7 @@ import('./message/message-update.js');
 
 // role
 import('./role/guild-role-create.js');
+import('./role/guild-role-delete.js');
 
 // other
 import('./interaction-create.js');
