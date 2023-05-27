@@ -24,7 +24,7 @@ class GuildMemberRemoveListener {
     }
 
     static #logMemberLeave() {
-        const memberRolesList = this.member.roles.cache.map((r) => `\n- ${r}`).join('');
+        const memberRolesList = this.member.roles.cache.map((r) => `- ${r}`).join('\n');
         const embedDescription = [
             '## Member Left',
             '### Member',
