@@ -40,7 +40,7 @@ export class Utils {
 			if (attachment.size >= Discord.MAX_ATTACHMENT_SIZE) {
 				storedAttachments.push({
 					link: '',
-					maskedLink: `- ${inlineCode(attachment.name)} [No link, size >${Math.round(Discord.MAX_ATTACHMENT_SIZE / 1_000_000)}MB]`,
+					maskedLink: `${inlineCode(attachment.name)} [No link, size >${Math.round(Discord.MAX_ATTACHMENT_SIZE / 1_000_000)}MB]`,
 					type: attachment.contentType ?? ''
 				});
 				continue;
@@ -53,7 +53,7 @@ export class Utils {
 			const storedAttachment = storedMessage.attachments.at(0);
 			storedAttachments.push({
 				link: storedAttachment?.url ?? '',
-				maskedLink: `- [${storedAttachment?.name ?? ''}](${storedAttachment?.url ?? ''})`,
+				maskedLink: `[${storedAttachment?.name ?? ''}](${storedAttachment?.url ?? ''})`,
 				type: storedAttachment?.contentType ?? 'N/A'
 			});
 		}

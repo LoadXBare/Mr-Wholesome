@@ -67,7 +67,7 @@ class MessageUpdateListener {
         const embed = new EmbedBuilder()
             .setDescription(`## Message Attachment Removed\nin ${this.newMessage.channel}\n\n### Attachment\n${storedAttachment?.maskedLink}`)
             .setFooter({
-                text: `@${this.newMessage.author?.username} • User ID: ${this.newMessage.author?.id}`,
+                text: `@${this.newMessage.author?.username} • Author ID: ${this.newMessage.author?.id}`,
                 iconURL: this.newMessage.author?.displayAvatarURL()
             })
             .setTimestamp()

@@ -12,6 +12,7 @@ import('./guild-member/guild-member-update.js');
 
 // message
 import('./message/message-create.js');
+import('./message/message-delete.js');
 import('./message/message-update.js');
 
 // role
