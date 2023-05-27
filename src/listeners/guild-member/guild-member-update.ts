@@ -22,16 +22,28 @@ class GuildMemberUpdateListener {
         if (logChannel === null) return;
 
         this.logChannel = logChannel;
-        this.#nicknameUpdate();
-        this.#rolesUpdate();
+        this.#logNicknameUpdate();
+        this.#logRolesUpdate();
     }
 
-    static #nicknameUpdate() {
+    static #logNicknameUpdate() {
         if (this.oldMember.nickname === this.newMember.nickname) return;
         const oldNickname = this.oldMember.nickname;
         const newNickname = this.newMember.nickname;
+        const embedDescription: Array<string> = [];
+
+        if (oldNickname === null) {
+            embedDescription.push(`## Nickname Added`, '### New Nickname', newNickname ?? '');
+        }
+        else if (newNickname === null) {
+            embedDescription.push('## Nickname Reset', '### Old Nickname', oldNickname);
+        }
+        else {
+            embedDescription.push('## Nickname Edited', '### Old Nickname', oldNickname, '### New Nickname', newNickname);
+        }
 
         const embed = new EmbedBuilder()
+            .setDescription(embedDescription.join('\n'))
             .setFooter({
                 text: `@${this.newMember.user.username} • User ID: ${this.newMember.user.id}`,
                 iconURL: this.newMember.user.displayAvatarURL()
@@ -39,45 +51,32 @@ class GuildMemberUpdateListener {
             .setTimestamp()
             .setColor(BotColors.Neutral);
 
-        if (oldNickname === null) {
-            embed.setDescription(`## Nickname Added\n### New Nickname\n${newNickname}`);
-        }
-        else if (newNickname === null) {
-            embed.setDescription(`## Nickname Reset\n### Old Nickname\n${oldNickname}`);
-        }
-        else {
-            embed.setDescription(`## Nickname Edited\n### Old Nickname\n${oldNickname}\n### New Nickname\n${newNickname}`);
-        }
-
         this.logChannel.send({ embeds: [embed] });
     }
 
-    static #rolesUpdate() {
+    static #logRolesUpdate() {
         if (this.oldMember.roles.cache.equals(this.newMember.roles.cache)) return;
         const oldRoles = this.oldMember.roles.cache;
         const newRoles = this.newMember.roles.cache;
         const rolesDifference = oldRoles.difference(newRoles);
+
         const addedRoles: Array<Role> = [];
         const removedRoles: Array<Role> = [];
-
         for (const [string, role] of rolesDifference) {
-            const roleRemoved = oldRoles.has(string);
+            const roleWasRemoved = oldRoles.has(string);
 
-            if (roleRemoved) removedRoles.push(role);
+            if (roleWasRemoved) removedRoles.push(role);
             else addedRoles.push(role);
         }
-        const addedRolesDescription =
-            addedRoles.length > 0
-                ? `\n### Roles Added${addedRoles.map((r) => `\n- ${r}`).join('')}`
-                : '';
-        const removedRolesDescription =
-            removedRoles.length > 0
-                ? `\n### Roles Removed${removedRoles.map((r) => `\n- ${r}`).join('')}`
-                : '';
 
+        const embedDescription = [
+            '## Member Roles Updated'
+        ];
+        if (addedRoles.length > 0) embedDescription.push('### Roles Added', addedRoles.map((r) => `- ${r}`).join('\n'));
+        if (removedRoles.length > 0) embedDescription.push('### Roles Removed', removedRoles.map((r) => `- ${r}`).join('\n'));
 
         const embed = new EmbedBuilder()
-            .setDescription(`## Member Roles Updated${addedRolesDescription}${removedRolesDescription}`)
+            .setDescription(embedDescription.join('\n'))
             .setFooter({
                 text: `@${this.newMember.user.username} • User ID: ${this.newMember.user.id}`,
                 iconURL: this.newMember.user.displayAvatarURL()

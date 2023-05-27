@@ -20,10 +20,10 @@ class MessageDeleteListener {
         if (logChannel === null) return;
 
         this.logChannel = logChannel;
-        this.#messageDeleted();
+        this.#logDeletedMessage();
     }
 
-    static async #messageDeleted() {
+    static async #logDeletedMessage() {
         const embeddableContentTypes = ['image/png', 'image/gif', 'image/webp', 'image/jpeg'];
         const removedAttachments = this.message.attachments;
         const storedAttachments = await Utils.storeAttachments(removedAttachments);
@@ -38,7 +38,11 @@ class MessageDeleteListener {
             userWhoDeletedMessage = latestMessageDeleteAuditLog.executor;
         }
 
-        let embedDescription = `## Message Deleted in ${this.message.channel}\n### Deleted by ${userWhoDeletedMessage}`;
+        const embedDescription = [
+            `## Message Deleted in ${this.message.channel}`,
+            `### Deleted by ${userWhoDeletedMessage}`
+        ];
+
         const embed = new EmbedBuilder()
             .setFooter({
                 text: `@${this.message.author?.username} • Author ID: ${this.message.author?.id}`,
@@ -48,22 +52,22 @@ class MessageDeleteListener {
             .setColor(BotColors.Negative);
 
         if (this.message.content !== '') {
-            embedDescription = embedDescription.concat(`\n### Message\n${this.message.content}`);
+            embedDescription.push('### Message', this.message.content ?? '');
         }
 
         if (storedAttachments.length === 1) {
-            const storedAttachment = storedAttachments.at(0);
-            embedDescription = embedDescription.concat(`\n### Attachment\n${storedAttachment?.maskedLink}`);
+            const storedAttachment = storedAttachments.at(0)!;
+            embedDescription.push('### Attachment', storedAttachment.maskedLink);
 
-            if (storedAttachment?.link !== '' && embeddableContentTypes.includes(storedAttachment?.type ?? '')) {
-                embed.setImage(storedAttachment?.link ?? '');
+            if (storedAttachment.link !== '' && embeddableContentTypes.includes(storedAttachment.type)) {
+                embed.setImage(storedAttachment.link);
             }
         }
         else if (storedAttachments.length > 1) {
-            embedDescription = embedDescription.concat(`\n### Attachments${storedAttachments.map((a) => `\n- ${a.maskedLink}`).join('')}`);
+            embedDescription.push('### Attachments', storedAttachments.map((a) => `- ${a.maskedLink}`).join('\n'));
         }
 
-        embed.setDescription(embedDescription);
+        embed.setDescription(embedDescription.join('\n'));
 
         this.logChannel.send({ embeds: [embed] });
     }

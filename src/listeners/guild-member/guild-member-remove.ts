@@ -20,12 +20,23 @@ class GuildMemberRemoveListener {
         if (logChannel === null) return;
 
         this.logChannel = logChannel;
-        this.#memberLeft();
+        this.#logMemberLeave();
     }
 
-    static #memberLeft() {
+    static #logMemberLeave() {
+        const memberRolesList = this.member.roles.cache.map((r) => `\n- ${r}`).join('');
+        const embedDescription = [
+            '## Member Left',
+            '### Member',
+            this.member.user,
+            '### Roles',
+            memberRolesList,
+            '### Join Date',
+            Utils.getRelativeTimeString(this.member.joinedAt ?? Date.now()),
+        ].join('\n');
+
         const embed = new EmbedBuilder()
-            .setDescription(`## Member Left\n### Member\n${this.member.user}\n### Join Date\n${Utils.getRelativeTimeString(this.member.joinedAt ?? Date.now())}`)
+            .setDescription(embedDescription)
             .setFooter({
                 text: `@${this.member.user.username} • User ID: ${this.member.user.id}`,
                 iconURL: this.member.user.displayAvatarURL()

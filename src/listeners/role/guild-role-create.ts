@@ -20,20 +20,26 @@ class GuildRoleCreateListener {
         if (logChannel === null) return;
 
         this.logChannel = logChannel;
-        this.#roleCreated();
+        this.#logCreatedRole();
     }
 
-    static #roleCreated() {
+    static #logCreatedRole() {
         const roleProperties = [
-            `\n- **Name** — ${this.role.name}`,
-            `\n- **Colour** — ${this.role.hexColor}`,
-            `\n- **Hoisted?** — ${this.role.hoist ? 'Yes' : 'No'}`,
-            `\n- **Created by bot?** — ${this.role.managed ? 'Yes' : 'No'}`,
-            `\n- **Mentionable?** — ${this.role.mentionable ? 'Yes' : 'No'}`
-        ];
+            `- **Name** — ${this.role.name}`,
+            `- **Colour** — ${this.role.hexColor}`,
+            `- **Hoisted?** — ${this.role.hoist ? 'Yes' : 'No'}`,
+            `- **Created by bot?** — ${this.role.managed ? 'Yes' : 'No'}`,
+            `- **Mentionable?** — ${this.role.mentionable ? 'Yes' : 'No'}`
+        ].join('\n');
+
+        const embedDescription = [
+            '## Role Created',
+            '### Properties',
+            roleProperties
+        ].join('\n');
 
         const embed = new EmbedBuilder()
-            .setDescription(`## Role Created\n### Properties${roleProperties.join('')}`)
+            .setDescription(embedDescription)
             .setFooter({
                 text: `${this.role.guild.name} • Role ID: ${this.role.id}`,
                 iconURL: this.role.guild.iconURL() ?? undefined

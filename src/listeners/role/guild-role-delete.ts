@@ -20,20 +20,26 @@ class GuildRoleDeleteListener {
         if (logChannel === null) return;
 
         this.logChannel = logChannel;
-        this.#roleDeleted();
+        this.#logDeletedRole();
     }
 
-    static #roleDeleted() {
+    static #logDeletedRole() {
         const roleProperties = [
-            `\n- **Name** — ${this.role.name}`,
-            `\n- **Colour** — ${this.role.hexColor}`,
-            `\n- **Hoisted?** — ${this.role.hoist ? 'Yes' : 'No'}`,
-            `\n- **Created by bot?** — ${this.role.managed ? 'Yes' : 'No'}`,
-            `\n- **Mentionable?** — ${this.role.mentionable ? 'Yes' : 'No'}`
-        ];
+            `- **Name** — ${this.role.name}`,
+            `- **Colour** — ${this.role.hexColor}`,
+            `- **Hoisted?** — ${this.role.hoist ? 'Yes' : 'No'}`,
+            `- **Created by bot?** — ${this.role.managed ? 'Yes' : 'No'}`,
+            `- **Mentionable?** — ${this.role.mentionable ? 'Yes' : 'No'}`
+        ].join('\n');
+
+        const embedDescription = [
+            '## Role Deleted',
+            '### Properties',
+            roleProperties
+        ].join('\n');
 
         const embed = new EmbedBuilder()
-            .setDescription(`## Role Deleted\n### Properties${roleProperties.join('')}`)
+            .setDescription(embedDescription)
             .setFooter({
                 text: `${this.role.guild.name} • Role ID: ${this.role.id}`,
                 iconURL: this.role.guild.iconURL() ?? undefined
