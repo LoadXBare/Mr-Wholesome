@@ -7,6 +7,7 @@
 // guild-ban
 
 // guild-member
+import('./guild-member/guild-member-add.js');
 import('./guild-member/guild-member-remove.js');
 import('./guild-member/guild-member-update.js');
 
