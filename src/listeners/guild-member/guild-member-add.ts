@@ -21,6 +21,7 @@ class GuildMemberAddListener {
 
         this.logChannel = logChannel;
         this.#logMemberJoined();
+        this.#giveMemberRole();
     }
 
     static #logMemberJoined() {
@@ -43,6 +44,23 @@ class GuildMemberAddListener {
             .setColor(EmbedColours.Positive);
 
         this.logChannel.send({ embeds: [embed] });
+    }
+
+    static async #giveMemberRole() {
+        /*
+         * This delay is necessary to prevent duplicate Member Role Updated embeds from being posted.
+         * Because upon a user joining a server for the first time, multiple guild-member-update events
+         * are fired simultaneously which leads to multiple Member Role Updated embeds being posted
+         * 90% of the time.
+         * 
+         * Having this delay allows the initial guild-member-update events to be fired and processed
+         * first so no duplicate embeds occur when adding the role.
+         */
+        await Utils.sleep(1000);
+
+        await this.member.roles.add(process.env.AKIALYTE_ROLE_ID!)
+            .then(() => Utils.log('Gave Akialyte role!', true))
+            .catch((e) => Utils.log('An error occurred while giving role!', false, e));
     }
 }
 GuildMemberAddListener.listener();

@@ -55,13 +55,14 @@ class GuildMemberUpdateListener {
     }
 
     static #logRolesUpdate() {
-        if (this.oldMember.roles.cache.equals(this.newMember.roles.cache)) return;
         const oldRoles = this.oldMember.roles.cache;
         const newRoles = this.newMember.roles.cache;
-        const rolesDifference = oldRoles.difference(newRoles);
+        if (oldRoles.equals(newRoles)) return;
 
+        const rolesDifference = oldRoles.difference(newRoles);
         const addedRoles: Array<Role> = [];
         const removedRoles: Array<Role> = [];
+
         for (const [string, role] of rolesDifference) {
             const roleWasRemoved = oldRoles.has(string);
 

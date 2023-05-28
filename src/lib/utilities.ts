@@ -90,6 +90,15 @@ export class Utils {
 		const rtf = new Intl.RelativeTimeFormat('en', { numeric: "auto" });
 		return rtf.format(Math.floor(deltaSeconds / divisor), units[unitIndex]);
 	}
+
+	/**
+	 * Allows for a synchronous delay in code execution if called with `await`.
+	 * @param ms The time, in milliseconds, to sleep
+	 * @returns Empty promise after specified delay has elapsed
+	 */
+	static sleep(ms: number) {
+		return new Promise((r) => setTimeout(r, ms));
+	}
 }
 
 export class DatabaseUtils {
