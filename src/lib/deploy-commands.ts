@@ -1,4 +1,6 @@
 import { ChannelType, REST, Routes, SlashCommandBuilder } from "discord.js";
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const commands = [
 	new SlashCommandBuilder()
@@ -25,6 +27,10 @@ const commands = [
 						ChannelType.PublicThread
 					)
 				)
+			)
+			.addSubcommand(subcommand => subcommand
+				.setName('ignored')
+				.setDescription('View the channels events aren\'t being monitored from')
 			)
 			.addSubcommand(subcommand => subcommand
 				.setName('unignore')
@@ -70,6 +76,15 @@ const commands = [
 		.setDescription('View Mr Wholesome\'s ping')
 ].map(command => command.toJSON());
 
-const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');
-rest.put(Routes.applicationGuildCommands('1068462826697531443', '1010933712084537414'), { body: commands })
-	.then(() => console.log(`Successfully registered ${commands.length} application commands!`));
+const rest = new REST({ version: '9' }).setToken(process.env.TOKEN!);
+
+if (process.env.ENVIRONMENT === 'DEVELOPMENT') {
+	rest.put(Routes.applicationGuildCommands(process.env.BOT_ID!, process.env.BOT_TESTING_GUILD_ID!), { body: commands })
+		.then(() => console.log(`✅ | Successfully registered ${commands.length} application commands for Bot Testing Den!`))
+		.catch((e) => console.log('❌ | An error occurred when registering guild application commands!\n', e));
+}
+else {
+	rest.put(Routes.applicationCommands(process.env.BOT_ID!), { body: commands })
+		.then(() => console.log(`✅ | Successfully registered ${commands.length} application commands globally!`))
+		.catch((e) => console.log('❌ | An error occurred when registering global application commands!\n', e));
+}

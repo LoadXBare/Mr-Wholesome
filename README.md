@@ -6,9 +6,10 @@
   <br>
   <p>
     <img alt="Time spent programming" src="https://wakatime.com/badge/user/87603537-98b6-4d98-bccb-d715695da413/project/dc28386b-0798-4bbf-8583-f7a45434f21f.svg">
-    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/loadxbare/mr-wholesome">
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/LoadXBare/Mr-Wholesome">
-    <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/loadxbare/mr-wholesome">
+    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/loadxbare/mr-wholesome/v2.0-rewrite">
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/loadxbare/mr-wholesome/v2.0-rewrite">
+    <img alt="Programming Stage" src="https://img.shields.io/badge/stage-development-red">
+    <img alt="GitHub license" src="https://img.shields.io/github/license/loadxbare/mr-wholesome">
   </p>
 </div>
 
