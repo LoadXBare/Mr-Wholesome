@@ -1,6 +1,6 @@
 import { EmbedBuilder, Events, GuildMember, TextBasedChannel } from "discord.js";
 import { client } from "../../index.js";
-import { BotColors } from "../../lib/config.js";
+import { EmbedColours } from "../../lib/config.js";
 import { DatabaseUtils, Utils } from "../../lib/utilities.js";
 
 class GuildMemberAddListener {
@@ -40,7 +40,7 @@ class GuildMemberAddListener {
                 iconURL: this.member.user.displayAvatarURL()
             })
             .setTimestamp()
-            .setColor(BotColors.Positive);
+            .setColor(EmbedColours.Positive);
 
         this.logChannel.send({ embeds: [embed] });
     }

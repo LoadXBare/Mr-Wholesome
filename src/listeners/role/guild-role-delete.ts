@@ -1,6 +1,6 @@
 import { EmbedBuilder, Events, Role, TextBasedChannel } from "discord.js";
 import { client } from "../../index.js";
-import { BotColors } from "../../lib/config.js";
+import { EmbedColours } from "../../lib/config.js";
 import { DatabaseUtils } from "../../lib/utilities.js";
 
 class GuildRoleDeleteListener {
@@ -45,7 +45,7 @@ class GuildRoleDeleteListener {
                 iconURL: this.role.guild.iconURL() ?? undefined
             })
             .setTimestamp()
-            .setColor(BotColors.Negative);
+            .setColor(EmbedColours.Negative);
 
         this.logChannel.send({ embeds: [embed] });
     }

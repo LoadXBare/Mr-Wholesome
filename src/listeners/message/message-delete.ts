@@ -1,6 +1,6 @@
 import { AuditLogEvent, EmbedBuilder, Events, Message, PartialMessage, TextBasedChannel } from "discord.js";
 import { client } from "../../index.js";
-import { BotColors } from "../../lib/config.js";
+import { EmbedColours } from "../../lib/config.js";
 import { DatabaseUtils, Utils } from "../../lib/utilities.js";
 
 class MessageDeleteListener {
@@ -49,7 +49,7 @@ class MessageDeleteListener {
                 iconURL: this.message.author?.displayAvatarURL()
             })
             .setTimestamp()
-            .setColor(BotColors.Negative);
+            .setColor(EmbedColours.Negative);
 
         if (this.message.content !== '') {
             embedDescription.push('### Message', this.message.content ?? '');

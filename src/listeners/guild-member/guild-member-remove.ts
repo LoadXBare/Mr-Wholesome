@@ -1,6 +1,6 @@
 import { EmbedBuilder, Events, GuildMember, PartialGuildMember, TextBasedChannel } from "discord.js";
 import { client } from "../../index.js";
-import { BotColors } from "../../lib/config.js";
+import { EmbedColours } from "../../lib/config.js";
 import { DatabaseUtils, Utils } from "../../lib/utilities.js";
 
 class GuildMemberRemoveListener {
@@ -42,7 +42,7 @@ class GuildMemberRemoveListener {
                 iconURL: this.member.user.displayAvatarURL()
             })
             .setTimestamp()
-            .setColor(BotColors.Negative);
+            .setColor(EmbedColours.Negative);
 
         this.logChannel.send({ embeds: [embed] });
     }

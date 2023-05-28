@@ -1,5 +1,5 @@
 import { ChannelType, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
-import { BotColors } from "../../lib/config.js";
+import { EmbedColours } from "../../lib/config.js";
 import { DatabaseUtils } from "../../lib/utilities.js";
 
 export class SettingsCommand {
@@ -31,12 +31,12 @@ export class SettingsCommand {
 			if (success) {
 				embed
 					.setDescription(`## Successfully ignored ${channelToIgnore}!\nEvents will no longer be logged from it.`)
-					.setColor(BotColors.Success);
+					.setColor(EmbedColours.Success);
 			}
 			else {
 				embed
 					.setDescription(`## Channel already ignored!\n${channelToIgnore} is either already ignored or an error occurred.`)
-					.setColor(BotColors.Error);
+					.setColor(EmbedColours.Error);
 			}
 
 			this.interaction.reply({ embeds: [embed] });
@@ -60,12 +60,12 @@ export class SettingsCommand {
 			if (success) {
 				embed
 					.setDescription(`## Successfully unignored ${channelToUnignore}!\nEvents will now be logged from it.`)
-					.setColor(BotColors.Success);
+					.setColor(EmbedColours.Success);
 			}
 			else {
 				embed
 					.setDescription(`## Channel not ignored!\n${channelToUnignore} is either not ignored or an error occurred.`)
-					.setColor(BotColors.Error);
+					.setColor(EmbedColours.Error);
 			}
 
 			this.interaction.reply({ embeds: [embed] });
@@ -81,7 +81,7 @@ export class SettingsCommand {
 
 			const embed = new EmbedBuilder()
 				.setDescription(description)
-				.setColor(BotColors.Info);
+				.setColor(EmbedColours.Info);
 
 			this.interaction.reply({ embeds: [embed] });
 		};
@@ -95,12 +95,12 @@ export class SettingsCommand {
 			if (success) {
 				embed
 					.setDescription(`## Successfully set to ${logChannel}!\nThis guild is now set to receive moderation logs in ${logChannel}!`)
-					.setColor(BotColors.Success);
+					.setColor(EmbedColours.Success);
 			}
 			else {
 				embed
 					.setDescription(`## Something went wrong 💥`)
-					.setColor(BotColors.Error);
+					.setColor(EmbedColours.Error);
 			}
 
 			this.interaction.reply({ embeds: [embed] });
@@ -113,12 +113,12 @@ export class SettingsCommand {
 			if (success) {
 				embed
 					.setDescription('## Successfully reset!\nThis guild\'s log channel has been reset!')
-					.setColor(BotColors.Success);
+					.setColor(EmbedColours.Success);
 			}
 			else {
 				embed
 					.setDescription('## Something went wrong 💥')
-					.setColor(BotColors.Error);
+					.setColor(EmbedColours.Error);
 			}
 
 			this.interaction.reply({ embeds: [embed] });

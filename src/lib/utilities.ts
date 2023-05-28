@@ -1,6 +1,6 @@
 import { Attachment, Collection, TextChannel, inlineCode } from "discord.js";
 import { client } from "../index.js";
-import { ChannelIDs, Discord, database } from "./config.js";
+import { Discord, database } from "./config.js";
 
 export class Utils {
 	/** 
@@ -33,7 +33,7 @@ export class Utils {
 	 * @returns Array of objects containg each attachment's link, masked link and type
 	 */
 	static async storeAttachments(attachments: Collection<string, Attachment>) {
-		const mediaChannel = await client.channels.fetch(ChannelIDs.MediaStorage) as TextChannel;
+		const mediaChannel = await client.channels.fetch(process.env.MEDIA_STORAGE_CHANNEL_ID!) as TextChannel;
 		const storedAttachments: Array<{ link: string, maskedLink: string, type: string; }> = [];
 
 		for (const [_string, attachment] of attachments) {

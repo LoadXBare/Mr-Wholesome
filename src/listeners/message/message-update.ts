@@ -1,7 +1,7 @@
 import { diffChars } from "diff";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, Message, PartialMessage, TextBasedChannel, codeBlock } from "discord.js";
 import { client } from "../../index.js";
-import { BotColors } from "../../lib/config.js";
+import { EmbedColours } from "../../lib/config.js";
 import { DatabaseUtils, Utils } from "../../lib/utilities.js";
 
 class MessageUpdateListener {
@@ -52,7 +52,7 @@ class MessageUpdateListener {
                 iconURL: this.newMessage.author?.displayAvatarURL()
             })
             .setTimestamp()
-            .setColor(BotColors.Neutral);
+            .setColor(EmbedColours.Neutral);
 
         const jumpButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
@@ -84,7 +84,7 @@ class MessageUpdateListener {
                 iconURL: this.newMessage.author?.displayAvatarURL()
             })
             .setTimestamp()
-            .setColor(BotColors.Neutral);
+            .setColor(EmbedColours.Neutral);
 
         if (storedAttachment?.link !== '' && embeddableContentTypes.includes(storedAttachment?.type ?? '')) {
             embed.setImage(storedAttachment?.link ?? '');

@@ -1,6 +1,6 @@
 import { Events, Message } from "discord.js";
 import { client } from "../../index.js";
-import { ChannelIDs, Emotes, UserIDs } from "../../lib/config.js";
+import { Emotes } from "../../lib/config.js";
 import { DatabaseUtils, Utils } from "../../lib/utilities.js";
 
 class MessageCreateListener {
@@ -37,7 +37,7 @@ class MessageCreateListener {
     // React with the :akiaBonque: emoji and say "NO SORRY" if the message contains "sorry" and is sent by Akia
     static async #bonkAkia() {
         const messageContainsSorry = this.message.content.search(/[s]+[o]+[r]+[y]+/mi) !== -1;
-        const authorIsAkia = this.message.author.id === UserIDs.Akialyne;
+        const authorIsAkia = this.message.author.id === process.env.AKIALYNE_USER_ID;
         if (!messageContainsSorry || !authorIsAkia) return;
 
         await this.message.react(Emotes.Bonque)
@@ -60,7 +60,7 @@ class MessageCreateListener {
     // Say "au chocolat?" if the message ends with "pain" and is sent in #🤡-memes-🤡
     static async #painAuChocolat() {
         const messageEndsWithPain = this.message.content.search(/\bpain\W{0,}$/i) !== -1;
-        const channelIsMemes = this.message.channelId === ChannelIDs.Memes;
+        const channelIsMemes = this.message.channelId === process.env.MEMES_CHANNEL_ID;
         if (!messageEndsWithPain || !channelIsMemes) return;
 
         await this.message.reply('au chocolat?')

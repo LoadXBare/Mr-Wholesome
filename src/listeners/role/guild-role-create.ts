@@ -1,6 +1,6 @@
 import { EmbedBuilder, Events, Role, TextBasedChannel } from "discord.js";
 import { client } from "../../index.js";
-import { BotColors } from "../../lib/config.js";
+import { EmbedColours } from "../../lib/config.js";
 import { DatabaseUtils } from "../../lib/utilities.js";
 
 class GuildRoleCreateListener {
@@ -45,7 +45,7 @@ class GuildRoleCreateListener {
                 iconURL: this.role.guild.iconURL() ?? undefined
             })
             .setTimestamp()
-            .setColor(BotColors.Positive);
+            .setColor(EmbedColours.Positive);
 
         this.logChannel.send({ embeds: [embed] });
     }
