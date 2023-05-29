@@ -3,16 +3,19 @@ import { EmbedColours } from "../../lib/config.js";
 import { DatabaseUtils } from "../../lib/utilities.js";
 
 export class SettingsCommand {
-	static interaction: ChatInputCommandInteraction;
+	interaction: ChatInputCommandInteraction;
 
-	static run(interaction: ChatInputCommandInteraction) {
+	constructor(interaction: ChatInputCommandInteraction) {
 		this.interaction = interaction;
+		this.#handle();
+	}
 
+	#handle() {
 		const commandGroup = this.interaction.options.getSubcommandGroup();
 		if (commandGroup === 'logs') this.#handleLogsSettings();
 	}
 
-	static async #handleLogsSettings() {
+	async #handleLogsSettings() {
 		const ignore = async () => {
 			const channelToIgnore = this.interaction.options.getChannel('channel', true, [
 				ChannelType.AnnouncementThread,
@@ -40,6 +43,10 @@ export class SettingsCommand {
 			}
 
 			this.interaction.reply({ embeds: [embed] });
+		};
+
+		const ignored = async () => {
+			this.interaction.reply('blehhh');
 		};
 
 		const unignore = async () => {
@@ -71,65 +78,10 @@ export class SettingsCommand {
 			this.interaction.reply({ embeds: [embed] });
 		};
 
-		const view = async () => {
-			let description = '## No channel set!\nThis guild currently has no channel set to receive moderation logs.';
-
-			const logChannel = await DatabaseUtils.fetchGuildLogChannel(this.interaction.guildId);
-			if (logChannel !== null) {
-				description = `## Log channel is ${logChannel}!\nThis guild currently has ${logChannel} set to receive moderation logs.`;
-			}
-
-			const embed = new EmbedBuilder()
-				.setDescription(description)
-				.setColor(EmbedColours.Info);
-
-			this.interaction.reply({ embeds: [embed] });
-		};
-
-		const set = async () => {
-			const logChannel = this.interaction.options.getChannel('channel', true, [ChannelType.GuildText]);
-
-			const success = await DatabaseUtils.updateGuildLogChannel(this.interaction.guildId, logChannel.id);
-			const embed = new EmbedBuilder();
-
-			if (success) {
-				embed
-					.setDescription(`## Successfully set to ${logChannel}!\nThis guild is now set to receive moderation logs in ${logChannel}!`)
-					.setColor(EmbedColours.Success);
-			}
-			else {
-				embed
-					.setDescription(`## Something went wrong 💥`)
-					.setColor(EmbedColours.Error);
-			}
-
-			this.interaction.reply({ embeds: [embed] });
-		};
-
-		const reset = async () => {
-			const success = await DatabaseUtils.resetGuildLogChannel(this.interaction.guildId);
-			const embed = new EmbedBuilder();
-
-			if (success) {
-				embed
-					.setDescription('## Successfully reset!\nThis guild\'s log channel has been reset!')
-					.setColor(EmbedColours.Success);
-			}
-			else {
-				embed
-					.setDescription('## Something went wrong 💥')
-					.setColor(EmbedColours.Error);
-			}
-
-			this.interaction.reply({ embeds: [embed] });
-		};
-
 		const command = this.interaction.options.getSubcommand();
 
 		if (command === 'ignore') ignore();
+		else if (command === 'ignored') ignored();
 		else if (command === 'unignore') unignore();
-		else if (command === 'view') view();
-		else if (command === 'set') set();
-		else if (command === 'reset') reset();
 	}
 }

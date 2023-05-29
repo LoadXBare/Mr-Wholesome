@@ -1,29 +1,22 @@
-import { EmbedBuilder, Events, GuildMember, PartialGuildMember, TextBasedChannel } from "discord.js";
+import { EmbedBuilder, Events, GuildMember, PartialGuildMember } from "discord.js";
 import { client } from "../../index.js";
-import { EmbedColours } from "../../lib/config.js";
-import { DatabaseUtils, Utils } from "../../lib/utilities.js";
+import { EmbedColours, EventHandler } from "../../lib/config.js";
+import { Utils } from "../../lib/utilities.js";
 
-class GuildMemberRemoveListener {
-    static member: GuildMember | PartialGuildMember;
-    static logChannel: TextBasedChannel;
+class GuildMemberRemoveHandler extends EventHandler {
+    member: GuildMember | PartialGuildMember;
 
-    static listener() {
-        client.on(Events.GuildMemberRemove, (member) => {
-            this.member = member;
-
-            this.#run();
-        });
+    constructor(member: GuildMember | PartialGuildMember) {
+        super();
+        this.member = member;
+        this.#handle();
     }
 
-    static async #run() {
-        const logChannel = await DatabaseUtils.fetchGuildLogChannel(this.member.guild.id);
-        if (logChannel === null) return;
-
-        this.logChannel = logChannel;
+    #handle() {
         this.#logMemberLeave();
     }
 
-    static #logMemberLeave() {
+    #logMemberLeave() {
         const memberRolesList = this.member.roles.cache.map((r) => `- ${r}`).join('\n');
         const embedDescription = [
             '## Member Left',
@@ -44,7 +37,10 @@ class GuildMemberRemoveListener {
             .setTimestamp()
             .setColor(EmbedColours.Negative);
 
-        this.logChannel.send({ embeds: [embed] });
+        super.logChannel.send({ embeds: [embed] }); // TODO: alert if user on watchlist
     }
 }
-GuildMemberRemoveListener.listener();
+
+client.on(Events.GuildMemberRemove, (member) => {
+    new GuildMemberRemoveHandler(member);
+});

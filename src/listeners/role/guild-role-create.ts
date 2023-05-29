@@ -1,35 +1,27 @@
-import { EmbedBuilder, Events, Role, TextBasedChannel } from "discord.js";
+import { EmbedBuilder, Events, Role } from "discord.js";
 import { client } from "../../index.js";
-import { EmbedColours } from "../../lib/config.js";
-import { DatabaseUtils } from "../../lib/utilities.js";
+import { EmbedColours, EventHandler } from "../../lib/config.js";
 
-class GuildRoleCreateListener {
-    static role: Role;
-    static logChannel: TextBasedChannel;
+class GuildRoleCreateHandler extends EventHandler {
+    role: Role;
 
-    static listner() {
-        client.on(Events.GuildRoleCreate, (role) => {
-            this.role = role;
-
-            this.#run();
-        });
+    constructor(role: Role) {
+        super();
+        this.role = role;
+        this.#handle();
     }
 
-    static async #run() {
-        const logChannel = await DatabaseUtils.fetchGuildLogChannel(this.role.guild.id);
-        if (logChannel === null) return;
-
-        this.logChannel = logChannel;
+    #handle() {
         this.#logCreatedRole();
     }
 
-    static #logCreatedRole() {
+    #logCreatedRole() {
         const roleProperties = [
-            `- **Name** — ${this.role.name}`,
-            `- **Colour** — ${this.role.hexColor}`,
-            `- **Hoisted?** — ${this.role.hoist ? 'Yes' : 'No'}`,
-            `- **Created by bot?** — ${this.role.managed ? 'Yes' : 'No'}`,
-            `- **Mentionable?** — ${this.role.mentionable ? 'Yes' : 'No'}`
+            `- **Name** — \`${this.role.name}\``,
+            `- **Colour** — \`${this.role.hexColor}\``,
+            `- **Hoisted?** — \`${this.role.hoist ? '✅' : '❌'}\``,
+            `- **Created by bot?** — \`${this.role.managed ? '✅' : '❌'}\``,
+            `- **Mentionable?** — \`${this.role.mentionable ? '✅' : '❌'}\``
         ].join('\n');
 
         const embedDescription = [
@@ -47,7 +39,10 @@ class GuildRoleCreateListener {
             .setTimestamp()
             .setColor(EmbedColours.Positive);
 
-        this.logChannel.send({ embeds: [embed] });
+        super.logChannel.send({ embeds: [embed] });
     }
 }
-GuildRoleCreateListener.listner();
+
+client.on(Events.GuildRoleCreate, (role) => {
+    new GuildRoleCreateHandler(role);
+});

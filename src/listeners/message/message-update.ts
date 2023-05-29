@@ -1,34 +1,29 @@
 import { diffChars } from "diff";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, Message, PartialMessage, TextBasedChannel, codeBlock } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, Message, PartialMessage, codeBlock } from "discord.js";
 import { client } from "../../index.js";
-import { EmbedColours } from "../../lib/config.js";
+import { EmbedColours, EventHandler } from "../../lib/config.js";
 import { DatabaseUtils, Utils } from "../../lib/utilities.js";
 
-class MessageUpdateListener {
-    static oldMessage: Message | PartialMessage;
-    static newMessage: Message | PartialMessage;
-    static logChannel: TextBasedChannel;
+class MessageUpdateHandler extends EventHandler {
+    oldMessage: Message | PartialMessage;
+    newMessage: Message | PartialMessage;
 
-    static listener() {
-        client.on(Events.MessageUpdate, (oldMessage, newMessage) => {
-            this.oldMessage = oldMessage;
-            this.newMessage = newMessage;
-
-            this.#run();
-        });
+    constructor(oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) {
+        super();
+        this.oldMessage = oldMessage;
+        this.newMessage = newMessage;
+        this.#handle();
     }
 
-    static async #run() {
-        const logChannel = await DatabaseUtils.fetchGuildLogChannel(this.newMessage.guildId);
+    async #handle() {
         const channelHasEventsIgnored = await DatabaseUtils.checkIfChannelHasEventsIgnored(this.newMessage.guildId, this.newMessage.channelId);
-        if (logChannel === null || this.newMessage.author?.bot || channelHasEventsIgnored) return;
+        if (this.newMessage.author?.bot || channelHasEventsIgnored) return;
 
-        this.logChannel = logChannel;
         this.#logEditedMessage();
         this.#logRemovedMessageAttachment();
     }
 
-    static #logEditedMessage() {
+    #logEditedMessage() {
         if (this.oldMessage.content === this.newMessage.content) return;
         const contentDifference = diffChars(this.oldMessage.content ?? '', this.newMessage.content ?? '');
 
@@ -61,10 +56,10 @@ class MessageUpdateListener {
                 .setURL(this.newMessage.url)
         );
 
-        this.logChannel.send({ embeds: [embed], components: [jumpButton] });
+        super.logChannel.send({ embeds: [embed], components: [jumpButton] }); // TODO: alert if user on watchlist
     }
 
-    static async #logRemovedMessageAttachment() {
+    async #logRemovedMessageAttachment() {
         if (this.oldMessage.attachments.size === this.newMessage.attachments.size) return;
         const embeddableContentTypes = ['image/png', 'image/gif', 'image/webp', 'image/jpeg'];
         const removedAttachment = this.oldMessage.attachments.difference(this.newMessage.attachments);
@@ -97,10 +92,10 @@ class MessageUpdateListener {
                 .setURL(this.newMessage.url)
         );
 
-        this.logChannel.send({
-            embeds: [embed],
-            components: [jumpButton]
-        });
+        super.logChannel.send({ embeds: [embed], components: [jumpButton] }); // TODO: alert if user on watchlist
     }
 }
-MessageUpdateListener.listener();
+
+client.on(Events.MessageUpdate, (oldMessage, newMessage) => {
+    new MessageUpdateHandler(oldMessage, newMessage);
+});

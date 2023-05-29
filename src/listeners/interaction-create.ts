@@ -1,29 +1,28 @@
 import { ChatInputCommandInteraction, Events, Interaction } from "discord.js";
 import { SettingsCommand } from "../commands/utility/settings.js";
 import { client } from "../index.js";
+import { EventHandler } from "../lib/config.js";
 
-class InteractionCreateListener {
-    static interaction: Interaction;
+class InteractionCreateHandler extends EventHandler {
+    interaction: Interaction;
 
-    static listener() {
-        client.on(Events.InteractionCreate, (interaction) => {
-            this.interaction = interaction;
-
-            this.#run();
-        });
+    constructor(interaction: Interaction) {
+        super();
+        this.interaction = interaction;
+        this.#handle();
     }
 
-    static #run() {
+    #handle() {
         this.#handleChatInputCommand();
     }
 
-    static async #handleChatInputCommand() {
+    async #handleChatInputCommand() {
         if (!this.interaction.isChatInputCommand()) return;
         const chatInputInteraction = this.interaction as ChatInputCommandInteraction;
 
         switch (chatInputInteraction.commandName) {
             case 'settings':
-                SettingsCommand.run(chatInputInteraction);
+                new SettingsCommand(chatInputInteraction);
                 break;
 
             default:
@@ -32,4 +31,7 @@ class InteractionCreateListener {
         }
     }
 }
-InteractionCreateListener.listener();
+
+client.on(Events.InteractionCreate, (interaction) => {
+    new InteractionCreateHandler(interaction);
+});

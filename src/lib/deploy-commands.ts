@@ -51,24 +51,6 @@ const commands = [
 					)
 				)
 			)
-			.addSubcommand(subcommand => subcommand
-				.setName('view')
-				.setDescription('View the channel moderation logs are currently being sent to')
-			)
-			.addSubcommand(subcommand => subcommand
-				.setName('set')
-				.setDescription('Choose the channel that moderation logs will be sent to')
-				.addChannelOption(option => option
-					.setName('channel')
-					.setDescription('The channel that moderation logs should be sent to')
-					.addChannelTypes(ChannelType.GuildText)
-					.setRequired(true)
-				)
-			)
-			.addSubcommand(subcommand => subcommand
-				.setName('reset')
-				.setDescription('Reset the channel that moderation logs are sent to')
-			)
 		),
 
 	new SlashCommandBuilder()

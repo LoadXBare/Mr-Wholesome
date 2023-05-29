@@ -1,35 +1,27 @@
-import { EmbedBuilder, Events, Role, TextBasedChannel } from "discord.js";
+import { EmbedBuilder, Events, Role } from "discord.js";
 import { client } from "../../index.js";
-import { EmbedColours } from "../../lib/config.js";
-import { DatabaseUtils } from "../../lib/utilities.js";
+import { EmbedColours, EventHandler } from "../../lib/config.js";
 
-class GuildRoleDeleteListener {
-    static role: Role;
-    static logChannel: TextBasedChannel;
+class GuildRoleDeleteHandler extends EventHandler {
+    role: Role;
 
-    static listener() {
-        client.on(Events.GuildRoleDelete, (role) => {
-            this.role = role;
-
-            this.#run();
-        });
+    constructor(role: Role) {
+        super();
+        this.role = role;
+        this.#handle();
     }
 
-    static async #run() {
-        const logChannel = await DatabaseUtils.fetchGuildLogChannel(this.role.guild.id);
-        if (logChannel === null) return;
-
-        this.logChannel = logChannel;
+    #handle() {
         this.#logDeletedRole();
     }
 
-    static #logDeletedRole() {
+    #logDeletedRole() {
         const roleProperties = [
-            `- **Name** — ${this.role.name}`,
-            `- **Colour** — ${this.role.hexColor}`,
-            `- **Hoisted?** — ${this.role.hoist ? 'Yes' : 'No'}`,
-            `- **Created by bot?** — ${this.role.managed ? 'Yes' : 'No'}`,
-            `- **Mentionable?** — ${this.role.mentionable ? 'Yes' : 'No'}`
+            `- **Name** — \`${this.role.name}\``,
+            `- **Colour** — \`${this.role.hexColor}\``,
+            `- **Hoisted?** — \`${this.role.hoist ? '✅' : '❌'}\``,
+            `- **Created by bot?** — \`${this.role.managed ? '✅' : '❌'}\``,
+            `- **Mentionable?** — \`${this.role.mentionable ? '✅' : '❌'}\``
         ].join('\n');
 
         const embedDescription = [
@@ -47,7 +39,10 @@ class GuildRoleDeleteListener {
             .setTimestamp()
             .setColor(EmbedColours.Negative);
 
-        this.logChannel.send({ embeds: [embed] });
+        super.logChannel.send({ embeds: [embed] });
     }
 }
-GuildRoleDeleteListener.listener();
+
+client.on(Events.GuildRoleDelete, (role) => {
+    new GuildRoleDeleteHandler(role);
+});

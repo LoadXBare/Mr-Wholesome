@@ -1,30 +1,23 @@
-import { EmbedBuilder, Events, GuildMember, TextBasedChannel } from "discord.js";
+import { EmbedBuilder, Events, GuildMember } from "discord.js";
 import { client } from "../../index.js";
-import { EmbedColours } from "../../lib/config.js";
-import { DatabaseUtils, Utils } from "../../lib/utilities.js";
+import { EmbedColours, EventHandler } from "../../lib/config.js";
+import { Utils } from "../../lib/utilities.js";
 
-class GuildMemberAddListener {
-    static member: GuildMember;
-    static logChannel: TextBasedChannel;
+class GuildMemberAddHandler extends EventHandler {
+    member: GuildMember;
 
-    static listener() {
-        client.on(Events.GuildMemberAdd, (member) => {
-            this.member = member;
-
-            this.#run();
-        });
+    constructor(member: GuildMember) {
+        super();
+        this.member = member;
+        this.#handle();
     }
 
-    static async #run() {
-        const logChannel = await DatabaseUtils.fetchGuildLogChannel(this.member.guild.id);
-        if (logChannel === null) return;
-
-        this.logChannel = logChannel;
+    #handle() {
         this.#logMemberJoined();
         this.#giveMemberRole();
     }
 
-    static #logMemberJoined() {
+    #logMemberJoined() {
         const embedDescription = [
             '## Member Joined',
             '### Member',
@@ -43,10 +36,10 @@ class GuildMemberAddListener {
             .setTimestamp()
             .setColor(EmbedColours.Positive);
 
-        this.logChannel.send({ embeds: [embed] });
+        super.logChannel.send({ embeds: [embed] }); // TODO: alert if user on watchlist
     }
 
-    static async #giveMemberRole() {
+    async #giveMemberRole() {
         /*
          * This delay is necessary to prevent duplicate Member Role Updated embeds from being posted.
          * Because upon a user joining a server for the first time, multiple guild-member-update events
@@ -63,4 +56,7 @@ class GuildMemberAddListener {
             .catch((e) => Utils.log('An error occurred while giving role!', false, e));
     }
 }
-GuildMemberAddListener.listener();
+
+client.on(Events.GuildMemberAdd, (member) => {
+    new GuildMemberAddHandler(member);
+});

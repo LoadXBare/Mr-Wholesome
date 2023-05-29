@@ -1,10 +1,11 @@
-import { ActivityType, Client } from 'discord.js';
+import { ActivityType, Client, GatewayIntentBits } from 'discord.js';
 import * as dotenv from 'dotenv';
-import { Intents } from './lib/config.js';
+const { Guilds, GuildMembers, GuildMessages, MessageContent, GuildModeration } = GatewayIntentBits;
+
 dotenv.config();
 
 export const client = new Client({
-	intents: Intents,
+	intents: [Guilds, GuildMembers, GuildMessages, MessageContent, GuildModeration],
 	presence: {
 		activities: [{
 			name: 'over The Akialytes',

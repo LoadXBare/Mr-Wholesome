@@ -5,6 +5,8 @@
 */
 
 // guild-ban
+import('./guild-ban/guild-ban-add.js');
+import('./guild-ban/guild-ban-remove.js');
 
 // guild-member
 import('./guild-member/guild-member-add.js');
@@ -19,6 +21,7 @@ import('./message/message-update.js');
 // role
 import('./role/guild-role-create.js');
 import('./role/guild-role-delete.js');
+import('./role/guild-role-update.js');
 
 // other
 import('./interaction-create.js');

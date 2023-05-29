@@ -1,29 +1,25 @@
-import { AuditLogEvent, EmbedBuilder, Events, Message, PartialMessage, TextBasedChannel } from "discord.js";
+import { AuditLogEvent, EmbedBuilder, Events, Message, PartialMessage } from "discord.js";
 import { client } from "../../index.js";
-import { EmbedColours } from "../../lib/config.js";
+import { EmbedColours, EventHandler } from "../../lib/config.js";
 import { DatabaseUtils, Utils } from "../../lib/utilities.js";
 
-class MessageDeleteListener {
-    static message: Message | PartialMessage;
-    static logChannel: TextBasedChannel;
+class MessageDeleteHandler extends EventHandler {
+    message: Message | PartialMessage;
 
-    static listener() {
-        client.on(Events.MessageDelete, (message) => {
-            this.message = message;
-
-            this.#run();
-        });
+    constructor(message: Message | PartialMessage) {
+        super();
+        this.message = message;
+        this.#handle();
     }
 
-    static async #run() {
-        const logChannel = await DatabaseUtils.fetchGuildLogChannel(this.message.guildId);
-        if (logChannel === null) return;
+    async #handle() {
+        const channelHasEventsIgnored = await DatabaseUtils.checkIfChannelHasEventsIgnored(this.message.guildId, this.message.channelId);
+        if (this.message.author?.bot || channelHasEventsIgnored) return;
 
-        this.logChannel = logChannel;
         this.#logDeletedMessage();
     }
 
-    static async #logDeletedMessage() {
+    async #logDeletedMessage() {
         const embeddableContentTypes = ['image/png', 'image/gif', 'image/webp', 'image/jpeg'];
         const removedAttachments = this.message.attachments;
         const storedAttachments = await Utils.storeAttachments(removedAttachments);
@@ -69,7 +65,10 @@ class MessageDeleteListener {
 
         embed.setDescription(embedDescription.join('\n'));
 
-        this.logChannel.send({ embeds: [embed] });
+        super.logChannel.send({ embeds: [embed] }); // TODO: alert if user on watchlist
     }
 }
-MessageDeleteListener.listener();
+
+client.on(Events.MessageDelete, (message) => {
+    new MessageDeleteHandler(message);
+});
