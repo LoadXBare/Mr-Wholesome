@@ -1,37 +1,36 @@
-import { ChatInputCommandInteraction, Events, Interaction } from "discord.js";
-import { SettingsCommand } from "../commands/utility/settings.js";
-import { client } from "../index.js";
-import { EventHandler } from "../lib/config.js";
+import { ChatInputCommandInteraction, Events, Interaction } from 'discord.js';
+import SettingsCommand from '../commands/utility/settings.js';
+import client from '../index.js';
+import { EventHandler } from '../lib/config.js';
 
 class InteractionCreateHandler extends EventHandler {
-	interaction: Interaction;
+  interaction: Interaction;
 
-	constructor(interaction: Interaction) {
-		super();
-		this.interaction = interaction;
-		this.#handle();
-	}
+  constructor(interaction: Interaction) {
+    super();
+    this.interaction = interaction;
+  }
 
-	#handle() {
-		this.#handleChatInputCommand();
-	}
+  handle() {
+    this.#handleChatInputCommand();
+  }
 
-	async #handleChatInputCommand() {
-		if (!this.interaction.isChatInputCommand()) return;
-		const chatInputInteraction = this.interaction as ChatInputCommandInteraction;
+  async #handleChatInputCommand() {
+    if (!this.interaction.isChatInputCommand()) return;
+    const chatInputInteraction = this.interaction as ChatInputCommandInteraction;
 
-		switch (chatInputInteraction.commandName) {
-			case 'settings':
-				new SettingsCommand(chatInputInteraction);
-				break;
+    switch (chatInputInteraction.commandName) {
+      case 'settings':
+        new SettingsCommand(chatInputInteraction).handle();
+        break;
 
-			default:
-				chatInputInteraction.reply({ content: 'This command hasn\'t been implemented yet, come back later (*・ω・)ﾉ', ephemeral: true });
-				break;
-		}
-	}
+      default:
+        chatInputInteraction.reply({ content: 'This command hasn\'t been implemented yet, come back later (*・ω・)ﾉ', ephemeral: true });
+        break;
+    }
+  }
 }
 
 client.on(Events.InteractionCreate, (interaction) => {
-	new InteractionCreateHandler(interaction);
+  new InteractionCreateHandler(interaction).handle();
 });

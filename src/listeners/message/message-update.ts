@@ -1,101 +1,105 @@
-import { diffChars } from "diff";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, Message, PartialMessage, codeBlock } from "discord.js";
-import { client } from "../../index.js";
-import { EmbedColours, EventHandler } from "../../lib/config.js";
-import { DatabaseUtils, Utils } from "../../lib/utilities.js";
+import { diffChars } from 'diff';
+import {
+  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder,
+  Events, Message, PartialMessage, codeBlock,
+} from 'discord.js';
+import client from '../../index.js';
+import { Discord, EmbedColours, EventHandler } from '../../lib/config.js';
+import { DatabaseUtils, Utils } from '../../lib/utilities.js';
 
 class MessageUpdateHandler extends EventHandler {
-	oldMessage: Message | PartialMessage;
-	newMessage: Message | PartialMessage;
+  oldMessage: Message | PartialMessage;
 
-	constructor(oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) {
-		super();
-		this.oldMessage = oldMessage;
-		this.newMessage = newMessage;
-		this.#handle();
-	}
+  newMessage: Message | PartialMessage;
 
-	async #handle() {
-		const channelHasEventsIgnored = await DatabaseUtils.checkIfChannelHasEventsIgnored(this.newMessage.guildId, this.newMessage.channelId);
-		if (this.newMessage.author?.bot || channelHasEventsIgnored) return;
+  constructor(oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) {
+    super();
+    this.oldMessage = oldMessage;
+    this.newMessage = newMessage;
+  }
 
-		this.#logEditedMessage();
-		this.#logRemovedMessageAttachment();
-	}
+  async handle() {
+    const { guildId, channelId, author } = this.newMessage;
+    const channelHasEventsIgnored = await DatabaseUtils.isIgnoringEvents(guildId, channelId);
+    if (author?.bot || channelHasEventsIgnored) return;
 
-	#logEditedMessage() {
-		if (this.oldMessage.content === this.newMessage.content) return;
-		const contentDifference = diffChars(this.oldMessage.content ?? '', this.newMessage.content ?? '');
+    this.#logEditedMessage();
+    this.#logRemovedMessageAttachment();
+  }
 
-		const formattedContentDifference: Array<string> = [];
-		for (const difference of contentDifference) {
-			if (difference.added) formattedContentDifference.push(`\u001b[1;32m${difference.value}`);
-			else if (difference.removed) formattedContentDifference.push(`\u001b[1;31m${difference.value}`);
-			else formattedContentDifference.push(`\u001b[0;37m${difference.value}`);
-		}
+  #logEditedMessage() {
+    if (this.oldMessage.content === this.newMessage.content) return;
+    const contentDifference = diffChars(this.oldMessage.content ?? '', this.newMessage.content ?? '');
 
-		const embedDescription = [
-			`## Message Edited in ${this.newMessage.channel}`,
-			'### Changes',
-			codeBlock('ansi', formattedContentDifference.join(''))
-		].join('\n');
+    const formattedContentDifference: Array<string> = [];
+    contentDifference.forEach((difference) => {
+      if (difference.added) formattedContentDifference.push(`${Discord.ANSI_GREEN}${difference.value}`);
+      else if (difference.removed) formattedContentDifference.push(`${Discord.ANSI_RED}${difference.value}`);
+      else formattedContentDifference.push(`${Discord.ANSI_WHITE}${difference.value}`);
+    });
 
-		const embed = new EmbedBuilder()
-			.setDescription(embedDescription)
-			.setFooter({
-				text: `@${this.newMessage.author?.username} • User ID: ${this.newMessage.author?.id}`,
-				iconURL: this.newMessage.author?.displayAvatarURL()
-			})
-			.setTimestamp()
-			.setColor(EmbedColours.Neutral);
+    const embedDescription = [
+      `## Message Edited in ${this.newMessage.channel}`,
+      '### Changes',
+      codeBlock('ansi', formattedContentDifference.join('')),
+    ].join('\n');
 
-		const jumpButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			new ButtonBuilder()
-				.setLabel('Jump To Message')
-				.setStyle(ButtonStyle.Link)
-				.setURL(this.newMessage.url)
-		);
+    const embed = new EmbedBuilder()
+      .setDescription(embedDescription)
+      .setFooter({
+        text: `@${this.newMessage.author?.username} • User ID: ${this.newMessage.author?.id}`,
+        iconURL: this.newMessage.author?.displayAvatarURL(),
+      })
+      .setTimestamp()
+      .setColor(EmbedColours.Neutral);
 
-		super.logChannel.send({ embeds: [embed], components: [jumpButton] }); // TODO: alert if user on watchlist
-	}
+    const jumpButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel('Jump To Message')
+        .setStyle(ButtonStyle.Link)
+        .setURL(this.newMessage.url),
+    );
 
-	async #logRemovedMessageAttachment() {
-		if (this.oldMessage.attachments.size === this.newMessage.attachments.size) return;
-		const embeddableContentTypes = ['image/png', 'image/gif', 'image/webp', 'image/jpeg'];
-		const removedAttachment = this.oldMessage.attachments.difference(this.newMessage.attachments);
+    super.logChannel.send({ embeds: [embed], components: [jumpButton] }); // TODO: alert if user on watchlist
+  }
 
-		const storedAttachment = (await Utils.storeAttachments(removedAttachment)).at(0);
-		const embedDescription = [
-			'## Message Attachment Removed',
-			`### in ${this.newMessage.channel}`,
-			'### Attachment',
-			storedAttachment?.maskedLink
-		].join('\n');
+  async #logRemovedMessageAttachment() {
+    if (this.oldMessage.attachments.size === this.newMessage.attachments.size) return;
+    const embeddableContentTypes = ['image/png', 'image/gif', 'image/webp', 'image/jpeg'];
+    const removedAttachment = this.oldMessage.attachments.difference(this.newMessage.attachments);
 
-		const embed = new EmbedBuilder()
-			.setDescription(embedDescription)
-			.setFooter({
-				text: `@${this.newMessage.author?.username} • Author ID: ${this.newMessage.author?.id}`,
-				iconURL: this.newMessage.author?.displayAvatarURL()
-			})
-			.setTimestamp()
-			.setColor(EmbedColours.Neutral);
+    const storedAttachment = (await Utils.storeAttachments(removedAttachment)).at(0);
+    const embedDescription = [
+      '## Message Attachment Removed',
+      `### in ${this.newMessage.channel}`,
+      '### Attachment',
+      storedAttachment?.maskedLink,
+    ].join('\n');
 
-		if (storedAttachment?.link !== '' && embeddableContentTypes.includes(storedAttachment?.type ?? '')) {
-			embed.setImage(storedAttachment?.link ?? '');
-		}
+    const embed = new EmbedBuilder()
+      .setDescription(embedDescription)
+      .setFooter({
+        text: `@${this.newMessage.author?.username} • Author ID: ${this.newMessage.author?.id}`,
+        iconURL: this.newMessage.author?.displayAvatarURL(),
+      })
+      .setTimestamp()
+      .setColor(EmbedColours.Neutral);
 
-		const jumpButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			new ButtonBuilder()
-				.setLabel('Jump To Message')
-				.setStyle(ButtonStyle.Link)
-				.setURL(this.newMessage.url)
-		);
+    if (storedAttachment?.link !== '' && embeddableContentTypes.includes(storedAttachment?.type ?? '')) {
+      embed.setImage(storedAttachment?.link ?? '');
+    }
 
-		super.logChannel.send({ embeds: [embed], components: [jumpButton] }); // TODO: alert if user on watchlist
-	}
+    const jumpButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel('Jump To Message')
+        .setStyle(ButtonStyle.Link)
+        .setURL(this.newMessage.url),
+    );
+
+    super.logChannel.send({ embeds: [embed], components: [jumpButton] }); // TODO: alert if user on watchlist
+  }
 }
 
 client.on(Events.MessageUpdate, (oldMessage, newMessage) => {
-	new MessageUpdateHandler(oldMessage, newMessage);
+  new MessageUpdateHandler(oldMessage, newMessage).handle();
 });
