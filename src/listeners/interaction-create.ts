@@ -1,4 +1,5 @@
 import { ChatInputCommandInteraction, Events, Interaction } from 'discord.js';
+import PingCommand from '../commands/information/ping.js';
 import SettingsCommand from '../commands/utility/settings.js';
 import client from '../index.js';
 import { EventHandler } from '../lib/config.js';
@@ -22,6 +23,10 @@ class InteractionCreateHandler extends EventHandler {
     switch (chatInputInteraction.commandName) {
       case 'settings':
         new SettingsCommand(chatInputInteraction).handle();
+        break;
+
+      case 'ping':
+        new PingCommand(chatInputInteraction).handle();
         break;
 
       default:
