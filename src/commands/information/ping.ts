@@ -1,5 +1,5 @@
-import { ChatInputCommandInteraction } from "discord.js";
-import client from "../../index.js";
+import { ChatInputCommandInteraction } from 'discord.js';
+import client from '../../index.js';
 
 class PingCommand {
   interaction: ChatInputCommandInteraction;
@@ -19,7 +19,7 @@ class PingCommand {
     const content = [
       '## Tweet! 🐦',
       `### ⌛ Bot Latency — \`${Date.now() - interactionResponse.createdTimestamp}ms\``,
-      `### ☁️ API Latency — \`${client.ws.ping}ms\``
+      `### ☁️ API Latency — \`${client.ws.ping}ms\``,
     ].join('\n');
 
     await this.interaction.editReply(content);
