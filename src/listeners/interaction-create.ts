@@ -1,4 +1,5 @@
 import { ChatInputCommandInteraction, Events, Interaction } from 'discord.js';
+import EightBallCommand from '../commands/fun/eight-ball.js';
 import PingCommand from '../commands/information/ping.js';
 import SettingsCommand from '../commands/utility/settings.js';
 import client from '../index.js';
@@ -27,6 +28,10 @@ class InteractionCreateHandler extends EventHandler {
 
       case 'ping':
         new PingCommand(chatInputInteraction).handle();
+        break;
+
+      case '8ball':
+        new EightBallCommand(chatInputInteraction).handle();
         break;
 
       default:

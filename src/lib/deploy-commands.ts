@@ -53,6 +53,15 @@ const commands = [
   new SlashCommandBuilder()
     .setName('ping')
     .setDescription('View Mr Wholesome\'s ping'),
+
+  new SlashCommandBuilder()
+    .setName('8ball')
+    .setDescription('Ask the 8ball a question')
+    .addStringOption((option) => option
+      .setName('question')
+      .setDescription('The question to ask the 8ball')
+      .setRequired(true)
+      .setMinLength(1)),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');
