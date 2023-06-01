@@ -1,4 +1,6 @@
-import { ChannelType, ChatInputCommandInteraction } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
+import client from '../../index.js';
+import { EmbedColours } from '../../lib/config.js';
 import { DatabaseUtils } from '../../lib/utilities.js';
 
 class SettingsCommand {
@@ -40,26 +42,51 @@ class LogSettings extends SettingsCommand {
     ]);
 
     const success = await DatabaseUtils.addEventIgnoredChannel(this.interaction.guildId, channelToIgnore.id);
-    const content: Array<string> = [];
+    const embedDescription: Array<string> = [];
+    const embed = new EmbedBuilder();
 
     if (success) {
-      content.push(
+      embed.setColor(EmbedColours.Success);
+      embedDescription.push(
         `## Successfully ignored ${channelToIgnore}!`,
         'Events will no longer be logged from it.',
       );
     } else {
-      content.push(
+      embed.setColor(EmbedColours.Error);
+      embedDescription.push(
         '## Channel already ignored!',
         `${channelToIgnore} is either already ignored or an error occurred.`,
       );
     }
 
-    await this.interaction.editReply(content.join('\n'));
+    embed.setDescription(embedDescription.join('\n'));
+
+    await this.interaction.editReply({ embeds: [embed] });
   }
 
   async ignored() {
     await this.interaction.deferReply();
-    await this.interaction.editReply('blehhh');
+    const eventIgnoredChannelIDs = await DatabaseUtils.fetchEventIgnoredChannels(this.interaction.guildId);
+    const embedDescription = [
+      '## Event Ignored Channels',
+    ];
+
+    if (eventIgnoredChannelIDs.length > 0) {
+      embedDescription.push('The following channels are all currently ignoring events:');
+    } else {
+      embedDescription.push('This guild has no channels ignoring events!');
+    }
+
+    eventIgnoredChannelIDs.forEach((id) => {
+      const channel = client.channels.resolve(id);
+      embedDescription.push(`- ${channel}`);
+    });
+
+    const embed = new EmbedBuilder()
+      .setDescription(embedDescription.join('\n'))
+      .setColor(EmbedColours.Info);
+
+    await this.interaction.editReply({ embeds: [embed] });
   }
 
   async unignore() {
@@ -76,21 +103,26 @@ class LogSettings extends SettingsCommand {
     ]);
 
     const success = await DatabaseUtils.removeEventIgnoredChannel(this.interaction.guildId, channelToUnignore.id);
-    const content: Array<string> = [];
+    const embedDescription: Array<string> = [];
+    const embed = new EmbedBuilder();
 
     if (success) {
-      content.push(
+      embed.setColor(EmbedColours.Success);
+      embedDescription.push(
         `## Successfully unignored ${channelToUnignore}!`,
         'Events will now be logged from it.',
       );
     } else {
-      content.push(
+      embed.setColor(EmbedColours.Error);
+      embedDescription.push(
         '## Channel not ignored!',
         `${channelToUnignore} is either not ignored or an error occurred.`,
       );
     }
 
-    await this.interaction.editReply(content.join('\n'));
+    embed.setDescription(embedDescription.join('\n'));
+
+    await this.interaction.editReply({ embeds: [embed] });
   }
 }
 
