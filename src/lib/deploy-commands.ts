@@ -62,6 +62,46 @@ const commands = [
       .setDescription('The question to ask the 8ball')
       .setRequired(true)
       .setMinLength(1)),
+
+  new SlashCommandBuilder()
+    .setName('birthday')
+    .setDescription('Birthday commands')
+    .addSubcommand((subcommand) => subcommand
+      .setName('set')
+      .setDescription('Set your birthday with Mr Wholesome')
+      .addIntegerOption((option) => option
+        .setName('day')
+        .setDescription('The day of your birthday')
+        .setMinValue(1)
+        .setMaxValue(31)
+        .setRequired(true))
+      .addIntegerOption((option) => option
+        .setName('month')
+        .setDescription('The month of your birthday')
+        .setChoices(
+          { name: 'January', value: 0 },
+          { name: 'February', value: 1 },
+          { name: 'March', value: 2 },
+          { name: 'April', value: 3 },
+          { name: 'May', value: 4 },
+          { name: 'June', value: 5 },
+          { name: 'July', value: 6 },
+          { name: 'August', value: 7 },
+          { name: 'September', value: 8 },
+          { name: 'October', value: 9 },
+          { name: 'November', value: 10 },
+          { name: 'December', value: 11 },
+        )
+        .setRequired(true)))
+    .addSubcommand((subcommand) => subcommand
+      .setName('upcoming')
+      .setDescription('View the upcoming birthdays in the next 2 weeks')
+      .addNumberOption((option) => option
+        .setName('days')
+        .setDescription('The number of days ahead to look for upcoming birthdays')
+        .setMinValue(2)
+        .setMaxValue(30)
+        .setRequired(false))),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');

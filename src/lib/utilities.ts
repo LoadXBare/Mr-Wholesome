@@ -1,3 +1,4 @@
+import { Birthday } from '@prisma/client';
 import {
   Attachment, Collection, Message, TextChannel, inlineCode,
 } from 'discord.js';
@@ -108,6 +109,42 @@ function sleep(ms: number) {
   new Promise((r) => setTimeout(r, ms));
 }
 
+function nth(number: number) {
+  const suffixes: { [key in Intl.LDMLPluralRule]: string; } = {
+    zero: 'th',
+    one: 'st',
+    two: 'nd',
+    few: 'rd',
+    many: 'th',
+    other: 'th',
+  };
+  const suffixCategory = new Intl.PluralRules('en', { type: 'ordinal' }).select(number);
+
+  return suffixes[suffixCategory];
+}
+
+function formatDate(day: number, month: number) {
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+
+  const formattedDay = `${day}${nth(day)}`;
+  const formattedMonth = months.at(month) ?? 'N/A';
+
+  return `${formattedDay} ${formattedMonth}`;
+}
+
 /**
   * Initialises a guild within the database to ensure its entry exists for other operations.
   * @param guildID The ID of the guild to initialise
@@ -117,6 +154,15 @@ async function initialiseGuild(guildID: string) {
     where: { guildID },
     create: { guildID, GuildConfig: { create: {} } },
     update: {},
+  })
+    .catch((e) => log('An error occurred while upserting the database!', false, e));
+}
+
+async function initialiseUser(userID: string) {
+  await database.user.upsert({
+    where: { userID },
+    create: { userID },
+    update: {}
   })
     .catch((e) => log('An error occurred while upserting the database!', false, e));
 }
@@ -216,12 +262,42 @@ async function fetchEventIgnoredChannels(guildID: string | null) {
   return eventIgnoredChannelIDs;
 }
 
+async function setBirthday(userID: string, day: number, month: number) {
+  await initialiseUser(userID);
+
+  const date = formatDate(day, month);
+  const result = await database.birthday.upsert({
+    where: { userID },
+    create: { date, userID },
+    update: { date }
+  });
+
+  return result;
+}
+
+async function fetchUpcomingBirthdays(days: number) {
+  const upcomingDays = new Array(days)
+    .fill(new Date().getUTCDate())
+    .map((value, index) => formatDate(value + index, new Date().getUTCMonth()));
+
+  const birthdays = await database.birthday.findMany();
+  const upcomingBirthdays: Array<Birthday> = [];
+  upcomingDays.forEach((day) => {
+    birthdays.forEach((birthday) => {
+      if (birthday.date === day) upcomingBirthdays.push(birthday);
+    });
+  });
+
+  return upcomingBirthdays;
+}
+
 export const Utils = {
   randomInt,
   log,
   storeAttachments,
   getRelativeTimeString,
   sleep,
+  nth,
 };
 
 export const DatabaseUtils = {
@@ -230,4 +306,6 @@ export const DatabaseUtils = {
   removeEventIgnoredChannel,
   isIgnoringEvents,
   fetchEventIgnoredChannels,
+  setBirthday,
+  fetchUpcomingBirthdays,
 };
