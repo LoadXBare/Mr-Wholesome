@@ -102,6 +102,10 @@ const commands = [
         .setMinValue(2)
         .setMaxValue(30)
         .setRequired(false))),
+
+  new SlashCommandBuilder()
+    .setName('cat')
+    .setDescription('Post a random cat image'),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');
