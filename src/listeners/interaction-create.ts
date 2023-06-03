@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, Events, Interaction } from 'discord.js';
 import CatCommand from '../commands/fun/cat.js';
 import DogCommand from '../commands/fun/dog.js';
 import EightBallCommand from '../commands/fun/eight-ball.js';
+import FoxCommand from '../commands/fun/fox.js';
 import PingCommand from '../commands/information/ping.js';
 import BirthdayCommand from '../commands/utility/birthday.js';
 import SettingsCommand from '../commands/utility/settings.js';
@@ -29,6 +30,7 @@ class InteractionCreateHandler extends EventHandler {
     if (cmd === 'cat') new CatCommand(chatInputInteraction).handle();
     else if (cmd === 'dog') new DogCommand(chatInputInteraction).handle();
     else if (cmd === '8ball') new EightBallCommand(chatInputInteraction).handle();
+    else if (cmd === 'fox') new FoxCommand(chatInputInteraction).handle();
 
     // Information
     else if (cmd === 'ping') new PingCommand(chatInputInteraction).handle();
