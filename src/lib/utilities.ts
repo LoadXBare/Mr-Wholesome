@@ -1,6 +1,6 @@
 import { Birthday } from '@prisma/client';
 import {
-  Attachment, Collection, Message, TextChannel, inlineCode,
+  Attachment, Collection, Message, TextChannel, User, inlineCode,
 } from 'discord.js';
 import client from '../index.js';
 import { Discord, database } from './config.js';
@@ -109,6 +109,11 @@ function sleep(ms: number) {
   new Promise((r) => setTimeout(r, ms));
 }
 
+/**
+ * Finds the suffix of the specified number.
+ * @param number The number to find the suffix for
+ * @returns The number's suffix
+ */
 function nth(number: number) {
   const suffixes: { [key in Intl.LDMLPluralRule]: string; } = {
     zero: 'th',
@@ -123,6 +128,12 @@ function nth(number: number) {
   return suffixes[suffixCategory];
 }
 
+/**
+ * Formats a day and month in the form "d MMMM".
+ * @param day The day to format
+ * @param month The month to format
+ * @returns Formatted date
+ */
 function formatDate(day: number, month: number) {
   const months = [
     'January',
@@ -158,6 +169,10 @@ async function initialiseGuild(guildID: string) {
     .catch((e) => log('An error occurred while upserting the database!', false, e));
 }
 
+/**
+ * Initialises a user within the database to ensure its entry exists for other operations.
+ * @param userID The ID of the user to initialise
+ */
 async function initialiseUser(userID: string) {
   await database.user.upsert({
     where: { userID },
@@ -262,6 +277,13 @@ async function fetchEventIgnoredChannels(guildID: string | null) {
   return eventIgnoredChannelIDs;
 }
 
+/**
+ * Sets or updates a user's birthday.
+ * @param userID The ID of the user to set the birthday for
+ * @param day The day of the user's birthday
+ * @param month The month of the user's birthday
+ * @returns Prisma Birthday object
+ */
 async function setBirthday(userID: string, day: number, month: number) {
   await initialiseUser(userID);
 
@@ -275,6 +297,11 @@ async function setBirthday(userID: string, day: number, month: number) {
   return result;
 }
 
+/**
+ * Fetches all upcoming birthdays from the database.
+ * @param days The number of days in the future to return birthdays for
+ * @returns Array of upcoming Prisma Birthday objects
+ */
 async function fetchUpcomingBirthdays(days: number) {
   const upcomingDays = new Array(days)
     .fill(new Date().getUTCDate())
@@ -289,6 +316,29 @@ async function fetchUpcomingBirthdays(days: number) {
   });
 
   return upcomingBirthdays;
+}
+
+/**
+ * Adds a warning for the specified user in the specified guild to the database.
+ * @param author The User object for the author of the warning
+ * @param warnedUser The User object for the user being warned
+ * @param guildID The ID of the guild the warning is in
+ * @param reason The reason for the warning
+ * @returns Prisma Warning object
+ */
+async function addWarning(author: User, warnedUser: User, guildID: string, reason: string) {
+  await initialiseGuild(guildID);
+
+  const result = await database.warning.create({
+    data: {
+      authorID: author.id,
+      reason,
+      warnedID: warnedUser.id,
+      guildID
+    }
+  });
+
+  return result;
 }
 
 export const Utils = {
@@ -308,4 +358,5 @@ export const DatabaseUtils = {
   fetchEventIgnoredChannels,
   setBirthday,
   fetchUpcomingBirthdays,
+  addWarning
 };
