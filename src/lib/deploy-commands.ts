@@ -65,7 +65,7 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName('birthday')
-    .setDescription('Birthday commands')
+    .setDescription('Birthday Commands')
     .addSubcommand((subcommand) => subcommand
       .setName('set')
       .setDescription('Set your birthday with Mr Wholesome')
@@ -113,7 +113,42 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName('fox')
-    .setDescription('Post a random fox image')
+    .setDescription('Post a random fox image'),
+
+  new SlashCommandBuilder()
+    .setName('warn')
+    .setDescription('Warning Commands')
+    .addSubcommand((subcommand) => subcommand
+      .setName('add')
+      .setDescription('Warn a user')
+      .addStringOption((option) => option
+        .setName('user')
+        .setDescription('The @mention or ID of the user to warn')
+        .setRequired(true))
+      .addStringOption((option) => option
+        .setName('reason')
+        .setDescription('The reason for the warning (use \\n for a newline)')
+        .setRequired(true))
+      .addBooleanOption((option) => option
+        .setName('dm')
+        .setDescription('Should the user be notified via DMs that they were warned?')
+        .setRequired(true))
+    )
+    .addSubcommand((subcommand) => subcommand
+      .setName('view')
+      .setDescription('View all warnings in the guild, or a user\'s warnings if specified')
+      .addStringOption((option) => option
+        .setName('user')
+        .setDescription('The @mention or ID of the user to view warnings of')
+        .setRequired(false)
+      ))
+    .addSubcommand((subcommand) => subcommand
+      .setName('delete')
+      .setDescription('Delete a warning')
+      .addStringOption((option) => option
+        .setName('id')
+        .setDescription('The ID of the warning to delete')
+        .setRequired(true)))
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');
