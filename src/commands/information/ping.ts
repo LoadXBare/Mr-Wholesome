@@ -14,19 +14,22 @@ class PingCommand {
   }
 
   async #handlePingCommand() {
-    await this.interaction.deferReply();
+    if (this.interaction.channel === null) return;
 
-    const interactionResponse = await this.interaction.editReply('uwu');
+    const interactionResponse = await this.interaction.channel.send('uwu');
+    const botLatency = interactionResponse.createdTimestamp - this.interaction.createdTimestamp;
+    interactionResponse.delete();
+
     const embedDescription = [
       '## Tweet! 🐦',
-      `### ⌛ Bot Latency — \`${Date.now() - interactionResponse.createdTimestamp}ms\``,
+      `### ⌛ Bot Latency — \`${botLatency}ms\``,
       `### ☁️ API Latency — \`${client.ws.ping}ms\``,
     ].join('\n');
     const embed = new EmbedBuilder()
       .setDescription(embedDescription)
       .setColor(EmbedColours.Info);
 
-    await this.interaction.editReply({ content: null, embeds: [embed] });
+    await this.interaction.reply({ embeds: [embed] });
   }
 }
 export default PingCommand;
