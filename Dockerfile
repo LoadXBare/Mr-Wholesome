@@ -1,13 +1,14 @@
-FROM node:18.16.0-slim
-
-ENV HOME /home/mr-wholesome/
-WORKDIR $HOME
-
-COPY ["package.json", "yarn.lock", "tsconfig.json", "prisma", "$HOME"]
+FROM node:18.16.0-alpine3.18 AS build
+WORKDIR /home/mr-wholesome/
+COPY ["package.json", "yarn.lock", "tsconfig.json", "prisma", "/home/mr-wholesome/"]
 RUN yarn --frozen-lockfile --link-duplicates
-RUN npx prisma generate
-
-COPY ["src", "$HOME/src"]
+COPY ["src", "/home/mr-wholesome/src"]
 RUN npx tsc
+
+FROM node:18.16.0-alpine3.18
+WORKDIR /home/mr-wholesome/
+COPY ["package.json", "yarn.lock", "prisma", "/home/mr-wholesome/"]
+RUN yarn install --frozen-lockfile --link-duplicates --pure-lockfile --production=true
+COPY --from=build ["/home/mr-wholesome/dist", "/home/mr-wholesome/dist"]
 
 CMD ["npm", "start"]
