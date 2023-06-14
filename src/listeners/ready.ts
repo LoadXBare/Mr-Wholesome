@@ -7,6 +7,7 @@ class ReadyHandler extends EventHandler {
   handle() {
     this.#logClientReady();
     this.#fetchAllGuildMembers();
+    this.#deployCommands();
   }
 
   async #logClientReady() {
@@ -24,6 +25,10 @@ class ReadyHandler extends EventHandler {
     });
 
     await Promise.all(fetchedGuildMembers);
+  }
+
+  #deployCommands() {
+    import('../lib/deploy-commands.js');
   }
 }
 
