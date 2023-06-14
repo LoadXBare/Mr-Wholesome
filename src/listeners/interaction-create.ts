@@ -4,6 +4,7 @@ import DogCommand from '../commands/fun/dog.js';
 import EightBallCommand from '../commands/fun/eight-ball.js';
 import FoxCommand from '../commands/fun/fox.js';
 import PingCommand from '../commands/information/ping.js';
+import WarnCommand from '../commands/moderation/warn.js';
 import BirthdayCommand from '../commands/utility/birthday.js';
 import SettingsCommand from '../commands/utility/settings.js';
 import client from '../index.js';
@@ -36,7 +37,7 @@ class InteractionCreateHandler extends EventHandler {
     else if (cmd === 'ping') new PingCommand(chatInputInteraction).handle();
 
     // Moderation
-
+    else if (cmd === 'warn') new WarnCommand(chatInputInteraction).handle();
 
     // Ranking
 

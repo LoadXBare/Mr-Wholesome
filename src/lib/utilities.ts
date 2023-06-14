@@ -157,32 +157,6 @@ function formatDate(day: number, month: number) {
 }
 
 /**
-  * Initialises a guild within the database to ensure its entry exists for other operations.
-  * @param guildID The ID of the guild to initialise
-  */
-async function initialiseGuild(guildID: string) {
-  await database.guild.upsert({
-    where: { guildID },
-    create: { guildID, GuildConfig: { create: {} } },
-    update: {},
-  })
-    .catch((e) => log('An error occurred while upserting the database!', false, e));
-}
-
-/**
- * Initialises a user within the database to ensure its entry exists for other operations.
- * @param userID The ID of the user to initialise
- */
-async function initialiseUser(userID: string) {
-  await database.user.upsert({
-    where: { userID },
-    create: { userID },
-    update: {}
-  })
-    .catch((e) => log('An error occurred while upserting the database!', false, e));
-}
-
-/**
  * Adds a channel to the list of event ignored channels in a guild.
  * @param guildID The ID of the guild the channel is in
  * @param channelID The ID of the channel to add
@@ -190,7 +164,6 @@ async function initialiseUser(userID: string) {
  */
 async function addEventIgnoredChannel(guildID: string | null, channelID: string | null) {
   if (guildID === null || channelID === null) return false;
-  await initialiseGuild(guildID);
 
   const guildConfig = await database.guildConfig.findFirst({
     where: { guildID },
@@ -219,7 +192,6 @@ async function addEventIgnoredChannel(guildID: string | null, channelID: string 
  */
 async function removeEventIgnoredChannel(guildID: string | null, channelID: string | null) {
   if (guildID === null || channelID === null) return false;
-  await initialiseGuild(guildID);
 
   const guildConfig = await database.guildConfig.findFirst({
     where: { guildID },
@@ -248,7 +220,6 @@ async function removeEventIgnoredChannel(guildID: string | null, channelID: stri
  */
 async function isIgnoringEvents(guildID: string | null, channelID: string | null) {
   if (guildID === null || channelID === null) return true;
-  await initialiseGuild(guildID);
 
   const guildConfig = await database.guildConfig.findFirst({
     where: { guildID },
@@ -266,7 +237,6 @@ async function isIgnoringEvents(guildID: string | null, channelID: string | null
  */
 async function fetchEventIgnoredChannels(guildID: string | null) {
   if (guildID === null) return [];
-  await initialiseGuild(guildID);
 
   const guildConfig = await database.guildConfig.findFirst({
     where: { guildID },
@@ -285,8 +255,6 @@ async function fetchEventIgnoredChannels(guildID: string | null) {
  * @returns Prisma Birthday object
  */
 async function setBirthday(userID: string, day: number, month: number) {
-  await initialiseUser(userID);
-
   const date = formatDate(day, month);
   const result = await database.birthday.upsert({
     where: { userID },
@@ -327,19 +295,52 @@ async function fetchUpcomingBirthdays(days: number) {
  * @returns Prisma Warning object
  */
 async function addWarning(author: User, warnedUser: User, guildID: string, reason: string) {
-  await initialiseGuild(guildID);
-
   const result = await database.warning.create({
     data: {
       authorID: author.id,
       reason,
       warnedID: warnedUser.id,
-      guildID
+      guildID,
+      date: Date.now()
     }
   });
 
   return result;
 }
+
+async function fetchUserWarnings(warnedID: string, guildID: string) {
+  const result = await database.warning.findMany({
+    where: { guildID, warnedID }
+  });
+
+  return result;
+}
+
+async function fetchGuildWarnings(guildID: string) {
+  const result = await database.warning.findMany({
+    where: { guildID }
+  });
+
+  return result;
+}
+
+async function fetchWarning(warningID: string) {
+  const result = await database.warning.findUnique({
+    where: { warningID }
+  });
+
+  return result;
+}
+
+async function deleteWarning(warningID: string) {
+  const result = await database.warning.delete({
+    where: { warningID }
+  });
+
+  return result;
+}
+
+//TODO: CONVERT TO CLASS SYSTEM
 
 export const Utils = {
   randomInt,
@@ -351,12 +352,15 @@ export const Utils = {
 };
 
 export const DatabaseUtils = {
-  initialiseGuild,
   addEventIgnoredChannel,
   removeEventIgnoredChannel,
   isIgnoringEvents,
   fetchEventIgnoredChannels,
   setBirthday,
   fetchUpcomingBirthdays,
-  addWarning
+  addWarning,
+  fetchUserWarnings,
+  fetchGuildWarnings,
+  fetchWarning,
+  deleteWarning
 };

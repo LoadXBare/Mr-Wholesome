@@ -141,14 +141,11 @@ const commands = [
         .setName('user')
         .setDescription('The @mention or ID of the user to view warnings of')
         .setRequired(false)
-      ))
-    .addSubcommand((subcommand) => subcommand
-      .setName('delete')
-      .setDescription('Delete a warning')
+      )
       .addStringOption((option) => option
-        .setName('id')
-        .setDescription('The ID of the warning to delete')
-        .setRequired(true)))
+        .setName('warning')
+        .setDescription('The ID of the warning to view in more details')
+        .setRequired(false)))
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');

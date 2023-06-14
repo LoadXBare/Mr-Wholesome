@@ -12,17 +12,10 @@ datasource db {
 
 // --- USER MODELS --- //
 
-model User {
-  userID   String    @id
-  Birthday Birthday?
-  Cookie   Cookie?
-}
-
 model Birthday {
   birthdayID String @id @default(uuid())
   userID     String @unique
   date       String
-  user       User   @relation(fields: [userID], references: [userID])
 }
 
 model Cookie {
@@ -30,22 +23,9 @@ model Cookie {
   userID   String @unique
   given    Int
   received Int
-  user     User   @relation(fields: [userID], references: [userID])
 }
 
 // --- GUILD MODELS --- //
-
-model Guild {
-  guildID     String        @id
-  GuildConfig GuildConfig?
-  Ban         Ban[]
-  Rank        Rank[]
-  TicketPanel TicketPanel[]
-  Warning     Warning[]
-  Notes       Notes[]
-  MemberStats MemberStats[]
-}
-
 model GuildConfig {
   configID                String   @id @default(uuid())
   guildID                 String   @unique
@@ -53,18 +33,16 @@ model GuildConfig {
   cmdIgnoredChannelIDs    String[] @default([])
   eventIgnoredChannelIDs  String[] @default([])
   rankedIgnoredChannelIDs String[] @default([])
-  guild                   Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
 }
 
 model Ban {
-  banID    String   @id @default(uuid())
+  banID    String  @id @default(uuid())
   guildID  String
   authorID String
   bannedID String
-  date     DateTime @default(now())
+  date     BigInt
   reason   String
-  unbanned Boolean  @default(false)
-  guild    Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+  unbanned Boolean @default(false)
 }
 
 model Rank {
@@ -75,7 +53,6 @@ model Rank {
   xpLevel     Int
   levelNotifs Boolean @default(true)
   credits     Int
-  guild       Guild   @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
 }
 
 model Ticket {
@@ -94,27 +71,24 @@ model TicketPanel {
   ticketEmbedJSON Json
   name            String   @unique
   tickets         Ticket[]
-  guild           Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
 }
 
 model Warning {
-  warningID String   @id @default(uuid())
+  warningID String @id @default(uuid())
   guildID   String
   authorID  String
   warnedID  String
   reason    String
-  date      DateTime @default(now())
-  guild     Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+  date      BigInt
 }
 
 model Notes {
-  noteID    String   @id @default(uuid())
+  noteID    String @id @default(uuid())
   authorID  String
   watchedID String
   guildID   String
-  date      DateTime @default(now())
+  date      BigInt
   noteText  String
-  guild     Guild    @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
 }
 
 model MemberStats {
@@ -123,5 +97,4 @@ model MemberStats {
   guildID            String
   messageCount       Int
   messageCountByHour Json
-  guild              Guild  @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
 }
