@@ -3,7 +3,7 @@ import client from '../../index.js';
 import { EmbedColours } from '../../lib/config.js';
 import { DatabaseUtils } from '../../lib/utilities.js';
 
-class BirthdayCommand {
+export default class BirthdayCommand {
   interaction: ChatInputCommandInteraction;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -77,4 +77,3 @@ class BirthdayCommand {
   }
 }
 
-export default BirthdayCommand;

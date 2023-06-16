@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction } from "discord.js";
 
-class FoxCommand {
+export default class FoxCommand {
   interaction: ChatInputCommandInteraction;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -21,5 +21,3 @@ class FoxCommand {
     await this.interaction.editReply(foxURL);
   }
 }
-
-export default FoxCommand;

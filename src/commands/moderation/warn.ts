@@ -3,7 +3,7 @@ import client from "../../index.js";
 import { EmbedColours } from "../../lib/config.js";
 import { DatabaseUtils } from "../../lib/utilities.js";
 
-class WarnCommand {
+export default class WarnCommand {
   interaction: ChatInputCommandInteraction;
   command: string;
   userString: string;
@@ -289,5 +289,3 @@ class WarnCommand {
     await this.interaction.editReply({ components: [] });
   }
 }
-
-export default WarnCommand;

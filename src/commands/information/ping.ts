@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours } from '../../lib/config.js';
 
-class PingCommand {
+export default class PingCommand {
   interaction: ChatInputCommandInteraction;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -32,4 +32,3 @@ class PingCommand {
     await this.interaction.reply({ embeds: [embed] });
   }
 }
-export default PingCommand;

@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction } from "discord.js";
 
-class DogCommand {
+export default class DogCommand {
   interaction: ChatInputCommandInteraction;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -21,5 +21,3 @@ class DogCommand {
     await this.interaction.editReply(dogURL);
   }
 }
-
-export default DogCommand;

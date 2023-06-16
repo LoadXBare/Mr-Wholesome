@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, ColorResolvable, EmbedBuilder } from 'discord.js';
 import { EmbedColours } from '../../lib/config.js';
 
-class EightBallCommand {
+export default class EightBallCommand {
   interaction: ChatInputCommandInteraction;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -57,4 +57,3 @@ class EightBallCommand {
     await this.interaction.editReply({ embeds: [embed] });
   }
 }
-export default EightBallCommand;

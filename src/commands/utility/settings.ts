@@ -3,7 +3,7 @@ import client from '../../index.js';
 import { EmbedColours } from '../../lib/config.js';
 import { DatabaseUtils } from '../../lib/utilities.js';
 
-class SettingsCommand {
+export default class SettingsCommand {
   interaction: ChatInputCommandInteraction;
 
   #commandGroup: string | null;
@@ -125,5 +125,3 @@ class LogSettings extends SettingsCommand {
     await this.interaction.editReply({ embeds: [embed] });
   }
 }
-
-export default SettingsCommand;
