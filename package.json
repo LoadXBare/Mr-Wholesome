@@ -9,26 +9,26 @@
   "type": "module",
   "scripts": {
     "start": "node .",
-    "start-dev": "npx ts-node src/index.ts",
-    "deploy-commands": "npx ts-node src/lib/deploy-commands.ts",
-    "lint": "npx eslint ."
+    "start-dev": "yarn ts-node src/index.ts",
+    "deploy-commands": "yarn ts-node src/lib/deploy-commands.ts",
+    "lint": "yarn eslint ."
   },
   "dependencies": {
-    "@prisma/client": "^4.15.0",
+    "@prisma/client": "^5.8.0",
     "diff": "^5.1.0",
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3"
   },
   "devDependencies": {
     "@types/diff": "^5.0.3",
-    "@types/node": "^20.2.3",
-    "@typescript-eslint/eslint-plugin": "^5.59.8",
-    "@typescript-eslint/parser": "^5.59.8",
-    "eslint": "8.2.0",
+    "@types/node": "^20.10.8",
+    "@typescript-eslint/eslint-plugin": "^6.18.1",
+    "@typescript-eslint/parser": "^6.18.1",
+    "eslint": "8.56.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-plugin-import": "2.25.2",
-    "prisma": "^4.15.0",
+    "eslint-plugin-import": "2.29.1",
+    "prisma": "^5.8.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   }
