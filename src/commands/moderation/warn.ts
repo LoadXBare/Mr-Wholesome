@@ -1,7 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, EmbedBuilder, User } from "discord.js";
 import client from "../../index.js";
-import { EmbedColours } from "../../lib/config.js";
-import { DatabaseUtils } from "../../lib/utilities.js";
+import { EmbedColours, database } from "../../lib/config.js";
 
 export default class WarnCommand {
   interaction: ChatInputCommandInteraction;
@@ -83,9 +82,8 @@ export default class WarnCommand {
   }
 
   async #addWarning() {
-    const guildID = this.interaction.guildId ?? '';
     if (!(this.user instanceof User)) return;
-    await DatabaseUtils.addWarning(this.interaction.user, this.user, guildID, this.reason);
+    await this.#addWarningToDatabase();
 
     const embedDescription = [
       '## Warning Added',
@@ -152,7 +150,7 @@ export default class WarnCommand {
   }
 
   async #viewAllGuildWarnings() {
-    const guildWarnings = await DatabaseUtils.fetchGuildWarnings(this.interaction.guildId ?? '');
+    const guildWarnings = await this.#fetchGuildWarningsFromDatabase();
 
     const userWarningCount: { [key: string]: number; } = {};
     const warnedUserPromises: Array<Promise<User>> = [];
@@ -170,8 +168,8 @@ export default class WarnCommand {
     warnedUsers.forEach((user) => {
       if (user !== undefined) {
         warningsList.push(
-          `- **@${user.username}** — ${userWarningCount[user.id]} warnings`,
-          ` - **User ID** — \`${user.id}\``
+          `- **@${user.username}** — ${userWarningCount[user.id]} warnings\
+          \n - **User ID** — \`${user.id}\``
         );
       }
     });
@@ -195,7 +193,7 @@ export default class WarnCommand {
       return;
     }
 
-    const userWarnings = await DatabaseUtils.fetchUserWarnings(this.user.id, this.interaction.guildId ?? '');
+    const userWarnings = await this.#fetchUserWarningsFromDatabase();
 
     const warningsList: Array<string> = [];
     userWarnings.forEach((warning, index) => {
@@ -216,7 +214,7 @@ export default class WarnCommand {
   }
 
   async #viewWarningDetails() {
-    const warning = await DatabaseUtils.fetchWarning(this.warningID);
+    const warning = await this.#fetchWarningFromDatabase();
 
     if (warning === null) {
       await this.interaction.editReply(`\`${this.warningID}\` is not a valid warning ID!`);
@@ -271,7 +269,7 @@ export default class WarnCommand {
   }
 
   async #deleteWarning() {
-    const result = await DatabaseUtils.deleteWarning(this.warningID);
+    const result = await this.#deleteWarningFromDatabase();
 
     const embedDescription = [
       '## Warning Deleted',
@@ -287,5 +285,55 @@ export default class WarnCommand {
 
   async #removeDeleteWarningButton() {
     await this.interaction.editReply({ components: [] });
+  }
+
+  // == Database Methods ==
+  async #addWarningToDatabase() {
+    const result = await database.warning.create({
+      data: {
+        authorID: this.interaction.user.id,
+        date: Date.now(),
+        guildID: this.interaction.guildId ?? '',
+        reason: this.reason,
+        warnedID: this.user?.id ?? ''
+      }
+    });
+
+    return result;
+  }
+
+  async #deleteWarningFromDatabase() {
+    const result = await database.warning.delete({
+      where: { warningID: this.warningID }
+    });
+
+    return result;
+  }
+
+  async #fetchGuildWarningsFromDatabase() {
+    const result = await database.warning.findMany({
+      where: { guildID: this.interaction.guildId ?? '' }
+    });
+
+    return result;
+  }
+
+  async #fetchUserWarningsFromDatabase() {
+    const result = await database.warning.findMany({
+      where: {
+        guildID: this.interaction.guildId ?? '',
+        warnedID: this.user?.id ?? ''
+      }
+    });
+
+    return result;
+  }
+
+  async #fetchWarningFromDatabase() {
+    const result = await database.warning.findUnique({
+      where: { warningID: this.warningID }
+    });
+
+    return result;
   }
 }

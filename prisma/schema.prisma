@@ -18,13 +18,6 @@ model Birthday {
   date       String
 }
 
-model Cookie {
-  cookieID String @id @default(uuid())
-  userID   String @unique
-  given    Int
-  received Int
-}
-
 // --- GUILD MODELS --- //
 model GuildConfig {
   configID                String   @id @default(uuid())

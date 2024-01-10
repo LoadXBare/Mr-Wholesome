@@ -1,6 +1,7 @@
 import { Birthday } from '@prisma/client';
 import {
-  Attachment, Collection, Message, TextChannel, User, inlineCode,
+  Attachment, Collection, Message, TextChannel,
+  inlineCode
 } from 'discord.js';
 import client from '../index.js';
 import { Discord, database } from './config.js';
@@ -286,60 +287,6 @@ async function fetchUpcomingBirthdays(days: number) {
   return upcomingBirthdays;
 }
 
-/**
- * Adds a warning for the specified user in the specified guild to the database.
- * @param author The User object for the author of the warning
- * @param warnedUser The User object for the user being warned
- * @param guildID The ID of the guild the warning is in
- * @param reason The reason for the warning
- * @returns Prisma Warning object
- */
-async function addWarning(author: User, warnedUser: User, guildID: string, reason: string) {
-  const result = await database.warning.create({
-    data: {
-      authorID: author.id,
-      reason,
-      warnedID: warnedUser.id,
-      guildID,
-      date: Date.now()
-    }
-  });
-
-  return result;
-}
-
-async function fetchUserWarnings(warnedID: string, guildID: string) {
-  const result = await database.warning.findMany({
-    where: { guildID, warnedID }
-  });
-
-  return result;
-}
-
-async function fetchGuildWarnings(guildID: string) {
-  const result = await database.warning.findMany({
-    where: { guildID }
-  });
-
-  return result;
-}
-
-async function fetchWarning(warningID: string) {
-  const result = await database.warning.findUnique({
-    where: { warningID }
-  });
-
-  return result;
-}
-
-async function deleteWarning(warningID: string) {
-  const result = await database.warning.delete({
-    where: { warningID }
-  });
-
-  return result;
-}
-
 //TODO: CONVERT TO CLASS SYSTEM
 
 export const Utils = {
@@ -357,10 +304,5 @@ export const DatabaseUtils = {
   isIgnoringEvents,
   fetchEventIgnoredChannels,
   setBirthday,
-  fetchUpcomingBirthdays,
-  addWarning,
-  fetchUserWarnings,
-  fetchGuildWarnings,
-  fetchWarning,
-  deleteWarning
+  fetchUpcomingBirthdays
 };
