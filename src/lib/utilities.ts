@@ -105,7 +105,7 @@ function getRelativeTimeString(date: Date | number) {
  * @param ms The time, in milliseconds, to sleep
  * @returns Empty promise after specified delay has elapsed
  */
-function sleep(ms: number) {
+async function sleep(ms: number) {
   /* eslint no-new: "off" */
   new Promise((r) => setTimeout(r, ms));
 }

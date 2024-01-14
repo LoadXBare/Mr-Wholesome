@@ -12,7 +12,7 @@ export enum EmbedColours {
   Error = 'Red',
 }
 export enum Discord {
-  MAX_ATTACHMENT_SIZE = 15_000_000, // The actual Non-Nitro max upload size is 25MB, but uploads that big can cause bot to timeout
+  MAX_ATTACHMENT_SIZE = 15_000_000, // The actual Non-Nitro max upload size is higher, but uploads that big can cause bot to timeout
 }
 export enum Emotes {
   Bonque = '<:akiaBonque:1072610966598066237>',
