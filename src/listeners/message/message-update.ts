@@ -1,10 +1,11 @@
 import { diffChars } from 'diff';
 import {
   ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder,
-  Events, Message, PartialMessage, codeBlock,
+  Events, Message, PartialMessage, bold,
+  strikethrough
 } from 'discord.js';
 import client from '../../index.js';
-import { Discord, EmbedColours, EventHandler } from '../../lib/config.js';
+import { EmbedColours, EventHandler } from '../../lib/config.js';
 import { DatabaseUtils, Utils } from '../../lib/utilities.js';
 
 class MessageUpdateHandler extends EventHandler {
@@ -33,15 +34,15 @@ class MessageUpdateHandler extends EventHandler {
 
     const formattedContentDifference: Array<string> = [];
     contentDifference.forEach((difference) => {
-      if (difference.added) formattedContentDifference.push(`${Discord.ANSI_GREEN}${difference.value}`);
-      else if (difference.removed) formattedContentDifference.push(`${Discord.ANSI_RED}${difference.value}`);
-      else formattedContentDifference.push(`${Discord.ANSI_WHITE}${difference.value}`);
+      if (difference.added) formattedContentDifference.push(bold(difference.value));
+      else if (difference.removed) formattedContentDifference.push(strikethrough(difference.value));
+      else formattedContentDifference.push(difference.value);
     });
 
     const embedDescription = [
       `## Message Edited in ${this.newMessage.channel}`,
       '### Changes',
-      codeBlock('ansi', formattedContentDifference.join('')),
+      formattedContentDifference.join(''),
     ].join('\n');
 
     const embed = new EmbedBuilder()

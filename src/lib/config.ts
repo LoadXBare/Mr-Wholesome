@@ -5,7 +5,7 @@ import client from '../index.js';
 export const database = new PrismaClient();
 export enum EmbedColours {
   Positive = 'Green',
-  Neutral = '#2b2d31',
+  Neutral = 'Blue',
   Negative = 'Red',
   Success = 'Green',
   Info = 'Purple',
@@ -13,9 +13,6 @@ export enum EmbedColours {
 }
 export enum Discord {
   MAX_ATTACHMENT_SIZE = 15_000_000, // The actual Non-Nitro max upload size is 25MB, but uploads that big can cause bot to timeout
-  ANSI_GREEN = '\u001b[1;32m',
-  ANSI_RED = '\u001b[1;31m',
-  ANSI_WHITE = '\u001b[0;37m',
 }
 export enum Emotes {
   Bonque = '<:akiaBonque:1072610966598066237>',
