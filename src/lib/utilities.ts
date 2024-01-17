@@ -25,7 +25,7 @@ function randomInt(min: number, max: number) {
  * @param payload Any additional payload to log to the console
  */
 function log(message: string, positive: boolean, ...payload: any) {
-  console.log(`${positive ? '✅' : '❌'} | ${message}\n`, ...payload);
+  console.log(`${positive ? '✔️' : '❌'} | ${message}\n`, ...payload);
 }
 
 /**
