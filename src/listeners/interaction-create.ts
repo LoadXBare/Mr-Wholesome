@@ -3,6 +3,7 @@ import CatCommand from '../commands/fun/cat.js';
 import DogCommand from '../commands/fun/dog.js';
 import EightBallCommand from '../commands/fun/eight-ball.js';
 import FoxCommand from '../commands/fun/fox.js';
+import ReadingCommand from '../commands/fun/reading.js';
 import PingCommand from '../commands/information/ping.js';
 import WarnCommand from '../commands/moderation/warn.js';
 import BirthdayCommand from '../commands/utility/birthday.js';
@@ -32,6 +33,7 @@ class InteractionCreateHandler extends EventHandler {
     else if (cmd === 'dog') new DogCommand(chatInputInteraction).handle();
     else if (cmd === '8ball') new EightBallCommand(chatInputInteraction).handle();
     else if (cmd === 'fox') new FoxCommand(chatInputInteraction).handle();
+    else if (cmd === 'reading') new ReadingCommand(chatInputInteraction).handle();
 
     // Information
     else if (cmd === 'ping') new PingCommand(chatInputInteraction).handle();

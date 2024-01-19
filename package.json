@@ -9,18 +9,21 @@
   "type": "module",
   "scripts": {
     "start": "node .",
-    "start-dev": "yarn ts-node src/index.ts",
-    "deploy-commands": "yarn ts-node src/lib/deploy-commands.ts",
+    "start-dev": "yarn tsx src/index.ts",
+    "deploy-commands": "yarn tsx src/lib/deploy-commands.ts",
     "lint": "yarn eslint ."
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.44",
     "@prisma/client": "^5.8.0",
+    "chance": "^1.1.11",
     "diff": "^5.1.0",
     "discord.js": "^14.11.0",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "undici": "^6.4.0"
   },
   "devDependencies": {
+    "@types/chance": "^1.1.6",
     "@types/diff": "^5.0.3",
     "@types/node": "^20.11.0",
     "@typescript-eslint/eslint-plugin": "^6.18.1",

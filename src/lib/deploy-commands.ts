@@ -72,6 +72,10 @@ const commands = [
     .setDescription('Post a random fox image'),
 
   new SlashCommandBuilder()
+    .setName('reading')
+    .setDescription('View your reading for the day'),
+
+  new SlashCommandBuilder()
     .setName('warn')
     .setDescription('Warning Commands')
     .addSubcommand((subcommand) => subcommand
