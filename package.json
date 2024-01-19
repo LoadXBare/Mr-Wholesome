@@ -15,24 +15,24 @@
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.44",
-    "@prisma/client": "^5.8.0",
+    "@prisma/client": "^5.8.1",
     "chance": "^1.1.11",
     "diff": "^5.1.0",
     "discord.js": "^14.11.0",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.2",
     "undici": "^6.4.0"
   },
   "devDependencies": {
     "@types/chance": "^1.1.6",
     "@types/diff": "^5.0.3",
-    "@types/node": "^20.11.0",
-    "@typescript-eslint/eslint-plugin": "^6.18.1",
-    "@typescript-eslint/parser": "^6.18.1",
+    "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
     "eslint": "8.56.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "2.29.1",
-    "prisma": "^5.8.0",
+    "prisma": "^5.8.1",
     "tsx": "^4.7.0",
     "typescript": "^5.0.4"
   }
