@@ -43,7 +43,6 @@ class InteractionCreateHandler extends EventHandler {
 
     // Ranking
 
-
     // Utility
     else if (cmd === 'birthday') new BirthdayCommand(chatInputInteraction).handle();
     else if (cmd === 'settings') new SettingsCommand(chatInputInteraction).handle();

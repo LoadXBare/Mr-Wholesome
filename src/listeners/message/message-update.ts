@@ -2,7 +2,7 @@ import { diffChars } from 'diff';
 import {
   ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder,
   Events, Message, PartialMessage, bold,
-  strikethrough
+  strikethrough,
 } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours, EventHandler } from '../../lib/config.js';

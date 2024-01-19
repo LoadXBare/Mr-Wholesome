@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from 'discord.js';
 
 export default class FoxCommand {
   interaction: ChatInputCommandInteraction;

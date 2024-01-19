@@ -1,5 +1,5 @@
 import {
-  REST, Routes, SlashCommandBuilder
+  REST, Routes, SlashCommandBuilder,
 } from 'discord.js';
 import * as dotenv from 'dotenv';
 
@@ -92,20 +92,18 @@ const commands = [
       .addBooleanOption((option) => option
         .setName('dm')
         .setDescription('Should the user be notified via DMs that they were warned?')
-        .setRequired(true))
-    )
+        .setRequired(true)))
     .addSubcommand((subcommand) => subcommand
       .setName('view')
       .setDescription('View all warnings in the guild, or a user\'s warnings if specified')
       .addStringOption((option) => option
         .setName('user')
         .setDescription('The @mention or ID of the user to view warnings of')
-        .setRequired(false)
-      )
+        .setRequired(false))
       .addStringOption((option) => option
         .setName('warning')
         .setDescription('The ID of the warning to view in more details')
-        .setRequired(false)))
+        .setRequired(false))),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');

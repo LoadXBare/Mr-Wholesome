@@ -1,14 +1,22 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, EmbedBuilder, User } from "discord.js";
-import client from "../../index.js";
-import { EmbedColours, database } from "../../lib/config.js";
+import {
+  ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, EmbedBuilder, User,
+} from 'discord.js';
+import client from '../../index.js';
+import { EmbedColours, database } from '../../lib/config.js';
 
 export default class WarnCommand {
   interaction: ChatInputCommandInteraction;
+
   command: string;
+
   userString: string;
+
   user: User | void | undefined;
+
   reason: string;
+
   dm: boolean;
+
   warningID: string;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -61,7 +69,7 @@ export default class WarnCommand {
       new ButtonBuilder()
         .setCustomId('no')
         .setLabel('No, cancel warning')
-        .setStyle(ButtonStyle.Danger)
+        .setStyle(ButtonStyle.Danger),
     );
 
     await this.interaction.editReply({ embeds: [embed], components: [buttons] });
@@ -87,7 +95,7 @@ export default class WarnCommand {
 
     const embedDescription = [
       '## Warning Added',
-      `Successfully warned ${this.user}!`
+      `Successfully warned ${this.user}!`,
     ].join('\n');
 
     const embed = new EmbedBuilder()
@@ -116,7 +124,7 @@ export default class WarnCommand {
       '## Warning',
       `You have received a warning from **${this.interaction.guild}**`,
       '### Reason',
-      this.reason
+      this.reason,
     ].join('\n');
 
     const warningEmbed = new EmbedBuilder()
@@ -131,7 +139,7 @@ export default class WarnCommand {
   async #cancelWarning() {
     const embedDescription = [
       '## Warning Cancelled',
-      `Warning creation was either cancelled by @${this.interaction.user.username} or timed out.`
+      `Warning creation was either cancelled by @${this.interaction.user.username} or timed out.`,
     ].join('\n');
 
     const embed = new EmbedBuilder()
@@ -162,14 +170,14 @@ export default class WarnCommand {
       userWarningCount[warning.warnedID] = (userWarningCount[warning.warnedID] ?? 0) + 1;
     });
 
-    const warnedUsers = (await Promise.allSettled(warnedUserPromises)).map((user) => user.status === 'fulfilled' ? user.value : undefined);
+    const warnedUsers = (await Promise.allSettled(warnedUserPromises)).map((user) => (user.status === 'fulfilled' ? user.value : undefined));
 
     const warningsList: Array<string> = [];
     warnedUsers.forEach((user) => {
       if (user !== undefined) {
         warningsList.push(
           `- **@${user.username}** — ${userWarningCount[user.id]} warnings\
-          \n - **User ID** — \`${user.id}\``
+          \n - **User ID** — \`${user.id}\``,
         );
       }
     });
@@ -177,7 +185,7 @@ export default class WarnCommand {
     const embedDescription = [
       `## Displaying warnings for \`${this.interaction.guild}\``,
       `### Found ${warningsList.length} users with warnings`,
-      warningsList.join('\n')
+      warningsList.join('\n'),
     ].join('\n');
 
     const embed = new EmbedBuilder()
@@ -203,7 +211,7 @@ export default class WarnCommand {
     const embedDescription = [
       `## Displaying warnings for \`@${this.user.username}\``,
       `### Found ${warningsList.length} warnings`,
-      warningsList.join('\n')
+      warningsList.join('\n'),
     ].join('\n');
 
     const embed = new EmbedBuilder()
@@ -224,7 +232,7 @@ export default class WarnCommand {
     const [guild, author, warnedUser] = await Promise.allSettled([
       client.guilds.fetch(warning.guildID),
       client.users.fetch(warning.authorID),
-      client.users.fetch(warning.warnedID)
+      client.users.fetch(warning.warnedID),
     ]);
     const guildName = guild.status === 'fulfilled' ? guild.value.name : 'N/A';
     const authorUsername = author.status === 'fulfilled' ? author.value.username : 'N/A';
@@ -235,8 +243,8 @@ export default class WarnCommand {
       `### Guild — ${guildName}`,
       `### Author — @${authorUsername}`,
       `### Warned User — @${warnedUsername}`,
-      `### Reason`,
-      warning.reason
+      '### Reason',
+      warning.reason,
     ].join('\n');
 
     const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -273,7 +281,7 @@ export default class WarnCommand {
 
     const embedDescription = [
       '## Warning Deleted',
-      `Successfully deleted warning with ID \`${result.warningID}\`!`
+      `Successfully deleted warning with ID \`${result.warningID}\`!`,
     ].join('\n');
 
     const embed = new EmbedBuilder()
@@ -295,8 +303,8 @@ export default class WarnCommand {
         date: Date.now(),
         guildID: this.interaction.guildId ?? '',
         reason: this.reason,
-        warnedID: this.user?.id ?? ''
-      }
+        warnedID: this.user?.id ?? '',
+      },
     });
 
     return result;
@@ -304,7 +312,7 @@ export default class WarnCommand {
 
   async #deleteWarningFromDatabase() {
     const result = await database.warning.delete({
-      where: { warningID: this.warningID }
+      where: { warningID: this.warningID },
     });
 
     return result;
@@ -312,7 +320,7 @@ export default class WarnCommand {
 
   async #fetchGuildWarningsFromDatabase() {
     const result = await database.warning.findMany({
-      where: { guildID: this.interaction.guildId ?? '' }
+      where: { guildID: this.interaction.guildId ?? '' },
     });
 
     return result;
@@ -322,8 +330,8 @@ export default class WarnCommand {
     const result = await database.warning.findMany({
       where: {
         guildID: this.interaction.guildId ?? '',
-        warnedID: this.user?.id ?? ''
-      }
+        warnedID: this.user?.id ?? '',
+      },
     });
 
     return result;
@@ -331,7 +339,7 @@ export default class WarnCommand {
 
   async #fetchWarningFromDatabase() {
     const result = await database.warning.findUnique({
-      where: { warningID: this.warningID }
+      where: { warningID: this.warningID },
     });
 
     return result;

@@ -1,7 +1,7 @@
 import { Birthday } from '@prisma/client';
 import {
   Attachment, Collection, Message, TextChannel,
-  inlineCode
+  inlineCode,
 } from 'discord.js';
 import client from '../index.js';
 import { Discord, database } from './config.js';
@@ -148,7 +148,7 @@ function formatDate(day: number, month: number) {
     'September',
     'October',
     'November',
-    'December'
+    'December',
   ];
 
   const formattedDay = `${day}${nth(day)}`;
@@ -260,7 +260,7 @@ async function setBirthday(userID: string, day: number, month: number) {
   const result = await database.birthday.upsert({
     where: { userID },
     create: { date, userID },
-    update: { date }
+    update: { date },
   });
 
   return result;
@@ -287,7 +287,7 @@ async function fetchUpcomingBirthdays(days: number) {
   return upcomingBirthdays;
 }
 
-//TODO: CONVERT TO CLASS SYSTEM
+// TODO: CONVERT TO CLASS SYSTEM
 
 export const Utils = {
   randomInt,
@@ -304,5 +304,5 @@ export const DatabaseUtils = {
   isIgnoringEvents,
   fetchEventIgnoredChannels,
   setBirthday,
-  fetchUpcomingBirthdays
+  fetchUpcomingBirthdays,
 };

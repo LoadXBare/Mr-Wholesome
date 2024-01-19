@@ -32,13 +32,13 @@ export default class BirthdayCommand {
       embed.setColor(EmbedColours.Success);
       embedDescription.push(
         '## Successfully set birthday!',
-        `Your birthday has been set to **${birthday.date}**.`
+        `Your birthday has been set to **${birthday.date}**.`,
       );
     } else {
       embed.setColor(EmbedColours.Error);
       embedDescription.push(
         '## Unable to set birthday!',
-        'An error occurred when attempting to set your birthday :('
+        'An error occurred when attempting to set your birthday :(',
       );
     }
 
@@ -61,7 +61,7 @@ export default class BirthdayCommand {
     });
 
     const embedDescription = [
-      '## Upcoming Birthdays'
+      '## Upcoming Birthdays',
     ];
 
     if (upcomingBirthdaysList.length === 0) embedDescription.push(`There are no birthdays in the next ${upcomingDayLimit} days!`);
@@ -76,4 +76,3 @@ export default class BirthdayCommand {
     await this.interaction.editReply({ embeds: [embed] });
   }
 }
-

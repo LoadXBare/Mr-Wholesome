@@ -1,13 +1,17 @@
-import { Canvas, SKRSContext2D, createCanvas, loadImage } from "@napi-rs/canvas";
-import { Chance } from "chance";
-import { AttachmentBuilder, ChatInputCommandInteraction, GuildMember } from "discord.js";
-import { request } from "undici";
-
+import {
+  Canvas, Image, SKRSContext2D, createCanvas, loadImage,
+} from '@napi-rs/canvas';
+import { Chance } from 'chance';
+import { AttachmentBuilder, ChatInputCommandInteraction, GuildMember } from 'discord.js';
+import { request } from 'undici';
 
 export default class ReadingCommand {
   interaction: ChatInputCommandInteraction;
+
   canvas: Canvas;
+
   canvasContext: SKRSContext2D;
+
   todayIsCursedDay: boolean;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -53,7 +57,11 @@ export default class ReadingCommand {
     const pixelsBetweenStars = 5;
 
     drawOrder.forEach((star, index) => {
-      const starImage = star === 'full' ? fullStarImage : star === 'half' ? halfStarImage : emptyStarImage;
+      let starImage: Image;
+      if (star === 'full') starImage = fullStarImage;
+      else if (star === 'half') starImage = halfStarImage;
+      else starImage = emptyStarImage;
+
       const starX = x + index * (starSize + pixelsBetweenStars);
 
       this.canvasContext.drawImage(starImage, starX, y, starSize, starSize);
@@ -95,7 +103,9 @@ export default class ReadingCommand {
     const wealth = chance.natural({ min: 1, max: 10 }) / 2;
     const overall = Math.round((love + success + luck + wealth) / 4 * 2) / 2; // Rounded to nearest 0.5
 
-    return { love, success, luck, wealth, overall };
+    return {
+      love, success, luck, wealth, overall,
+    };
   }
 
   async #initialiseCanvas() {
