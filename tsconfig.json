@@ -24,8 +24,5 @@
 		"useDefineForClassFields": true,
 		"rootDir": "src",
 		"outDir": "dist"
-	},
-	"ts-node": {
-		"esm": true
 	}
 }
