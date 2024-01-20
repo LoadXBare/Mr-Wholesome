@@ -20,6 +20,7 @@ class MessageCreateHandler extends EventHandler {
     this.#bonkAkiaForSorry();
     this.#painAuChocolat();
     this.#reactWithArson();
+    this.#useSlashCommands();
     // TODO: RANKING STUFF
   }
 
@@ -65,6 +66,17 @@ class MessageCreateHandler extends EventHandler {
     await this.message.react(Emotes.Arson)
       .then(() => Utils.log('Reacted with Arson!', true))
       .catch((e) => Utils.log('An error occurred while reacting to a message!', false, e));
+  }
+
+  // Say "Hey, I use slash commands now!" if the message is an old command
+  async #useSlashCommands() {
+    const oldCommands = ['!birthday', '!8ball', '!cookie', '!cat', '!dog', '!fox', '!reading', '!help', '!mystats', '!ping', '!ban', '!warn', '!watchlist', '!top', '!rank', '!ticketpanel'];
+    const messageIsOldCommand = oldCommands.includes(this.message.content.split(' ')[0]);
+    if (!messageIsOldCommand) return;
+
+    await this.message.reply('Hey, I use slash commands now!')
+      .then(() => Utils.log('Replied with "Please use slash commands instead!"!', true))
+      .catch((e) => Utils.log('An error occurred while replying to a message!', false, e));
   }
 }
 

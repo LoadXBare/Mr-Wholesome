@@ -35,7 +35,7 @@ export default class ReadingCommand {
     const attachment = await this.#createUserReadingImage();
     const userName = this.interaction.member instanceof GuildMember ? this.interaction.member.displayName : this.interaction.user.username;
 
-    await this.interaction.editReply({ content: `## Here is your ${cursed}reading for today, ${userName}...`, files: [attachment] });
+    await this.interaction.editReply({ content: `## Here is your ${cursed}reading for ${new Date().toDateString()}, ${userName}...`, files: [attachment] });
   }
 
   #fetchStarDrawOrder(starReading: number, starCount: number) {

@@ -1,6 +1,6 @@
 /*
- * Here I dynamically import all files that contain event listeners
- * in order to run them each exactly once so they begin listening
+ * Here I import all files that contain event listeners
+ * in order to run them each once so they begin listening
  * out for their respective event.
 */
 
