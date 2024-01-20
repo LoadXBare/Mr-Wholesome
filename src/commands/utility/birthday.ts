@@ -1,7 +1,8 @@
+import { Birthday } from '@prisma/client';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import client from '../../index.js';
-import { EmbedColours } from '../../lib/config.js';
-import { DatabaseUtils } from '../../lib/utilities.js';
+import { EmbedColours, database } from '../../lib/config.js';
+import { Utils } from '../../lib/utilities.js';
 
 export default class BirthdayCommand {
   interaction: ChatInputCommandInteraction;
@@ -23,7 +24,7 @@ export default class BirthdayCommand {
 
     const day = this.interaction.options.getInteger('day', true);
     const month = this.interaction.options.getInteger('month', true);
-    const birthday = await DatabaseUtils.setBirthday(this.interaction.user.id, day, month);
+    const birthday = await this.#setBirthdayInDatabase(this.interaction.user.id, day, month);
 
     const embedDescription: Array<string> = [];
     const embed = new EmbedBuilder();
@@ -51,7 +52,7 @@ export default class BirthdayCommand {
     await this.interaction.deferReply();
 
     const upcomingDayLimit = this.interaction.options.getNumber('days', false) ?? 14;
-    const upcomingBirthdays = await DatabaseUtils.fetchUpcomingBirthdays(upcomingDayLimit);
+    const upcomingBirthdays = await this.#fetchUpcomingBirthdaysFromDatabase(upcomingDayLimit);
     const upcomingBirthdaysList: Array<string> = [];
     upcomingBirthdays.forEach((birthday) => {
       const birthdayUser = client.users.resolve(birthday.userID);
@@ -74,5 +75,55 @@ export default class BirthdayCommand {
       .setColor(EmbedColours.Info);
 
     await this.interaction.editReply({ embeds: [embed] });
+  }
+
+  #formatDate(day: number, month: number) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+
+    const formattedDay = `${day}${Utils.nth(day)}`;
+    const formattedMonth = months.at(month) ?? 'N/A';
+
+    return `${formattedDay} ${formattedMonth}`;
+  }
+
+  // == Datebase Methods ==
+  async #setBirthdayInDatabase(userID: string, day: number, month: number) {
+    const date = this.#formatDate(day, month);
+    const result = await database.birthday.upsert({
+      where: { userID },
+      create: { date, userID },
+      update: { date },
+    });
+
+    return result;
+  }
+
+  async #fetchUpcomingBirthdaysFromDatabase(days: number) {
+    const upcomingDays = new Array(days)
+      .fill(new Date().getUTCDate())
+      .map((value, index) => this.#formatDate(value + index, new Date().getUTCMonth()));
+
+    const birthdays = await database.birthday.findMany();
+    const upcomingBirthdays: Array<Birthday> = [];
+    upcomingDays.forEach((day) => {
+      birthdays.forEach((birthday) => {
+        if (birthday.date === day) upcomingBirthdays.push(birthday);
+      });
+    });
+
+    return upcomingBirthdays;
   }
 }

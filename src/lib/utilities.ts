@@ -1,4 +1,3 @@
-import { Birthday } from '@prisma/client';
 import {
   Attachment, Collection, Message, TextChannel,
   inlineCode,
@@ -130,34 +129,6 @@ function nth(number: number) {
 }
 
 /**
- * Formats a day and month in the form "d MMMM".
- * @param day The day to format
- * @param month The month to format
- * @returns Formatted date
- */
-function formatDate(day: number, month: number) {
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
-  const formattedDay = `${day}${nth(day)}`;
-  const formattedMonth = months.at(month) ?? 'N/A';
-
-  return `${formattedDay} ${formattedMonth}`;
-}
-
-/**
  * Adds a channel to the list of event ignored channels in a guild.
  * @param guildID The ID of the guild the channel is in
  * @param channelID The ID of the channel to add
@@ -248,45 +219,6 @@ async function fetchEventIgnoredChannels(guildID: string | null) {
   return eventIgnoredChannelIDs;
 }
 
-/**
- * Sets or updates a user's birthday.
- * @param userID The ID of the user to set the birthday for
- * @param day The day of the user's birthday
- * @param month The month of the user's birthday
- * @returns Prisma Birthday object
- */
-async function setBirthday(userID: string, day: number, month: number) {
-  const date = formatDate(day, month);
-  const result = await database.birthday.upsert({
-    where: { userID },
-    create: { date, userID },
-    update: { date },
-  });
-
-  return result;
-}
-
-/**
- * Fetches all upcoming birthdays from the database.
- * @param days The number of days in the future to return birthdays for
- * @returns Array of upcoming Prisma Birthday objects
- */
-async function fetchUpcomingBirthdays(days: number) {
-  const upcomingDays = new Array(days)
-    .fill(new Date().getUTCDate())
-    .map((value, index) => formatDate(value + index, new Date().getUTCMonth()));
-
-  const birthdays = await database.birthday.findMany();
-  const upcomingBirthdays: Array<Birthday> = [];
-  upcomingDays.forEach((day) => {
-    birthdays.forEach((birthday) => {
-      if (birthday.date === day) upcomingBirthdays.push(birthday);
-    });
-  });
-
-  return upcomingBirthdays;
-}
-
 // TODO: CONVERT TO CLASS SYSTEM
 
 export const Utils = {
@@ -303,6 +235,4 @@ export const DatabaseUtils = {
   removeEventIgnoredChannel,
   isIgnoringEvents,
   fetchEventIgnoredChannels,
-  setBirthday,
-  fetchUpcomingBirthdays,
 };
