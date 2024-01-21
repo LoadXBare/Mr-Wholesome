@@ -90,7 +90,7 @@ export default class ReadingCommand {
     this.canvasContext.restore();
 
     const avatarRing = await loadImage(`assets/reading/${cursed}avatar-ring.png`);
-    this.canvasContext.drawImage(avatarRing, avatarX, avatarY, avatarSize, avatarSize);
+    this.canvasContext.drawImage(avatarRing, 0, 0, this.canvas.width, this.canvas.height);
   }
 
   #generateStarReading() {
