@@ -20,9 +20,7 @@ model Birthday {
 
 // --- GUILD MODELS --- //
 model GuildConfig {
-  configID                String   @id @default(uuid())
-  guildID                 String   @unique
-  logChannelID            String   @default("")
+  guildID                 String   @id
   cmdIgnoredChannelIDs    String[] @default([])
   eventIgnoredChannelIDs  String[] @default([])
   rankedIgnoredChannelIDs String[] @default([])
@@ -39,13 +37,14 @@ model Ban {
 }
 
 model Rank {
-  rankID      String  @id @default(uuid())
   userID      String
   guildID     String
-  xp          Int
-  xpLevel     Int
+  xp          Int     @default(0)
+  xpLevel     Int     @default(0)
   levelNotifs Boolean @default(true)
-  credits     Int
+  credits     Int     @default(0)
+
+  @@id([userID, guildID])
 }
 
 model Ticket {
@@ -85,9 +84,10 @@ model Notes {
 }
 
 model MemberStats {
-  statsID            String @id @default(uuid())
   userID             String
   guildID            String
   messageCount       Int
   messageCountByHour Json
+
+  @@id([userID, guildID])
 }
