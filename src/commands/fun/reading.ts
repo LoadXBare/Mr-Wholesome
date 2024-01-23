@@ -1,9 +1,9 @@
 import {
   Canvas, Image, SKRSContext2D, createCanvas, loadImage,
 } from '@napi-rs/canvas';
-import { Chance } from 'chance';
-import { AttachmentBuilder, ChatInputCommandInteraction, GuildMember } from 'discord.js';
+import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { request } from 'undici';
+import { Utils } from '../../lib/utilities.js';
 
 export default class ReadingCommand {
   interaction: ChatInputCommandInteraction;
@@ -33,7 +33,7 @@ export default class ReadingCommand {
 
     const cursed = this.todayIsCursedDay ? 'cursed ' : '';
     const attachment = await this.#createUserReadingImage();
-    const userName = this.interaction.member instanceof GuildMember ? this.interaction.member.displayName : this.interaction.user.username;
+    const userName = Utils.displayName(this.interaction);
 
     await this.interaction.editReply({ content: `## Here is your ${cursed}reading for ${new Date().toDateString()}, ${userName}...`, files: [attachment] });
   }
@@ -95,12 +95,11 @@ export default class ReadingCommand {
 
   #generateStarReading() {
     const seed = `${this.interaction.user.id} ${new Date().toDateString()}`;
-    const chance = new Chance(seed);
 
-    const love = chance.natural({ min: 1, max: 10 }) / 2;
-    const success = chance.natural({ min: 1, max: 10 }) / 2;
-    const luck = chance.natural({ min: 1, max: 10 }) / 2;
-    const wealth = chance.natural({ min: 1, max: 10 }) / 2;
+    const love = Utils.randomInt(1, 10, seed) / 2;
+    const success = Utils.randomInt(1, 10, seed) / 2;
+    const luck = Utils.randomInt(1, 10, seed) / 2;
+    const wealth = Utils.randomInt(1, 10, seed) / 2;
     const overall = Math.round((love + success + luck + wealth) / 4 * 2) / 2; // Rounded to nearest 0.5
 
     return {

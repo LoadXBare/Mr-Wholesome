@@ -1,6 +1,10 @@
+import { Chance } from 'chance';
 import {
-  Attachment, Collection, Message, TextChannel,
-  inlineCode,
+  Attachment,
+  ChatInputCommandInteraction,
+  Collection,
+  GuildMember, Message, TextChannel,
+  inlineCode
 } from 'discord.js';
 import client from '../index.js';
 import { Discord, database } from './config.js';
@@ -11,10 +15,10 @@ import { Discord, database } from './config.js';
    * @param max The maximum value that can be returned
    * @returns Randomly generated integer
   */
-function randomInt(min: number, max: number) {
-  const range = max - min + 1;
-  const randomNumber = Math.floor(Math.random() * range) + min;
-  return randomNumber;
+function randomInt(min: number, max: number, seed?: string) {
+  const chance = seed ? new Chance(seed) : new Chance();
+
+  return chance.integer({ min, max });
 }
 
 /**
@@ -128,6 +132,20 @@ function nth(number: number) {
   return suffixes[suffixCategory];
 }
 
+function displayName(data: Message | ChatInputCommandInteraction) {
+  if (data instanceof Message) {
+    if (data.member instanceof GuildMember) return data.member.displayName;
+    else return data.author.username;
+  }
+
+  else if (data instanceof ChatInputCommandInteraction) {
+    if (data.member instanceof GuildMember) return data.member.displayName;
+    else return data.user.username;
+  }
+
+  return '[Unknown]';
+}
+
 /**
  * Adds a channel to the list of event ignored channels in a guild.
  * @param guildID The ID of the guild the channel is in
@@ -228,6 +246,7 @@ export const Utils = {
   getRelativeTimeString,
   sleep,
   nth,
+  displayName,
 };
 
 export const DatabaseUtils = {
