@@ -9,9 +9,9 @@
   "type": "module",
   "scripts": {
     "start": "node .",
-    "start-dev": "yarn tsx src/index.ts",
-    "deploy-commands": "yarn tsx src/lib/deploy-commands.ts",
-    "lint": "yarn eslint ."
+    "start-dev": "npx tsx watch src/index.ts",
+    "deploy-commands": "npx tsx src/lib/deploy-commands.ts",
+    "lint": "npx eslint ."
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.44",

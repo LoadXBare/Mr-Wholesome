@@ -3,3 +3,4 @@ migrations
 .env
 .wakatime-project
 tsconfig.tsbuildinfo
+package-lock.json
