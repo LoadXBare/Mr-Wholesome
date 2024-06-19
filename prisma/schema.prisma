@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:mr-wholesome.db"
 }
 
 // --- USER MODELS --- //
@@ -20,10 +20,10 @@ model Birthday {
 
 // --- GUILD MODELS --- //
 model GuildConfig {
-  guildID                 String   @id
-  cmdIgnoredChannelIDs    String[] @default([])
-  eventIgnoredChannelIDs  String[] @default([])
-  rankedIgnoredChannelIDs String[] @default([])
+  guildID                 String @id
+  cmdIgnoredChannelIDs    String @default("")
+  eventIgnoredChannelIDs  String @default("")
+  rankedIgnoredChannelIDs String @default("")
 }
 
 model Ban {
@@ -59,8 +59,8 @@ model TicketPanel {
   ticketPanelID   String   @id @default(uuid())
   guildID         String
   categoryID      String
-  panelEmbedJSON  Json
-  ticketEmbedJSON Json
+  panelEmbedJSON  String
+  ticketEmbedJSON String
   name            String   @unique
   tickets         Ticket[]
 }
@@ -84,10 +84,10 @@ model Notes {
 }
 
 model MemberStats {
-  userID             String
-  guildID            String
-  messageCount       Int
-  messageCountByHour Json
+  userID                 String
+  guildID                String
+  messageCount           Int
+  messageCountByHourJSON String
 
   @@id([userID, guildID])
 }

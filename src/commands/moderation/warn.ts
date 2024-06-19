@@ -1,22 +1,14 @@
-import {
-  ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, EmbedBuilder, User,
-} from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, EmbedBuilder, User } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours, database } from '../../lib/config.js';
 
 export default class WarnCommand {
   interaction: ChatInputCommandInteraction;
-
   command: string;
-
   userString: string;
-
   user: User | void | undefined;
-
   reason: string;
-
   dm: boolean;
-
   warningID: string;
 
   constructor(interaction: ChatInputCommandInteraction) {

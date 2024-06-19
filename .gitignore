@@ -1,5 +1,7 @@
 node_modules
-migrations
+prisma/migrations
+prisma/*.db
+prisma/*.db-journal
 .env
 .wakatime-project
 tsconfig.tsbuildinfo
