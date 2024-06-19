@@ -3,7 +3,7 @@ import {
 } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours, EventHandler } from '../../lib/config.js';
-import { DatabaseUtils, Utils } from '../../lib/utilities.js';
+import { Utils, dbUtils } from '../../lib/utilities.js';
 
 class MessageDeleteHandler extends EventHandler {
   message: Message | PartialMessage;
@@ -15,7 +15,7 @@ class MessageDeleteHandler extends EventHandler {
 
   async handle() {
     const { guildId, channelId, author } = this.message;
-    const channelHasEventsIgnored = await DatabaseUtils.isIgnoringEvents(guildId, channelId);
+    const channelHasEventsIgnored = await dbUtils.channelIgnoresEvents(guildId, channelId);
     if (author?.bot || channelHasEventsIgnored) return;
 
     this.#logDeletedMessage();

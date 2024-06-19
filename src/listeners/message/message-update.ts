@@ -6,7 +6,7 @@ import {
 } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours, EventHandler } from '../../lib/config.js';
-import { DatabaseUtils, Utils } from '../../lib/utilities.js';
+import { Utils, dbUtils } from '../../lib/utilities.js';
 
 class MessageUpdateHandler extends EventHandler {
   oldMessage: Message | PartialMessage;
@@ -21,7 +21,7 @@ class MessageUpdateHandler extends EventHandler {
 
   async handle() {
     const { guildId, channelId, author } = this.newMessage;
-    const channelHasEventsIgnored = await DatabaseUtils.isIgnoringEvents(guildId, channelId);
+    const channelHasEventsIgnored = await dbUtils.channelIgnoresEvents(guildId, channelId);
     if (author?.bot || channelHasEventsIgnored) return;
 
     this.#logEditedMessage();

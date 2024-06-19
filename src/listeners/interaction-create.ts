@@ -7,7 +7,6 @@ import ReadingCommand from '../commands/fun/reading.js';
 import PingCommand from '../commands/information/ping.js';
 import WarnCommand from '../commands/moderation/warn.js';
 import BirthdayCommand from '../commands/utility/birthday.js';
-import SettingsCommand from '../commands/utility/settings.js';
 import client from '../index.js';
 import { EventHandler } from '../lib/config.js';
 
@@ -45,7 +44,6 @@ class InteractionCreateHandler extends EventHandler {
 
     // Utility
     else if (cmd === 'birthday') new BirthdayCommand(chatInputInteraction).handle();
-    else if (cmd === 'settings') new SettingsCommand(chatInputInteraction).handle();
 
     // Unknown Command / Not Implemented
     else chatInputInteraction.reply({ content: 'This command hasn\'t been implemented yet, come back later (*・ω・)ﾉ', ephemeral: true });

@@ -1,17 +1,13 @@
-import {
-  Canvas, Image, SKRSContext2D, createCanvas, loadImage,
-} from '@napi-rs/canvas';
+import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
+import { Chance } from 'chance';
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { request } from 'undici';
 import { Utils } from '../../lib/utilities.js';
 
 export default class ReadingCommand {
   interaction: ChatInputCommandInteraction;
-
   canvas: Canvas;
-
   canvasContext: SKRSContext2D;
-
   todayIsCursedDay: boolean;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -71,7 +67,7 @@ export default class ReadingCommand {
   async #drawAvatar() {
     const cursed = this.todayIsCursedDay ? 'cursed-' : '';
 
-    const { body } = await request(this.interaction.user.displayAvatarURL({ extension: 'png' }));
+    const { body } = await request(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }));
     const avatar = await loadImage(await body.arrayBuffer());
     const avatarX = 517;
     const avatarY = 97;
@@ -95,11 +91,12 @@ export default class ReadingCommand {
 
   #generateStarReading() {
     const seed = `${this.interaction.user.id} ${new Date().toDateString()}`;
+    const chance = new Chance(seed);
 
-    const love = Utils.randomInt(1, 10, seed) / 2;
-    const success = Utils.randomInt(1, 10, seed) / 2;
-    const luck = Utils.randomInt(1, 10, seed) / 2;
-    const wealth = Utils.randomInt(1, 10, seed) / 2;
+    const love = chance.integer({ min: 0, max: 10 }) / 2;
+    const success = chance.integer({ min: 0, max: 10 }) / 2;
+    const luck = chance.integer({ min: 0, max: 10 }) / 2;
+    const wealth = chance.integer({ min: 0, max: 10 }) / 2;
     const overall = Math.round((love + success + luck + wealth) / 4 * 2) / 2; // Rounded to nearest 0.5
 
     return {
@@ -128,8 +125,7 @@ export default class ReadingCommand {
     await this.#drawAvatar();
 
     const imageAltText = `Your ${cursed}reading is ${readings.overall * cMod} stars overall, with ${readings.love * cMod} stars for love, ${readings.success * cMod} stars for success, ${readings.luck * cMod} stars for luck, and ${readings.wealth * cMod} stars for wealth.`;
-
-    const attachment = new AttachmentBuilder(await this.canvas.encode('png'), { name: 'reading.png', description: imageAltText });
+    const attachment = new AttachmentBuilder(await this.canvas.encode('jpeg'), { name: 'reading.jpeg', description: imageAltText });
     return attachment;
   }
 }

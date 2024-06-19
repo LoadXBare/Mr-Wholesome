@@ -1,4 +1,3 @@
-import { Chance } from 'chance';
 import {
   Attachment,
   ChatInputCommandInteraction,
@@ -8,18 +7,6 @@ import {
 } from 'discord.js';
 import client from '../index.js';
 import { Discord, database } from './config.js';
-
-/**
-   * Generates a random integer between min and max (inclusive).
-   * @param min The minimum value that can be returned
-   * @param max The maximum value that can be returned
-   * @returns Randomly generated integer
-  */
-function randomInt(min: number, max: number, seed?: string) {
-  const chance = seed ? new Chance(seed) : new Chance();
-
-  return chance.integer({ min, max });
-}
 
 /**
  * Logs a stylised message to the console.
@@ -147,68 +134,12 @@ function displayName(data: Message | ChatInputCommandInteraction) {
 }
 
 /**
- * Adds a channel to the list of event ignored channels in a guild.
- * @param guildID The ID of the guild the channel is in
- * @param channelID The ID of the channel to add
- * @returns True if addition successful, or false otherwise
- */
-async function addEventIgnoredChannel(guildID: string | null, channelID: string | null) {
-  if (guildID === null || channelID === null) return false;
-
-  const guildConfig = await database.guildConfig.findFirst({
-    where: { guildID },
-  })
-    .catch((e) => log('An error occurred while fetching from the database!', false, e));
-
-  const eventIgnoredChannelIDs = guildConfig?.eventIgnoredChannelIDs ?? [];
-  if (eventIgnoredChannelIDs.includes(channelID)) return false;
-  eventIgnoredChannelIDs.push(channelID);
-
-  const result = await database.guildConfig.update({
-    where: { guildID },
-    data: { eventIgnoredChannelIDs },
-  })
-    .catch((e) => log('An error occurred while updating the database!', false, e));
-
-  if (result === undefined) return false;
-  return true;
-}
-
-/**
- * Removes a channel from the list of event ingored channels in a guild.
- * @param guildID The ID of the guild the channel is in
- * @param channelID The ID of the channel to remove
- * @returns True if removal successful, or false otherwise
- */
-async function removeEventIgnoredChannel(guildID: string | null, channelID: string | null) {
-  if (guildID === null || channelID === null) return false;
-
-  const guildConfig = await database.guildConfig.findFirst({
-    where: { guildID },
-  })
-    .catch((e) => log('An error occurred while fetching from the database!', false, e));
-
-  const oldEventIgnoredChannelIDs = guildConfig?.eventIgnoredChannelIDs ?? [];
-  if (!oldEventIgnoredChannelIDs.includes(channelID)) return false;
-
-  const eventIgnoredChannelIDs = oldEventIgnoredChannelIDs.filter((id) => id !== channelID);
-  const result = await database.guildConfig.update({
-    where: { guildID },
-    data: { eventIgnoredChannelIDs },
-  })
-    .catch((e) => log('An error occurred while updating the database!', false, e));
-
-  if (result === undefined) return false;
-  return true;
-}
-
-/**
  * Checks whether a channel has events ignored in the specified guild.
  * @param guildID The ID of the guild the channel is in
  * @param channelID The ID of the channel to check
  * @returns True if the channel has events ignored, or false otherwise
  */
-async function isIgnoringEvents(guildID: string | null, channelID: string | null) {
+async function channelIgnoresEvents(guildID: string | null, channelID: string | null) {
   if (guildID === null || channelID === null) return true;
 
   const guildConfig = await database.guildConfig.findFirst({
@@ -216,31 +147,13 @@ async function isIgnoringEvents(guildID: string | null, channelID: string | null
   })
     .catch((e) => log('An error occurred while fetching from the database!', false, e));
 
-  const eventIgnoredChannelIDs = guildConfig?.eventIgnoredChannelIDs ?? [];
+  const eventIgnoredChannelIDs = guildConfig?.eventIgnoredChannelIDs.split(',') ?? [];
   return eventIgnoredChannelIDs.includes(channelID);
-}
-
-/**
- * Fetches all channels in a guild that has events ignored.
- * @param guildID The ID of the guild to fetch channels for
- * @returns Array of channel IDs that have events ignored
- */
-async function fetchEventIgnoredChannels(guildID: string | null) {
-  if (guildID === null) return [];
-
-  const guildConfig = await database.guildConfig.findFirst({
-    where: { guildID },
-  })
-    .catch((e) => log('An error occurred while fetching from the database!', false, e));
-
-  const eventIgnoredChannelIDs = guildConfig?.eventIgnoredChannelIDs ?? [];
-  return eventIgnoredChannelIDs;
 }
 
 // TODO: CONVERT TO CLASS SYSTEM
 
 export const Utils = {
-  randomInt,
   log,
   storeAttachments,
   getRelativeTimeString,
@@ -249,9 +162,6 @@ export const Utils = {
   displayName,
 };
 
-export const DatabaseUtils = {
-  addEventIgnoredChannel,
-  removeEventIgnoredChannel,
-  isIgnoringEvents,
-  fetchEventIgnoredChannels,
+export const dbUtils = {
+  channelIgnoresEvents
 };

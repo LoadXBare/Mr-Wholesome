@@ -35,7 +35,7 @@ class MessageCreateHandler extends EventHandler {
 
   // React with :akiaBonque: emoji and say "NO SORRY" if message contains "sorry" and sent by Akia
   async #bonkAkiaForSorry() {
-    const messageContainsSorry = this.message.content.search(/[s]+[o]+[r]+[y]+/mi) !== -1;
+    const messageContainsSorry = this.message.content.search(/[s]+[o]+[rw]+[y]+/mi) !== -1;
     const authorIsAkia = this.message.author.id === process.env.AKIALYNE_USER_ID;
     if (!messageContainsSorry || !authorIsAkia) return;
 
