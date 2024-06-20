@@ -3,6 +3,8 @@ import { TextChannel } from 'discord.js';
 import client from '../index.js';
 
 export const database = new PrismaClient();
+export const buttonDataCache: { [messageID: string]: any; } = {};
+export const xpCooldownCache: { [userID: string]: number; } = {};
 export enum EmbedColours {
   Positive = 'Green',
   Neutral = 'Blue',

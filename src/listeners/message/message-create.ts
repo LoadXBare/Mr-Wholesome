@@ -1,7 +1,8 @@
 import { Events, Message } from 'discord.js';
 import client from '../../index.js';
 import { Emotes, EventHandler } from '../../lib/config.js';
-import { DatabaseUtils, Utils } from '../../lib/utilities.js';
+import RankingHandler from '../../lib/ranking-handler.js';
+import { Utils, dbUtils } from '../../lib/utilities.js';
 
 class MessageCreateHandler extends EventHandler {
   message: Message;
@@ -13,7 +14,7 @@ class MessageCreateHandler extends EventHandler {
 
   async handle() {
     const { guildId, channelId, author } = this.message;
-    const channelHasEventsIgnored = await DatabaseUtils.isIgnoringEvents(guildId, channelId);
+    const channelHasEventsIgnored = await dbUtils.channelIgnoresEvents(guildId, channelId);
     if (author.bot || channelHasEventsIgnored) return;
 
     this.#autoCrosspost();
@@ -21,7 +22,7 @@ class MessageCreateHandler extends EventHandler {
     this.#painAuChocolat();
     this.#reactWithArson();
     this.#useSlashCommands();
-    // TODO: RANKING STUFF
+    this.#handleRanking();
   }
 
   // Automatically crosspost any message sent in Announcement channels
@@ -77,6 +78,11 @@ class MessageCreateHandler extends EventHandler {
     await this.message.reply('Hey, I use slash commands now!')
       .then(() => Utils.log('Replied with "Please use slash commands instead!"!', true))
       .catch((e) => Utils.log('An error occurred while replying to a message!', false, e));
+  }
+
+  // Handle everything related to ranking (it is lengthy so I contained it within its own class)
+  async #handleRanking() {
+    new RankingHandler(this.message).handle();
   }
 }
 

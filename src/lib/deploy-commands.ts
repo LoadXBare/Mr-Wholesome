@@ -104,6 +104,19 @@ const commands = [
         .setName('warning')
         .setDescription('The ID of the warning to view in more details')
         .setRequired(false))),
+
+  new SlashCommandBuilder()
+    .setName('rank')
+    .setDescription('View your server rank'),
+
+  new SlashCommandBuilder()
+    .setName('leaderboard')
+    .setDescription('View the server leaderboard')
+    .addIntegerOption((option) => option
+      .setName('page')
+      .setDescription('The page number of the leaderboard to view')
+      .setMinValue(1)
+      .setRequired(false)),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');
