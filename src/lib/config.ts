@@ -23,6 +23,9 @@ export enum Emotes {
   Added = '<:added:1113169938933358592>',
   Removed = '<:removed:1113169940858556487>',
 }
+export enum Images {
+  WatchedUser = 'https://cdn.discordapp.com/attachments/1010934331725852723/1254528002708996217/alert.png?ex=6679d1bf&is=6678803f&hm=4cdeec033e6d945b910f8975200f70fed4c9d5133e4d07add2be79223023421c&'
+}
 
 export class EventHandler {
   get logChannel() {

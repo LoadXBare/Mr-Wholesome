@@ -5,7 +5,7 @@ import {
   strikethrough,
 } from 'discord.js';
 import client from '../../index.js';
-import { EmbedColours, EventHandler } from '../../lib/config.js';
+import { EmbedColours, EventHandler, Images, database } from '../../lib/config.js';
 import { Utils, dbUtils } from '../../lib/utilities.js';
 
 class MessageUpdateHandler extends EventHandler {
@@ -28,7 +28,7 @@ class MessageUpdateHandler extends EventHandler {
     this.#logRemovedMessageAttachment();
   }
 
-  #logEditedMessage() {
+  async #logEditedMessage() {
     if (this.oldMessage.content === this.newMessage.content) return;
     const contentDifference = diffChars(this.oldMessage.content ?? '', this.newMessage.content ?? '');
 
@@ -61,7 +61,11 @@ class MessageUpdateHandler extends EventHandler {
         .setURL(this.newMessage.url),
     );
 
-    super.logChannel.send({ embeds: [embed], components: [jumpButton] }); // TODO: alert if user on watchlist
+    const watchlist = await this.#fetchWatchlist();
+    const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMessage.author?.id ?? '');
+    if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
+
+    super.logChannel.send({ embeds: [embed], components: [jumpButton] });
   }
 
   async #logRemovedMessageAttachment() {
@@ -97,7 +101,20 @@ class MessageUpdateHandler extends EventHandler {
         .setURL(this.newMessage.url),
     );
 
-    super.logChannel.send({ embeds: [embed], components: [jumpButton] }); // TODO: alert if user on watchlist
+    const watchlist = await this.#fetchWatchlist();
+    const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMessage.author?.id ?? '');
+    if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
+
+    super.logChannel.send({ embeds: [embed], components: [jumpButton] });
+  }
+
+  // == Database Methods ==
+  async #fetchWatchlist() {
+    const result = await database.notes.findMany({
+      where: { guildID: this.newMessage.guild?.id }
+    });
+
+    return result;
   }
 }
 

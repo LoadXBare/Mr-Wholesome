@@ -2,7 +2,7 @@ import {
   AuditLogEvent, EmbedBuilder, Events, Message, PartialMessage,
 } from 'discord.js';
 import client from '../../index.js';
-import { EmbedColours, EventHandler } from '../../lib/config.js';
+import { EmbedColours, EventHandler, Images, database } from '../../lib/config.js';
 import { Utils, dbUtils } from '../../lib/utilities.js';
 
 class MessageDeleteHandler extends EventHandler {
@@ -68,7 +68,20 @@ class MessageDeleteHandler extends EventHandler {
 
     embed.setDescription(embedDescription.join('\n'));
 
-    super.logChannel.send({ embeds: [embed] }); // TODO: alert if user on watchlist
+    const watchlist = await this.#fetchWatchlist();
+    const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.message.author?.id ?? '');
+    if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
+
+    super.logChannel.send({ embeds: [embed] });
+  }
+
+  // == Database Methods ==
+  async #fetchWatchlist() {
+    const result = await database.notes.findMany({
+      where: { guildID: this.message.guild?.id }
+    });
+
+    return result;
   }
 }
 

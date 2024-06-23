@@ -1,6 +1,6 @@
 import { EmbedBuilder, Events, GuildMember } from 'discord.js';
 import client from '../../index.js';
-import { EmbedColours, EventHandler } from '../../lib/config.js';
+import { EmbedColours, EventHandler, Images, database } from '../../lib/config.js';
 import { Utils } from '../../lib/utilities.js';
 
 class GuildMemberAddHandler extends EventHandler {
@@ -16,7 +16,7 @@ class GuildMemberAddHandler extends EventHandler {
     this.#giveMemberRole();
   }
 
-  #logMemberJoined() {
+  async #logMemberJoined() {
     const embedDescription = [
       '## Member Joined',
       '### Member',
@@ -35,7 +35,11 @@ class GuildMemberAddHandler extends EventHandler {
       .setTimestamp()
       .setColor(EmbedColours.Positive);
 
-    super.logChannel.send({ embeds: [embed] }); // TODO: alert if user on watchlist
+    const watchlist = await this.#fetchWatchlist();
+    const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.member.id);
+    if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
+
+    super.logChannel.send({ embeds: [embed] });
   }
 
   async #giveMemberRole() {
@@ -53,6 +57,15 @@ class GuildMemberAddHandler extends EventHandler {
     await this.member.roles.add(process.env.AKIALYTE_ROLE_ID!)
       .then(() => Utils.log('Gave Akialyte role!', true))
       .catch((e) => Utils.log('An error occurred while giving role!', false, e));
+  }
+
+  // == Database Methods ==
+  async #fetchWatchlist() {
+    const result = await database.notes.findMany({
+      where: { guildID: this.member.guild.id }
+    });
+
+    return result;
   }
 }
 

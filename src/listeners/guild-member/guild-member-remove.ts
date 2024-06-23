@@ -2,7 +2,7 @@ import {
   EmbedBuilder, Events, GuildMember, PartialGuildMember,
 } from 'discord.js';
 import client from '../../index.js';
-import { EmbedColours, EventHandler } from '../../lib/config.js';
+import { EmbedColours, EventHandler, Images, database } from '../../lib/config.js';
 import { Utils } from '../../lib/utilities.js';
 
 class GuildMemberRemoveHandler extends EventHandler {
@@ -17,7 +17,7 @@ class GuildMemberRemoveHandler extends EventHandler {
     this.#logMemberLeave();
   }
 
-  #logMemberLeave() {
+  async #logMemberLeave() {
     const memberRolesList = this.member.roles.cache.map((r) => `- ${r}`).join('\n');
     const embedDescription = [
       '## Member Left',
@@ -38,7 +38,20 @@ class GuildMemberRemoveHandler extends EventHandler {
       .setTimestamp()
       .setColor(EmbedColours.Negative);
 
-    super.logChannel.send({ embeds: [embed] }); // TODO: alert if user on watchlist
+    const watchlist = await this.#fetchWatchlist();
+    const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.member.id);
+    if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
+
+    super.logChannel.send({ embeds: [embed] });
+  }
+
+  // == Database Methods ==
+  async #fetchWatchlist() {
+    const result = await database.notes.findMany({
+      where: { guildID: this.member.guild.id }
+    });
+
+    return result;
   }
 }
 

@@ -1,9 +1,7 @@
 import { ActivityType, Client, GatewayIntentBits } from 'discord.js';
 import * as dotenv from 'dotenv';
 
-const {
-  Guilds, GuildMembers, GuildMessages, MessageContent, GuildModeration,
-} = GatewayIntentBits;
+const { Guilds, GuildMembers, GuildMessages, MessageContent, GuildModeration } = GatewayIntentBits;
 
 dotenv.config();
 

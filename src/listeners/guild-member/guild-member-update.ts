@@ -2,11 +2,10 @@ import {
   EmbedBuilder, Events, GuildMember, PartialGuildMember,
 } from 'discord.js';
 import client from '../../index.js';
-import { EmbedColours, Emotes, EventHandler } from '../../lib/config.js';
+import { EmbedColours, Emotes, EventHandler, Images, database } from '../../lib/config.js';
 
 class GuildMemberUpdateHandler extends EventHandler {
   oldMember: GuildMember | PartialGuildMember;
-
   newMember: GuildMember;
 
   constructor(oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) {
@@ -20,7 +19,7 @@ class GuildMemberUpdateHandler extends EventHandler {
     this.#logRolesUpdate();
   }
 
-  #logNicknameUpdate() {
+  async #logNicknameUpdate() {
     if (this.oldMember.nickname === this.newMember.nickname) return;
     const oldNickname = this.oldMember.nickname;
     const newNickname = this.newMember.nickname;
@@ -43,10 +42,14 @@ class GuildMemberUpdateHandler extends EventHandler {
       .setTimestamp()
       .setColor(EmbedColours.Neutral);
 
-    super.logChannel.send({ embeds: [embed] }); // TODO: alert if user on watchlist
+    const watchlist = await this.#fetchWatchlist();
+    const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMember.id);
+    if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
+
+    super.logChannel.send({ embeds: [embed] });
   }
 
-  #logRolesUpdate() {
+  async #logRolesUpdate() {
     const oldRoles = this.oldMember.roles.cache;
     const newRoles = this.newMember.roles.cache;
     if (oldRoles.equals(newRoles)) return;
@@ -73,8 +76,22 @@ class GuildMemberUpdateHandler extends EventHandler {
       .setTimestamp()
       .setColor(EmbedColours.Neutral);
 
-    super.logChannel.send({ embeds: [embed] }); // TODO: alert if user on watchlist
+    const watchlist = await this.#fetchWatchlist();
+    const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMember.id);
+    if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
+
+    super.logChannel.send({ embeds: [embed] });
   }
+
+  // == Database Methods ==
+  async #fetchWatchlist() {
+    const result = await database.notes.findMany({
+      where: { guildID: this.newMember.guild.id }
+    });
+
+    return result;
+  }
+
 }
 
 client.on(Events.GuildMemberUpdate, (oldMember, newMember) => {

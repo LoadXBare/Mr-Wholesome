@@ -31,8 +31,6 @@ class InteractionCreateHandler extends EventHandler {
     const chatInputInteraction = this.interaction;
     const cmd = chatInputInteraction.commandName;
 
-    // TODO: Use this.interaction.inGuild() and pass it to the command constructor for commands with guild-dependent features.
-
     // Fun
     if (cmd === 'cat') new CatCommand(chatInputInteraction).handle();
     else if (cmd === 'dog') new DogCommand(chatInputInteraction).handle();
