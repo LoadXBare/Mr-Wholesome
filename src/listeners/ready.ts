@@ -10,7 +10,7 @@ class ReadyHandler extends EventHandler {
     this.#deployCommands();
   }
 
-  async #logClientReady() {
+  #logClientReady() {
     Utils.log(`Logged in as ${client.user?.tag}! [${client.user?.id}]`, true);
   }
 

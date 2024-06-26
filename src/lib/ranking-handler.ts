@@ -1,6 +1,6 @@
 import { Chance } from "chance";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, TextChannel } from "discord.js";
-import { EmbedColours, buttonDataCache, database, xpCooldownCache } from "./config.js";
+import { ChannelIDs, EmbedColours, buttonDataCache, database, xpCooldownCache } from "./config.js";
 import { Utils } from "./utilities.js";
 
 export default class RankingHandler {
@@ -48,7 +48,7 @@ export default class RankingHandler {
   }
 
   async #handleLevelUp(level: number, levelNotifs: boolean) {
-    const levelUpNotifChannel = this.message.guild?.channels.resolve(process.env.LEVEL_UP_CHANNEL_ID ?? '');
+    const levelUpNotifChannel = this.message.guild?.channels.resolve(ChannelIDs.LevelUp);
     if (!(levelUpNotifChannel instanceof TextChannel)) return;
 
     const content = levelNotifs ? `${this.message.author}` : undefined;

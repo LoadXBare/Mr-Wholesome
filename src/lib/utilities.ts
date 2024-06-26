@@ -6,7 +6,7 @@ import {
   inlineCode
 } from 'discord.js';
 import client from '../index.js';
-import { Discord, database } from './config.js';
+import { ChannelIDs, Discord, database } from './config.js';
 
 /**
  * Logs a stylised message to the console.
@@ -24,7 +24,7 @@ function log(message: string, positive: boolean, ...payload: any) {
  * @returns Array of objects containg each attachment's link, masked link and type
  */
 async function storeAttachments(attachments: Collection<string, Attachment>) {
-  const mediaChannel = await client.channels.fetch(process.env.MEDIA_STORAGE_CHANNEL_ID ?? '') as TextChannel;
+  const mediaChannel = await client.channels.fetch(ChannelIDs.MediaStorage) as TextChannel;
   const storedAttachments: Array<{ link: string, maskedLink: string, type: string; }> = [];
 
   const storedPromiseMessages: Array<Promise<undefined | Message>> = [];

@@ -1,6 +1,6 @@
 import { EmbedBuilder, Events, GuildMember } from 'discord.js';
 import client from '../../index.js';
-import { EmbedColours, EventHandler, Images, database } from '../../lib/config.js';
+import { EmbedColours, EventHandler, Images, RoleIDs, database } from '../../lib/config.js';
 import { Utils } from '../../lib/utilities.js';
 
 class GuildMemberAddHandler extends EventHandler {
@@ -54,7 +54,7 @@ class GuildMemberAddHandler extends EventHandler {
      */
     await Utils.sleep(1000);
 
-    await this.member.roles.add(process.env.AKIALYTE_ROLE_ID!)
+    await this.member.roles.add(RoleIDs.Akialyte)
       .then(() => Utils.log('Gave Akialyte role!', true))
       .catch((e) => Utils.log('An error occurred while giving role!', false, e));
   }

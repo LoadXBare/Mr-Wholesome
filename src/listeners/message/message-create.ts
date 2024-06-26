@@ -1,6 +1,6 @@
 import { Events, Message } from 'discord.js';
 import client from '../../index.js';
-import { Emotes, EventHandler } from '../../lib/config.js';
+import { ChannelIDs, Emotes, EventHandler, UserIDs } from '../../lib/config.js';
 import RankingHandler from '../../lib/ranking-handler.js';
 import { Utils, dbUtils } from '../../lib/utilities.js';
 
@@ -37,7 +37,7 @@ class MessageCreateHandler extends EventHandler {
   // React with :akiaBonque: emoji and say "NO SORRY" if message contains "sorry" and sent by Akia
   async #bonkAkiaForSorry() {
     const messageContainsSorry = this.message.content.search(/[s]+[o]+[rw]+[y]+/mi) !== -1;
-    const authorIsAkia = this.message.author.id === process.env.AKIALYNE_USER_ID;
+    const authorIsAkia = this.message.author.id === UserIDs.Akialyne;
     if (!messageContainsSorry || !authorIsAkia) return;
 
     await this.message.react(Emotes.Bonque)
@@ -51,7 +51,7 @@ class MessageCreateHandler extends EventHandler {
   // Say "au chocolat?" if the message ends with "pain" and is sent in #🤡-memes-🤡
   async #painAuChocolat() {
     const messageEndsWithPain = this.message.content.search(/\bpain\W{0,}$/i) !== -1;
-    const channelIsMemes = this.message.channelId === process.env.MEMES_CHANNEL_ID;
+    const channelIsMemes = this.message.channelId === ChannelIDs.Memes;
     if (!messageEndsWithPain || !channelIsMemes) return;
 
     await this.message.reply('au chocolat?')
