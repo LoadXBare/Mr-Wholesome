@@ -77,31 +77,9 @@ export default class BirthdayCommand {
     await this.interaction.editReply({ embeds: [embed] });
   }
 
-  #formatDate(day: number, month: number) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-
-    const formattedDay = `${day}${Utils.nth(day)}`;
-    const formattedMonth = months.at(month) ?? 'N/A';
-
-    return `${formattedDay} ${formattedMonth}`;
-  }
-
   // == Datebase Methods ==
   async #setBirthdayInDatabase(userID: string, day: number, month: number) {
-    const date = this.#formatDate(day, month);
+    const date = Utils.formatDate(day, month);
     const result = await database.birthday.upsert({
       where: { userID },
       create: { date, userID },
@@ -114,7 +92,7 @@ export default class BirthdayCommand {
   async #fetchUpcomingBirthdaysFromDatabase(days: number) {
     const upcomingDays = new Array(days)
       .fill(new Date().getUTCDate())
-      .map((value, index) => this.#formatDate(value + index, new Date().getUTCMonth()));
+      .map((value, index) => Utils.formatDate(value + index, new Date().getUTCMonth()));
 
     const birthdays = await database.birthday.findMany();
     const upcomingBirthdays: Array<Birthday> = [];

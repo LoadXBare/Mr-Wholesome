@@ -133,6 +133,28 @@ function displayName(data: Message | ChatInputCommandInteraction) {
   return '[Unknown]';
 }
 
+function formatDate(day: number, month: number) {
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const formattedDay = `${day}${nth(day)}`;
+  const formattedMonth = months.at(month) ?? 'N/A';
+
+  return `${formattedDay} ${formattedMonth}`;
+}
+
 /**
  * Checks whether a channel has events ignored in the specified guild.
  * @param guildID The ID of the guild the channel is in
@@ -160,6 +182,7 @@ export const Utils = {
   sleep,
   nth,
   displayName,
+  formatDate
 };
 
 export const dbUtils = {
