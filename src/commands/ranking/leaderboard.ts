@@ -42,7 +42,7 @@ export default class LeaderboardCommand {
       .setImage('attachment://leaderboard.png')
       .setThumbnail(this.interaction.guild?.iconURL() ?? '')
       .setFooter({ text: `Page ${this.page} / ${pageCount} • Run "/leaderboard ${this.page + 1}" to go to page ${this.page + 1} of the leaderboard` })
-      .setColor(EmbedColours.Success);
+      .setColor(EmbedColours.Positive);
 
     this.interaction.editReply({ files: [attachment], embeds: [embed] });
   }

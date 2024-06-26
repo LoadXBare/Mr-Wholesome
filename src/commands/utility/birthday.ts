@@ -30,13 +30,13 @@ export default class BirthdayCommand {
     const embed = new EmbedBuilder();
 
     if (birthday !== undefined) {
-      embed.setColor(EmbedColours.Success);
+      embed.setColor(EmbedColours.Positive);
       embedDescription.push(
         '## Successfully set birthday!',
         `Your birthday has been set to **${birthday.date}**.`,
       );
     } else {
-      embed.setColor(EmbedColours.Error);
+      embed.setColor(EmbedColours.Negative);
       embedDescription.push(
         '## Unable to set birthday!',
         'An error occurred when attempting to set your birthday :(',

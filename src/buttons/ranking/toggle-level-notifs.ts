@@ -31,7 +31,7 @@ export default class ToggleLevelNotifButton {
       ].join('\n');
       embed = new EmbedBuilder()
         .setDescription(embedDescription)
-        .setColor(EmbedColours.Success);
+        .setColor(EmbedColours.Positive);
 
       await this.#disableButtonReusability();
     }
@@ -42,7 +42,7 @@ export default class ToggleLevelNotifButton {
       ].join('\n');
       embed = new EmbedBuilder()
         .setDescription(embedDescription)
-        .setColor(EmbedColours.Error);
+        .setColor(EmbedColours.Negative);
     }
 
     await this.interaction.editReply({ embeds: [embed] });
