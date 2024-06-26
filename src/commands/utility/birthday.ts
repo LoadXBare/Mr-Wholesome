@@ -2,7 +2,7 @@ import { Birthday } from '@prisma/client';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours, database } from '../../lib/config.js';
-import { Utils } from '../../lib/utilities.js';
+import { formatDate } from '../../lib/utilities.js';
 
 export default class BirthdayCommand {
   interaction: ChatInputCommandInteraction;
@@ -79,7 +79,7 @@ export default class BirthdayCommand {
 
   // == Datebase Methods ==
   async #setBirthdayInDatabase(userID: string, day: number, month: number) {
-    const date = Utils.formatDate(day, month);
+    const date = formatDate(day, month);
     const result = await database.birthday.upsert({
       where: { userID },
       create: { date, userID },
@@ -92,7 +92,7 @@ export default class BirthdayCommand {
   async #fetchUpcomingBirthdaysFromDatabase(days: number) {
     const upcomingDays = new Array(days)
       .fill(new Date().getUTCDate())
-      .map((value, index) => Utils.formatDate(value + index, new Date().getUTCMonth()));
+      .map((value, index) => formatDate(value + index, new Date().getUTCMonth()));
 
     const birthdays = await database.birthday.findMany();
     const upcomingBirthdays: Array<Birthday> = [];

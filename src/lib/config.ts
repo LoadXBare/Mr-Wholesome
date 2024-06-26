@@ -12,9 +12,6 @@ export const EmbedColours = {
   Negative: Colors.Red,
   Info: Colors.Purple,
 };
-export const Discord = {
-  MAX_ATTACHMENT_SIZE: 15_000_000, // The actual Non-Nitro max upload size is higher, but uploads that big can cause bot to timeout
-};
 export const Emotes = {
   Bonque: '<:akiaBonque:1072610966598066237>',
   Arson: '<a:arson:1010942526976430191>',
@@ -32,7 +29,6 @@ export const UserIDs = {
 };
 export const ChannelIDs = {
   Birthday: process.env.BIRTHDAY_CHANNEL_ID ?? '',
-  MediaStorage: process.env.MEDIA_STORAGE_CHANNEL_ID ?? '',
   Memes: process.env.MEMES_CHANNEL_ID ?? '',
   ModerationLogs: process.env.MODERATION_LOGS_CHANNEL_ID ?? '',
   LevelUp: process.env.LEVEL_UP_CHANNEL_ID ?? '',

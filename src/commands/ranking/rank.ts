@@ -3,7 +3,7 @@ import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
 import { request } from "undici";
 import { database } from "../../lib/config.js";
 import { xpRequiredForLevel } from "../../lib/ranking-handler.js";
-import { Utils } from "../../lib/utilities.js";
+import { displayName } from "../../lib/utilities.js";
 
 export default class RankCommand {
   interaction: ChatInputCommandInteraction;
@@ -101,7 +101,7 @@ export default class RankCommand {
 
     const userPosition = await this.#fetchRankPositionFromDatabase();
 
-    const usernameText = Utils.displayName(this.interaction);
+    const usernameText = displayName(this.interaction);
     const levelText = `Level ${level}`;
     const userPositionText = `Rank #${userPosition}`;
 

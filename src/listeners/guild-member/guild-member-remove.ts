@@ -3,7 +3,7 @@ import {
 } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours, EventHandler, Images, database } from '../../lib/config.js';
-import { Utils } from '../../lib/utilities.js';
+import { getRelativeTimeString } from '../../lib/utilities.js';
 
 class GuildMemberRemoveHandler extends EventHandler {
   member: GuildMember | PartialGuildMember;
@@ -26,7 +26,7 @@ class GuildMemberRemoveHandler extends EventHandler {
       '### Roles',
       memberRolesList,
       '### Join Date',
-      Utils.getRelativeTimeString(this.member.joinedAt ?? Date.now()),
+      getRelativeTimeString(this.member.joinedAt ?? Date.now()),
     ].join('\n');
 
     const embed = new EmbedBuilder()

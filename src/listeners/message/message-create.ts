@@ -1,8 +1,9 @@
 import { Events, Message } from 'discord.js';
 import client from '../../index.js';
 import { ChannelIDs, Emotes, EventHandler, UserIDs } from '../../lib/config.js';
+import { channelIgnoresEvents } from '../../lib/database-utilities.js';
 import RankingHandler from '../../lib/ranking-handler.js';
-import { Utils, dbUtils } from '../../lib/utilities.js';
+import { styleLog } from '../../lib/utilities.js';
 
 class MessageCreateHandler extends EventHandler {
   message: Message;
@@ -14,7 +15,7 @@ class MessageCreateHandler extends EventHandler {
 
   async handle() {
     const { guildId, channelId, author } = this.message;
-    const channelHasEventsIgnored = await dbUtils.channelIgnoresEvents(guildId, channelId);
+    const channelHasEventsIgnored = await channelIgnoresEvents(guildId, channelId);
     if (author.bot || channelHasEventsIgnored) return;
 
     this.#autoCrosspost();
@@ -30,8 +31,8 @@ class MessageCreateHandler extends EventHandler {
     if (!this.message.crosspostable) return;
 
     await this.message.crosspost()
-      .then(() => Utils.log('Crossposted message!', true))
-      .catch((e) => Utils.log('An error occurred while crossposting a message!', false, e));
+      .then(() => styleLog('Crossposted message!', true, 'message-create.js'))
+      .catch((e) => styleLog('Error occurred while crossposting message!', false, 'message-create.js', e));
   }
 
   // React with :akiaBonque: emoji and say "NO SORRY" if message contains "sorry" and sent by Akia
@@ -41,11 +42,11 @@ class MessageCreateHandler extends EventHandler {
     if (!messageContainsSorry || !authorIsAkia) return;
 
     await this.message.react(Emotes.Bonque)
-      .then(() => Utils.log('Reacted with Bonque!', true))
-      .catch((e) => Utils.log('An error occurred while reacting to a message!', false, e));
+      .then(() => styleLog('Reacted with Bonque!', true, 'message-create.js'))
+      .catch((e) => styleLog('Error occurred while reacting to message!', false, 'message-create.js', e));
     await this.message.reply(`NO SORRY ${Emotes.Bonque}`)
-      .then(() => Utils.log('Replied with "NO SORRY"!', true))
-      .catch((e) => Utils.log('An error occurred while replying to a message!', false, e));
+      .then(() => styleLog('Replied with "NO SORRY"!', true, 'message-create.js'))
+      .catch((e) => styleLog('Error occurred while replying to message!', false, 'message-create.js', e));
   }
 
   // Say "au chocolat?" if the message ends with "pain" and is sent in #🤡-memes-🤡
@@ -55,8 +56,8 @@ class MessageCreateHandler extends EventHandler {
     if (!messageEndsWithPain || !channelIsMemes) return;
 
     await this.message.reply('au chocolat?')
-      .then(() => Utils.log('Replied with "au chocolat?"!', true))
-      .catch((e) => Utils.log('An error occurred while replying to a message!', false, e));
+      .then(() => styleLog('Replied with "au chocolat?"!', true, 'message-create.js'))
+      .catch((e) => styleLog('Error occurred while replying to a message!', false, 'message-create.js', e));
   }
 
   // React with the :arson: emoji if the message contains "arson"
@@ -65,8 +66,8 @@ class MessageCreateHandler extends EventHandler {
     if (!messageContainsArson) return;
 
     await this.message.react(Emotes.Arson)
-      .then(() => Utils.log('Reacted with Arson!', true))
-      .catch((e) => Utils.log('An error occurred while reacting to a message!', false, e));
+      .then(() => styleLog('Reacted with Arson!', true, 'message-create.js'))
+      .catch((e) => styleLog('Error occurred while reacting to message!', false, 'message-create.js', e));
   }
 
   // Say "Hey, I use slash commands now!" if the message is an old command
@@ -76,8 +77,8 @@ class MessageCreateHandler extends EventHandler {
     if (!messageIsOldCommand) return;
 
     await this.message.reply('Hey, I use slash commands now!')
-      .then(() => Utils.log('Replied with "Please use slash commands instead!"!', true))
-      .catch((e) => Utils.log('An error occurred while replying to a message!', false, e));
+      .then(() => styleLog('Replied with "Please use slash commands instead!"!', true, 'message-create.js'))
+      .catch((e) => styleLog('Error occurred while replying to message!', false, 'message-create.js', e));
   }
 
   // Handle everything related to ranking (it is lengthy so I contained it within its own class)

@@ -1,7 +1,7 @@
 import { Chance } from "chance";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, TextChannel } from "discord.js";
 import { ChannelIDs, EmbedColours, buttonDataCache, database, xpCooldownCache } from "./config.js";
-import { Utils } from "./utilities.js";
+import { displayName, styleLog } from "./utilities.js";
 
 export default class RankingHandler {
   message: Message;
@@ -52,10 +52,9 @@ export default class RankingHandler {
     if (!(levelUpNotifChannel instanceof TextChannel)) return;
 
     const content = levelNotifs ? `${this.message.author}` : undefined;
-    const displayName = Utils.displayName(this.message);
     const embedDescription = [
       '# LEVEL UP!',
-      `**${displayName}** has levelled up to **Level ${level}**!`,
+      `**${displayName(this.message)}** has levelled up to **Level ${level}**!`,
       '',
       'For more information, use the `/rank` command.',
     ].join('\n');
@@ -85,7 +84,7 @@ export default class RankingHandler {
     const guildConfig = await database.guildConfig.findFirst({
       where: { guildID },
     })
-      .catch((e) => Utils.log('An error occurred while fetching from the database!', false, e));
+      .catch((e) => styleLog('An error occurred while fetching from the database!', false, e)); // TODO: Change error handling
 
     const rankedIgnoredChannelIDs = guildConfig?.rankedIgnoredChannelIDs.split(',') ?? [];
     return !rankedIgnoredChannelIDs.includes(this.message.channelId);
@@ -101,7 +100,7 @@ export default class RankingHandler {
       create: { guildID, userID },
       update: {},
     })
-      .catch((e) => Utils.log('An error occurred while upserting from the database!', false, e));
+      .catch((e) => styleLog('An error occurred while upserting from the database!', false, e)); // TODO: Change error handling
 
     return memberRank;
   }
@@ -115,7 +114,7 @@ export default class RankingHandler {
       where: { userID_guildID: { guildID, userID, } },
       data: { xp, xpLevel },
     })
-      .catch((e) => Utils.log('An error occurred while updating the database!', false, e));
+      .catch((e) => styleLog('An error occurred while updating the database!', false, e)); // TODO: Change error handling
 
     return memberRank;
   }

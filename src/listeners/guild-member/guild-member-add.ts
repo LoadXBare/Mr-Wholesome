@@ -1,7 +1,7 @@
 import { EmbedBuilder, Events, GuildMember } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours, EventHandler, Images, RoleIDs, database } from '../../lib/config.js';
-import { Utils } from '../../lib/utilities.js';
+import { getRelativeTimeString, sleep, styleLog } from '../../lib/utilities.js';
 
 class GuildMemberAddHandler extends EventHandler {
   member: GuildMember;
@@ -22,7 +22,7 @@ class GuildMemberAddHandler extends EventHandler {
       '### Member',
       this.member.user,
       '### Account Created',
-      Utils.getRelativeTimeString(this.member.user.createdAt),
+      getRelativeTimeString(this.member.user.createdAt),
     ].join('\n');
 
     const embed = new EmbedBuilder()
@@ -52,11 +52,11 @@ class GuildMemberAddHandler extends EventHandler {
      * Having this delay allows the initial guild-member-update events to be fired and processed
      * first so no duplicate embeds occur when adding the role.
      */
-    await Utils.sleep(1000);
+    await sleep(1000);
 
     await this.member.roles.add(RoleIDs.Akialyte)
-      .then(() => Utils.log('Gave Akialyte role!', true))
-      .catch((e) => Utils.log('An error occurred while giving role!', false, e));
+      .then(() => styleLog('Gave Akialyte role!', true, 'guild-member-add.js'))
+      .catch((e) => styleLog('Error occurred while giving Akialyte role!', false, 'guild-member-add.js', e));
   }
 
   // == Database Methods ==

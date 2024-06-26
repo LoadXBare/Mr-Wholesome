@@ -1,12 +1,11 @@
 import {
   Attachment,
   ChatInputCommandInteraction,
+  Client,
   Collection,
   GuildMember, Message, TextChannel,
   inlineCode
 } from 'discord.js';
-import client from '../index.js';
-import { ChannelIDs, Discord, database } from './config.js';
 
 /**
  * Logs a stylised message to the console.
@@ -14,8 +13,8 @@ import { ChannelIDs, Discord, database } from './config.js';
  * @param positive Whether the reason for logging is positive
  * @param payload Any additional payload to log to the console
  */
-function log(message: string, positive: boolean, ...payload: any) {
-  console.log(`${positive ? '✔️' : '❌'} | ${message}\n`, ...payload);
+export function styleLog(message: string, positive: boolean, filename: string, ...payload: any) {
+  console.log(`${positive ? '✔️ ' : '❌ '} [${filename}] — ${message}\n`, ...payload);
 }
 
 /**
@@ -23,17 +22,19 @@ function log(message: string, positive: boolean, ...payload: any) {
  * @param attachments The Discord.JS Collection of attachments to store
  * @returns Array of objects containg each attachment's link, masked link and type
  */
-async function storeAttachments(attachments: Collection<string, Attachment>) {
-  const mediaChannel = await client.channels.fetch(ChannelIDs.MediaStorage) as TextChannel;
+export async function storeAttachments(attachments: Collection<string, Attachment>, client: Client) {
+  const mediaStorageChannelID = process.env.MEDIA_STORAGE_CHANNEL_ID ?? '';
+  const mediaChannel = await client.channels.fetch(mediaStorageChannelID) as TextChannel;
   const storedAttachments: Array<{ link: string, maskedLink: string, type: string; }> = [];
+  const maxAttachmentSize = 15_000_000;
 
   const storedPromiseMessages: Array<Promise<undefined | Message>> = [];
   attachments.forEach((attachment) => {
     if (attachment !== undefined) {
-      if (attachment.size >= Discord.MAX_ATTACHMENT_SIZE) {
+      if (attachment.size >= maxAttachmentSize) {
         storedAttachments.push({
           link: '',
-          maskedLink: `${inlineCode(attachment.name)} [No link, size >${Math.round(Discord.MAX_ATTACHMENT_SIZE / 1_000_000)}MB]`,
+          maskedLink: `${inlineCode(attachment.name)} [No link, size >${Math.round(maxAttachmentSize / 1_000_000)}MB]`,
           type: attachment.contentType ?? '',
         });
       } else {
@@ -65,7 +66,7 @@ async function storeAttachments(attachments: Collection<string, Attachment>) {
  * @param date The date to convert
  * @returns The relative time from the specified date
  */
-function getRelativeTimeString(date: Date | number) {
+export function getRelativeTimeString(date: Date | number) {
   // Allow dates or times to be passed
   const timeMs = typeof date === 'number' ? date : date.getTime();
 
@@ -95,7 +96,7 @@ function getRelativeTimeString(date: Date | number) {
  * @param ms The time, in milliseconds, to sleep
  * @returns Empty promise after specified delay has elapsed
  */
-async function sleep(ms: number) {
+export async function sleep(ms: number) {
   new Promise((r) => setTimeout(r, ms));
 }
 
@@ -104,7 +105,7 @@ async function sleep(ms: number) {
  * @param number The number to find the suffix for
  * @returns The number's suffix
  */
-function nth(number: number) {
+export function nth(number: number) {
   const suffixes: { [key in Intl.LDMLPluralRule]: string; } = {
     zero: 'th',
     one: 'st',
@@ -118,7 +119,7 @@ function nth(number: number) {
   return suffixes[suffixCategory];
 }
 
-function displayName(data: Message | ChatInputCommandInteraction) {
+export function displayName(data: Message | ChatInputCommandInteraction) {
   if (data instanceof Message) {
     if (data.member instanceof GuildMember) return data.member.displayName;
     else return data.author.username;
@@ -132,7 +133,7 @@ function displayName(data: Message | ChatInputCommandInteraction) {
   return '[Unknown]';
 }
 
-function formatDate(day: number, month: number) {
+export function formatDate(day: number, month: number) {
   const months = [
     'January',
     'February',
@@ -153,37 +154,3 @@ function formatDate(day: number, month: number) {
 
   return `${formattedDay} ${formattedMonth}`;
 }
-
-/**
- * Checks whether a channel has events ignored in the specified guild.
- * @param guildID The ID of the guild the channel is in
- * @param channelID The ID of the channel to check
- * @returns True if the channel has events ignored, or false otherwise
- */
-async function channelIgnoresEvents(guildID: string | null, channelID: string | null) {
-  if (guildID === null || channelID === null) return true;
-
-  const guildConfig = await database.guildConfig.findFirst({
-    where: { guildID },
-  })
-    .catch((e) => log('An error occurred while fetching from the database!', false, e));
-
-  const eventIgnoredChannelIDs = guildConfig?.eventIgnoredChannelIDs.split(',') ?? [];
-  return eventIgnoredChannelIDs.includes(channelID);
-}
-
-// TODO: CONVERT TO CLASS SYSTEM
-
-export const Utils = {
-  log,
-  storeAttachments,
-  getRelativeTimeString,
-  sleep,
-  nth,
-  displayName,
-  formatDate
-};
-
-export const dbUtils = {
-  channelIgnoresEvents
-};

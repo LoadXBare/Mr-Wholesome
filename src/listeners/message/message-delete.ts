@@ -3,7 +3,8 @@ import {
 } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours, EventHandler, Images, database } from '../../lib/config.js';
-import { Utils, dbUtils } from '../../lib/utilities.js';
+import { channelIgnoresEvents } from '../../lib/database-utilities.js';
+import { storeAttachments } from '../../lib/utilities.js';
 
 class MessageDeleteHandler extends EventHandler {
   message: Message | PartialMessage;
@@ -15,7 +16,7 @@ class MessageDeleteHandler extends EventHandler {
 
   async handle() {
     const { guildId, channelId, author } = this.message;
-    const channelHasEventsIgnored = await dbUtils.channelIgnoresEvents(guildId, channelId);
+    const channelHasEventsIgnored = await channelIgnoresEvents(guildId, channelId);
     if (author?.bot || channelHasEventsIgnored) return;
 
     this.#logDeletedMessage();
@@ -25,7 +26,7 @@ class MessageDeleteHandler extends EventHandler {
     const embeddableContentTypes = ['image/png', 'image/gif', 'image/webp', 'image/jpeg'];
 
     const removedAttachments = this.message.attachments;
-    const storedAttachments = await Utils.storeAttachments(removedAttachments);
+    const storedAttachments = await storeAttachments(removedAttachments, this.message.client);
 
     const auditLogs = await this.message.guild?.fetchAuditLogs({ type: AuditLogEvent.MessageDelete });
     const latestAuditLog = auditLogs?.entries.at(0);

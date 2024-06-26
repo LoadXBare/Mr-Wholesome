@@ -2,6 +2,7 @@ import {
   REST, Routes, SlashCommandBuilder,
 } from 'discord.js';
 import * as dotenv from 'dotenv';
+import { styleLog } from './utilities.js';
 
 dotenv.config();
 
@@ -123,10 +124,10 @@ const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');
 
 if (process.env.ENVIRONMENT === 'DEVELOPMENT') {
   rest.put(Routes.applicationGuildCommands(process.env.BOT_ID ?? '', process.env.BOT_TESTING_GUILD_ID ?? ''), { body: commands })
-    .then(() => console.log(`✔️ | Successfully registered ${commands.length} application commands for Bot Testing Den!`))
-    .catch((e) => console.log('❌ | An error occurred when registering guild application commands!\n', e));
+    .then(() => styleLog(`Locally registered ${commands.length} application commands!`, true, 'deploy-commands.js'))
+    .catch((e) => styleLog('Error when locally registering application commands!', false, 'deploy-commands.js', e));
 } else {
   rest.put(Routes.applicationCommands(process.env.BOT_ID ?? ''), { body: commands })
-    .then(() => console.log(`✔️ | Successfully registered ${commands.length} application commands globally!`))
-    .catch((e) => console.log('❌ | An error occurred when registering global application commands!\n', e));
+    .then(() => styleLog(`Globally registered ${commands.length} application commands!`, true, 'deploy-commands.js'))
+    .catch((e) => styleLog('Error when globally registering application commands!', false, 'deploy-commands.js', e));
 }

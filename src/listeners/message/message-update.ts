@@ -6,7 +6,8 @@ import {
 } from 'discord.js';
 import client from '../../index.js';
 import { EmbedColours, EventHandler, Images, database } from '../../lib/config.js';
-import { Utils, dbUtils } from '../../lib/utilities.js';
+import { channelIgnoresEvents } from '../../lib/database-utilities.js';
+import { storeAttachments } from '../../lib/utilities.js';
 
 class MessageUpdateHandler extends EventHandler {
   oldMessage: Message | PartialMessage;
@@ -21,7 +22,7 @@ class MessageUpdateHandler extends EventHandler {
 
   async handle() {
     const { guildId, channelId, author } = this.newMessage;
-    const channelHasEventsIgnored = await dbUtils.channelIgnoresEvents(guildId, channelId);
+    const channelHasEventsIgnored = await channelIgnoresEvents(guildId, channelId);
     if (author?.bot || channelHasEventsIgnored) return;
 
     this.#logEditedMessage();
@@ -73,7 +74,7 @@ class MessageUpdateHandler extends EventHandler {
     const embeddableContentTypes = ['image/png', 'image/gif', 'image/webp', 'image/jpeg'];
     const removedAttachment = this.oldMessage.attachments.difference(this.newMessage.attachments);
 
-    const storedAttachment = (await Utils.storeAttachments(removedAttachment)).at(0);
+    const storedAttachment = (await storeAttachments(removedAttachment, this.newMessage.client)).at(0);
     const embedDescription = [
       '## Message Attachment Removed',
       `### in ${this.newMessage.channel}`,
