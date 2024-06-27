@@ -15,6 +15,7 @@ import {
  */
 export function styleLog(message: string, positive: boolean, filename: string, ...payload: any) {
   console.log(`${positive ? '✔️ ' : '❌ '} [${filename}] — ${message}\n`, ...payload);
+  return null;
 }
 
 /**

@@ -83,38 +83,36 @@ export default class RankingHandler {
 
     const guildConfig = await database.guildConfig.findFirst({
       where: { guildID },
-    })
-      .catch((e) => styleLog('An error occurred while fetching from the database!', false, e)); // TODO: Change error handling
+    });
+    if (!guildConfig) return styleLog('Error fetching from GUILDCONFIG table!', false, 'ranking-handler.js');
 
     const rankedIgnoredChannelIDs = guildConfig?.rankedIgnoredChannelIDs.split(',') ?? [];
     return !rankedIgnoredChannelIDs.includes(this.message.channelId);
   }
 
   async #fetchMemberRankFromDatabase() {
-    const guildID = this.message.guildId;
+    const guildID = this.message.guildId!; // Bot cannot receive DMs
     const userID = this.message.author.id;
-    if (!guildID) return null;
 
     const memberRank = await database.rank.upsert({
       where: { userID_guildID: { guildID, userID } },
       create: { guildID, userID },
       update: {},
-    })
-      .catch((e) => styleLog('An error occurred while upserting from the database!', false, e)); // TODO: Change error handling
+    });
+    if (!memberRank) return styleLog('Error while upserting the RANK table!', false, 'ranking-handler.js');
 
     return memberRank;
   }
 
   async #updateMemberRankInDatabase(xp: number, xpLevel: number) {
-    const guildID = this.message.guildId;
+    const guildID = this.message.guildId!; // Bot cannot receive DMs
     const userID = this.message.author.id;
-    if (!guildID) return null;
 
     const memberRank = await database.rank.update({
       where: { userID_guildID: { guildID, userID, } },
       data: { xp, xpLevel },
-    })
-      .catch((e) => styleLog('An error occurred while updating the database!', false, e)); // TODO: Change error handling
+    });
+    if (!memberRank) return styleLog('Error while updating the RANK table!', false, 'ranking-handler.js');
 
     return memberRank;
   }
