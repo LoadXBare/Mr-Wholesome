@@ -55,8 +55,8 @@ class GuildMemberAddHandler extends EventHandler {
     await sleep(1000);
 
     await this.member.roles.add(RoleIDs.Akialyte)
-      .then(() => styleLog('Gave Akialyte role!', true, 'guild-member-add.js'))
-      .catch((e) => styleLog('Error occurred while giving Akialyte role!', false, 'guild-member-add.js', e));
+      .then(() => styleLog(`Gave Akialyte role to ${this.member.displayName}!`, true, 'guild-member-add.js'))
+      .catch((e) => styleLog(`Error giving Akialyte role to ${this.member.displayName}!`, false, 'guild-member-add.js', e));
   }
 
   // == Database Methods ==

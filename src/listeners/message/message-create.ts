@@ -31,8 +31,8 @@ class MessageCreateHandler extends EventHandler {
     if (!this.message.crosspostable) return;
 
     await this.message.crosspost()
-      .then(() => styleLog('Crossposted message!', true, 'message-create.js'))
-      .catch((e) => styleLog('Error occurred while crossposting message!', false, 'message-create.js', e));
+      .then(() => styleLog(`Crossposted message! [${this.message.url}]`, true, 'message-create.js'))
+      .catch((e) => styleLog(`Error crossposting message! [${this.message.url}]`, false, 'message-create.js', e));
   }
 
   // React with :akiaBonque: emoji and say "NO SORRY" if message contains "sorry" and sent by Akia
@@ -42,11 +42,11 @@ class MessageCreateHandler extends EventHandler {
     if (!messageContainsSorry || !authorIsAkia) return;
 
     await this.message.react(Emotes.Bonque)
-      .then(() => styleLog('Reacted with Bonque!', true, 'message-create.js'))
-      .catch((e) => styleLog('Error occurred while reacting to message!', false, 'message-create.js', e));
+      .then(() => styleLog(`Reacted with Bonque! [${this.message.url}]`, true, 'message-create.js'))
+      .catch((e) => styleLog(`Error reacting to message! [${this.message.url}]`, false, 'message-create.js', e));
     await this.message.reply(`NO SORRY ${Emotes.Bonque}`)
-      .then(() => styleLog('Replied with "NO SORRY"!', true, 'message-create.js'))
-      .catch((e) => styleLog('Error occurred while replying to message!', false, 'message-create.js', e));
+      .then(() => styleLog(`Replied with "NO SORRY"! [${this.message.url}]`, true, 'message-create.js'))
+      .catch((e) => styleLog(`Error replying to message! [${this.message.url}]`, false, 'message-create.js', e));
   }
 
   // Say "au chocolat?" if the message ends with "pain" and is sent in #🤡-memes-🤡
@@ -56,8 +56,8 @@ class MessageCreateHandler extends EventHandler {
     if (!messageEndsWithPain || !channelIsMemes) return;
 
     await this.message.reply('au chocolat?')
-      .then(() => styleLog('Replied with "au chocolat?"!', true, 'message-create.js'))
-      .catch((e) => styleLog('Error occurred while replying to a message!', false, 'message-create.js', e));
+      .then(() => styleLog(`Replied with "au chocolat?"! [${this.message.url}]`, true, 'message-create.js'))
+      .catch((e) => styleLog(`Error replying to message! [${this.message.url}]`, false, 'message-create.js', e));
   }
 
   // React with the :arson: emoji if the message contains "arson"
@@ -66,8 +66,8 @@ class MessageCreateHandler extends EventHandler {
     if (!messageContainsArson) return;
 
     await this.message.react(Emotes.Arson)
-      .then(() => styleLog('Reacted with Arson!', true, 'message-create.js'))
-      .catch((e) => styleLog('Error occurred while reacting to message!', false, 'message-create.js', e));
+      .then(() => styleLog(`Reacted with Arson! [${this.message.url}]`, true, 'message-create.js'))
+      .catch((e) => styleLog(`Error reacting to message! [${this.message.url}]`, false, 'message-create.js', e));
   }
 
   // Say "Hey, I use slash commands now!" if the message is an old command
@@ -77,8 +77,8 @@ class MessageCreateHandler extends EventHandler {
     if (!messageIsOldCommand) return;
 
     await this.message.reply('Hey, I use slash commands now!')
-      .then(() => styleLog('Replied with "Please use slash commands instead!"!', true, 'message-create.js'))
-      .catch((e) => styleLog('Error occurred while replying to message!', false, 'message-create.js', e));
+      .then(() => styleLog(`Replied with Slash Command Reminder! [${this.message.url}]`, true, 'message-create.js'))
+      .catch((e) => styleLog(`Error replying to message! [${this.message.url}]`, false, 'message-create.js', e));
   }
 
   // Handle everything related to ranking (it is lengthy so I contained it within its own class)

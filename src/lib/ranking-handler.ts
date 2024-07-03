@@ -87,7 +87,7 @@ export default class RankingHandler {
       create: { guildID },
       update: {},
     });
-    if (!guildConfig) return styleLog('Error fetching from GUILDCONFIG table!', false, 'ranking-handler.js');
+    if (!guildConfig) return styleLog('Error upserting the GUILDCONFIG table!', false, 'ranking-handler.js');
 
     const rankedIgnoredChannelIDs = guildConfig?.rankedIgnoredChannelIDs.split(',') ?? [];
     return !rankedIgnoredChannelIDs.includes(this.message.channelId);
@@ -102,7 +102,7 @@ export default class RankingHandler {
       create: { guildID, userID },
       update: {},
     });
-    if (!memberRank) return styleLog('Error while upserting the RANK table!', false, 'ranking-handler.js');
+    if (!memberRank) return styleLog('Error upserting the RANK table!', false, 'ranking-handler.js');
 
     return memberRank;
   }
@@ -115,7 +115,7 @@ export default class RankingHandler {
       where: { userID_guildID: { guildID, userID, } },
       data: { xp, xpLevel },
     });
-    if (!memberRank) return styleLog('Error while updating the RANK table!', false, 'ranking-handler.js');
+    if (!memberRank) return styleLog('Error updating the RANK table!', false, 'ranking-handler.js');
 
     return memberRank;
   }
