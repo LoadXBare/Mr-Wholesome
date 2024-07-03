@@ -1,6 +1,5 @@
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
-import { request } from "undici";
 import { database } from "../../lib/config.js";
 import { xpRequiredForLevel } from "../../lib/ranking-handler.js";
 import { displayName } from "../../lib/utilities.js";
@@ -37,8 +36,8 @@ export default class RankCommand {
   }
 
   async #drawAvatar() {
-    const { body } = await request(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }));
-    const avatar = await loadImage(await body.arrayBuffer());
+    const response = await fetch(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }));
+    const avatar = await loadImage(await response.arrayBuffer());
     const avatarX = 50;
     const avatarY = 50;
     const avatarSize = 310;

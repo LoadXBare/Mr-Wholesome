@@ -1,7 +1,6 @@
 import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
 import { Chance } from 'chance';
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { request } from 'undici';
 import { displayName } from '../../lib/utilities.js';
 
 export default class ReadingCommand {
@@ -67,8 +66,8 @@ export default class ReadingCommand {
   async #drawAvatar() {
     const cursed = this.todayIsCursedDay ? 'cursed-' : '';
 
-    const { body } = await request(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }));
-    const avatar = await loadImage(await body.arrayBuffer());
+    const response = await fetch(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }));
+    const avatar = await loadImage(await response.arrayBuffer());
     const avatarX = 517;
     const avatarY = 97;
     const avatarSize = 310;
