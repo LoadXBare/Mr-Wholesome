@@ -6,3 +6,4 @@ prisma/*.db-journal
 .wakatime-project
 tsconfig.tsbuildinfo
 package-lock.json
+*.sqlite

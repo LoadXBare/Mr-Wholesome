@@ -1,6 +1,7 @@
 import { Chance } from "chance";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, TextChannel } from "discord.js";
-import { ChannelIDs, EmbedColours, buttonDataCache, database, xpCooldownCache } from "./config.js";
+import { levelNotifButtonData } from "./api.js";
+import { ChannelIDs, EmbedColours, database, xpCooldownCache } from "./config.js";
 import { displayName, styleLog } from "./utilities.js";
 
 export default class RankingHandler {
@@ -73,7 +74,7 @@ export default class RankingHandler {
       );
 
     const levelUpMessage = await levelUpNotifChannel.send({ content, embeds: [embed], components: [button], allowedMentions: { users: [this.message.author.id] } });
-    buttonDataCache[levelUpMessage.id] = { ownerID: this.message.author.id, levelNotifState: levelNotifs };
+    levelNotifButtonData.set(levelUpMessage.id, this.message.author.id, levelNotifs);
   }
 
   // == DATABASE METHODS ==
@@ -81,8 +82,10 @@ export default class RankingHandler {
     const guildID = this.message.guildId;
     if (!guildID) return false;
 
-    const guildConfig = await database.guildConfig.findFirst({
+    const guildConfig = await database.guildConfig.upsert({
       where: { guildID },
+      create: { guildID },
+      update: {},
     });
     if (!guildConfig) return styleLog('Error fetching from GUILDCONFIG table!', false, 'ranking-handler.js');
 

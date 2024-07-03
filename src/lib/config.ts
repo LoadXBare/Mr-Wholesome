@@ -3,7 +3,6 @@ import { Colors, TextChannel } from 'discord.js';
 import client from '../index.js';
 
 export const database = new PrismaClient();
-export const buttonDataCache: { [messageID: string]: any; } = {};
 export const xpCooldownCache: { [userID: string]: number; } = {};
 export const akialytesGuild = await client.guilds.fetch(process.env.AKIALYTES_GUILD_ID ?? '');
 export const EmbedColours = {

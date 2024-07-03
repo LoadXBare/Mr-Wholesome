@@ -1,5 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, EmbedBuilder } from "discord.js";
-import { EmbedColours, buttonDataCache, database } from "../../lib/config.js";
+import { levelNotifButtonData } from "../../lib/api.js";
+import { EmbedColours, database } from "../../lib/config.js";
 
 export default class ToggleLevelNotifButton {
   interaction: ButtonInteraction;
@@ -14,10 +15,11 @@ export default class ToggleLevelNotifButton {
 
   async #toggleLevelNotif() {
     await this.interaction.deferReply({ ephemeral: true });
+    const buttonData = await levelNotifButtonData.get(this.interaction.message.id);
 
-    if (!buttonDataCache[this.interaction.message.id]) return this.#handleError();
+    if (!buttonData) return this.#handleError();
 
-    const { ownerID, levelNotifState } = buttonDataCache[this.interaction.message.id];
+    const { ownerID, levelNotifState } = buttonData;
     const clickNotFromOwner = this.interaction.user.id !== ownerID;
     if (clickNotFromOwner) return this.#handleClickNotFromOwner();
 
@@ -34,6 +36,7 @@ export default class ToggleLevelNotifButton {
         .setColor(EmbedColours.Positive);
 
       await this.#disableButtonReusability();
+      await levelNotifButtonData.del(this.interaction.message.id);
     }
     else {
       const embedDescription = [
@@ -53,7 +56,7 @@ export default class ToggleLevelNotifButton {
   }
 
   async #handleError() {
-    await this.interaction.editReply({ content: 'Button data no longer exists, __no changes have been made__.\n\n*This is an expected error, button data is purged every bot restart.*' });
+    await this.interaction.editReply({ content: 'Button data cannot be found, __no changes have been made__.\n\n*LoadXBare has been notified.*' });
     await this.#disableButtonReusability();
   }
 
