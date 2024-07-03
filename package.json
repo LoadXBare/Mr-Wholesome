@@ -17,6 +17,7 @@
     "@napi-rs/canvas": "^0.1.53",
     "@prisma/client": "^5.15.1",
     "chance": "^1.1.11",
+    "croner": "^8.0.2",
     "diff": "^5.2.0",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
