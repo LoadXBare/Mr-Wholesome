@@ -66,12 +66,11 @@ model TicketPanel {
 }
 
 model Warning {
-  warningID String @id @default(uuid())
-  guildID   String
-  authorID  String
-  warnedID  String
-  reason    String
-  date      BigInt
+  date     String @id
+  guildID  String
+  authorID String
+  warnedID String
+  reason   String
 }
 
 model Notes {

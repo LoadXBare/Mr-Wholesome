@@ -100,11 +100,14 @@ const commands = [
       .addStringOption((option) => option
         .setName('user')
         .setDescription('The @mention or ID of the user to view warnings of')
-        .setRequired(false))
+        .setRequired(false)))
+    .addSubcommand((subcommand) => subcommand
+      .setName('remove')
+      .setDescription('Remove a warning from a user')
       .addStringOption((option) => option
         .setName('warning')
-        .setDescription('The ID of the warning to view in more details')
-        .setRequired(false))),
+        .setDescription('The ID of the warning to remove')
+        .setRequired(true))),
 
   new SlashCommandBuilder()
     .setName('rank')

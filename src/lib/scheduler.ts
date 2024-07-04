@@ -7,7 +7,6 @@ import { formatDate, styleLog } from "./utilities.js";
 export default class Scheduler {
   start() {
     this.#birthdayScheduler();
-
     Cron('0 0 0 * * *', () => this.#birthdayScheduler());
   }
 
