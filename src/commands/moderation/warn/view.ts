@@ -1,6 +1,6 @@
+import { client } from "@base";
+import { database } from "@lib/config.js";
 import { bold, ChatInputCommandInteraction, codeBlock, EmbedBuilder, heading, inlineCode, time, User } from "discord.js";
-import client from "../../../index.js";
-import { database } from "../../../lib/config.js";
 
 export default class WarningViewer {
   interaction: ChatInputCommandInteraction;

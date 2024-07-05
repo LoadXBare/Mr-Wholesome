@@ -1,7 +1,7 @@
+import { EmbedColours, database } from "@lib/config.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { Rank } from "@prisma/client";
 import { AttachmentBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
-import { EmbedColours, database } from "../../lib/config.js";
 
 export default class LeaderboardCommand {
   interaction: ChatInputCommandInteraction;

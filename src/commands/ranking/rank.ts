@@ -1,8 +1,8 @@
+import { database } from "@lib/config.js";
+import { xpRequiredForLevel } from "@lib/ranking-handler.js";
+import { displayName } from "@lib/utilities.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
-import { database } from "../../lib/config.js";
-import { xpRequiredForLevel } from "../../lib/ranking-handler.js";
-import { displayName } from "../../lib/utilities.js";
 
 export default class RankCommand {
   interaction: ChatInputCommandInteraction;

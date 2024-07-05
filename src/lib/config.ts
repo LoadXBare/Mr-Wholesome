@@ -1,6 +1,6 @@
+import { client } from '@base';
 import { PrismaClient } from '@prisma/client';
 import { Colors, TextChannel } from 'discord.js';
-import client from '../index.js';
 
 export const database = new PrismaClient();
 export const xpCooldownCache: { [userID: string]: number; } = {};

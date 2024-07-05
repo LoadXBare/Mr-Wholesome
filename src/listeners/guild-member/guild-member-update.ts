@@ -1,8 +1,8 @@
+import { client } from '@base';
+import { EmbedColours, Emotes, EventHandler, Images, database } from '@lib/config.js';
 import {
   EmbedBuilder, Events, GuildMember, PartialGuildMember,
 } from 'discord.js';
-import client from '../../index.js';
-import { EmbedColours, Emotes, EventHandler, Images, database } from '../../lib/config.js';
 
 class GuildMemberUpdateHandler extends EventHandler {
   oldMember: GuildMember | PartialGuildMember;

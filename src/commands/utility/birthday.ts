@@ -1,8 +1,8 @@
+import { client } from '@base';
+import { EmbedColours, database } from '@lib/config.js';
+import { formatDate } from '@lib/utilities.js';
 import { Birthday } from '@prisma/client';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import client from '../../index.js';
-import { EmbedColours, database } from '../../lib/config.js';
-import { formatDate } from '../../lib/utilities.js';
 
 export default class BirthdayCommand {
   interaction: ChatInputCommandInteraction;

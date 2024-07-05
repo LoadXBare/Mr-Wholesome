@@ -1,13 +1,13 @@
+import { client } from '@base';
+import { EmbedColours, EventHandler, Images, database } from '@lib/config.js';
+import { channelIgnoresEvents } from '@lib/database-utilities.js';
+import { storeAttachments } from '@lib/utilities.js';
 import { diffChars } from 'diff';
 import {
   ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder,
   Events, Message, PartialMessage, bold,
   strikethrough,
 } from 'discord.js';
-import client from '../../index.js';
-import { EmbedColours, EventHandler, Images, database } from '../../lib/config.js';
-import { channelIgnoresEvents } from '../../lib/database-utilities.js';
-import { storeAttachments } from '../../lib/utilities.js';
 
 class MessageUpdateHandler extends EventHandler {
   oldMessage: Message | PartialMessage;

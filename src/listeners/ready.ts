@@ -1,8 +1,8 @@
+import { client } from '@base';
+import { EventHandler } from '@lib/config.js';
+import Scheduler from '@lib/scheduler.js';
+import { styleLog } from '@lib/utilities.js';
 import { Collection, Events, GuildMember } from 'discord.js';
-import client from '../index.js';
-import { EventHandler } from '../lib/config.js';
-import Scheduler from '../lib/scheduler.js';
-import { styleLog } from '../lib/utilities.js';
 
 class ReadyHandler extends EventHandler {
   handle() {
@@ -31,7 +31,7 @@ class ReadyHandler extends EventHandler {
   }
 
   #deployCommands() {
-    import('../lib/deploy-commands.js');
+    import('@lib/deploy-commands.js');
   }
 
   #startScheduler() {

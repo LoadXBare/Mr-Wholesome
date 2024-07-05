@@ -1,4 +1,4 @@
-import { database } from "./config.js";
+import { database } from "@lib/config.js";
 
 /**
  * Checks whether a channel has events ignored in the specified guild.

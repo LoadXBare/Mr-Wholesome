@@ -1,6 +1,6 @@
+import { client } from '@base';
+import { EmbedColours, EventHandler } from '@lib/config.js';
 import { EmbedBuilder, Events, Role } from 'discord.js';
-import client from '../../index.js';
-import { EmbedColours, EventHandler } from '../../lib/config.js';
 
 class GuildRoleCreateHandler extends EventHandler {
   role: Role;

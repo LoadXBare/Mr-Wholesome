@@ -1,5 +1,5 @@
+import { database } from "@lib/config.js";
 import { bold, ChatInputCommandInteraction } from "discord.js";
-import { database } from "../../../lib/config.js";
 
 export default class WarningRemover {
   interaction: ChatInputCommandInteraction;

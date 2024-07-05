@@ -23,6 +23,21 @@
 		"target": "ESNext",
 		"useDefineForClassFields": true,
 		"rootDir": "src",
-		"outDir": "dist"
+		"outDir": "dist",
+		"baseUrl": "src",
+		"paths": {
+			"@base": [
+				"./index.js"
+			],
+			"@buttons/*": [
+				"buttons/*"
+			],
+			"@commands/*": [
+				"commands/*"
+			],
+			"@lib/*": [
+				"lib/*"
+			]
+		}
 	}
 }

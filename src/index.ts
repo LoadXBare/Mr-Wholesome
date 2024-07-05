@@ -5,7 +5,7 @@ const { Guilds, GuildMembers, GuildMessages, MessageContent, GuildModeration } =
 
 dotenv.config();
 
-const client = new Client({
+export const client = new Client({
   intents: [Guilds, GuildMembers, GuildMessages, MessageContent, GuildModeration],
   presence: {
     activities: [{
@@ -18,7 +18,6 @@ const client = new Client({
     roles: [],
   },
 });
-export default client;
 
 // Initalise event listeners
 import('./listeners/index.js');

@@ -1,8 +1,8 @@
+import { levelNotifButtonData } from "@lib/api.js";
+import { ChannelIDs, EmbedColours, database, xpCooldownCache } from "@lib/config.js";
+import { displayName, styleLog } from "@lib/utilities.js";
 import { Chance } from "chance";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, TextChannel } from "discord.js";
-import { levelNotifButtonData } from "./api.js";
-import { ChannelIDs, EmbedColours, database, xpCooldownCache } from "./config.js";
-import { displayName, styleLog } from "./utilities.js";
 
 export default class RankingHandler {
   message: Message;

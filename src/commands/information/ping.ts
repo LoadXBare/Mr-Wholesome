@@ -1,6 +1,6 @@
+import { client } from '@base';
+import { EmbedColours } from '@lib/config.js';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import client from '../../index.js';
-import { EmbedColours } from '../../lib/config.js';
 
 export default class PingCommand {
   interaction: ChatInputCommandInteraction;

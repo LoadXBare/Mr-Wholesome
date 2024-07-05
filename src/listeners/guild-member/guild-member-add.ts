@@ -1,7 +1,7 @@
+import { client } from '@base';
+import { EmbedColours, EventHandler, Images, RoleIDs, database } from '@lib/config.js';
+import { getRelativeTimeString, sleep, styleLog } from '@lib/utilities.js';
 import { EmbedBuilder, Events, GuildMember } from 'discord.js';
-import client from '../../index.js';
-import { EmbedColours, EventHandler, Images, RoleIDs, database } from '../../lib/config.js';
-import { getRelativeTimeString, sleep, styleLog } from '../../lib/utilities.js';
 
 class GuildMemberAddHandler extends EventHandler {
   member: GuildMember;

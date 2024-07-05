@@ -1,7 +1,7 @@
+import { displayName } from '@lib/utilities.js';
 import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
 import { Chance } from 'chance';
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { displayName } from '../../lib/utilities.js';
 
 export default class ReadingCommand {
   interaction: ChatInputCommandInteraction;

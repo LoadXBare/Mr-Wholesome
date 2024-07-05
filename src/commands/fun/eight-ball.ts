@@ -1,5 +1,5 @@
+import { EmbedColours } from '@lib/config.js';
 import { ChatInputCommandInteraction, ColorResolvable, EmbedBuilder } from 'discord.js';
-import { EmbedColours } from '../../lib/config.js';
 
 export default class EightBallCommand {
   interaction: ChatInputCommandInteraction;

@@ -1,6 +1,6 @@
+import { levelNotifButtonData } from "@lib/api.js";
+import { EmbedColours, database } from "@lib/config.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, EmbedBuilder } from "discord.js";
-import { levelNotifButtonData } from "../../lib/api.js";
-import { EmbedColours, database } from "../../lib/config.js";
 
 export default class ToggleLevelNotifButton {
   interaction: ButtonInteraction;
