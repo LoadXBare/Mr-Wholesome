@@ -1,7 +1,5 @@
 import { styleLog } from '@lib/utilities.js';
-import {
-  REST, Routes, SlashCommandBuilder,
-} from 'discord.js';
+import { REST, Routes, SlashCommandBuilder } from 'discord.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -91,7 +89,7 @@ const commands = [
         .setDescription('The reason for the warning (use \\n for a newline)')
         .setRequired(true))
       .addBooleanOption((option) => option
-        .setName('dm')
+        .setName('notify_user')
         .setDescription('Should the user be notified via DMs that they were warned?')
         .setRequired(true)))
     .addSubcommand((subcommand) => subcommand
@@ -105,7 +103,7 @@ const commands = [
       .setName('remove')
       .setDescription('Remove a warning from a user')
       .addStringOption((option) => option
-        .setName('warning')
+        .setName('id')
         .setDescription('The ID of the warning to remove')
         .setRequired(true))),
 

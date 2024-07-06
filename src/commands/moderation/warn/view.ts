@@ -60,7 +60,7 @@ export default class WarningViewer {
 
       embedDescription.push(
         `${bold(time(date, 'R'))} — Warn ID: ${bold(warning.date)}`,
-        `${bold(author.username)} warned ${bold(warned.username)}`,
+        `${bold(author.username)} warned ${bold(warned.username)} [ID: ${warned.id}]`,
         codeBlock(reason),
       );
     }

@@ -38,7 +38,7 @@ class GuildRoleCreateHandler extends EventHandler {
       .setTimestamp()
       .setColor(EmbedColours.Positive);
 
-    super.logChannel.send({ embeds: [embed] }); // TODO: Log all events to console too
+    super.logChannel.send({ embeds: [embed] });
   }
 }
 

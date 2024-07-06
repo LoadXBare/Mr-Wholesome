@@ -11,7 +11,7 @@ export default class WarningAdder {
   constructor(interaction: ChatInputCommandInteraction) {
     this.interaction = interaction;
     this.warnedUserString = this.interaction.options.getString('user', true).replace(/[^0-9]/g, '');
-    this.notifyWarnedUser = this.interaction.options.getBoolean('dm', true);
+    this.notifyWarnedUser = this.interaction.options.getBoolean('notify_user', true);
 
     this.reason = this.interaction.options.getString('reason', true);
     this.reason = this.reason.split('\\n').map((v) => v.trim()).join('\n'); // add multi-line support using "\n"

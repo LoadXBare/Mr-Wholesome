@@ -7,7 +7,7 @@ export default class WarningRemover {
 
   constructor(interaction: ChatInputCommandInteraction) {
     this.interaction = interaction;
-    this.warningID = this.interaction.options.getString('warning', true);
+    this.warningID = this.interaction.options.getString('id', true);
   }
 
   handle() {

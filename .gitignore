@@ -7,3 +7,4 @@ prisma/*.db-journal
 tsconfig.tsbuildinfo
 package-lock.json
 *.sqlite
+.VSCodeCounter
