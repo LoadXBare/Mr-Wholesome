@@ -27,11 +27,10 @@ model GuildConfig {
 }
 
 model Ban {
-  banID    String  @id @default(uuid())
+  date     String  @id
   guildID  String
   authorID String
   bannedID String
-  date     BigInt
   reason   String
   unbanned Boolean @default(false)
 }

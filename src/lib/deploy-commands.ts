@@ -75,37 +75,75 @@ const commands = [
     .setDescription('View your reading for the day'),
 
   new SlashCommandBuilder()
-    .setName('warn')
-    .setDescription('Warning Commands')
+    .setName('ban')
+    .setDescription('Ban a user')
+    .addUserOption((option) => option
+      .setName('user')
+      .setDescription('The user to ban')
+      .setRequired(true))
+    .addIntegerOption((option) => option
+      .setName('delete_messages')
+      .setDescription('Should the user\'s messages be deleted?')
+      .setChoices(
+        { name: 'Don\'t Delete Any', value: 0 },
+        { name: 'Previous Hour', value: 60 * 60 },
+        { name: 'Previous 6 Hours', value: 6 * 60 * 60 },
+        { name: 'Previous 12 Hours', value: 12 * 60 * 60 },
+        { name: 'Previous 24 Hours', value: 24 * 60 * 60 },
+        { name: 'Previous 3 Days', value: 3 * 24 * 60 * 60 },
+        { name: 'Previous 7 Days', value: 7 * 24 * 60 * 60 },
+      )
+      .setRequired(true))
+    .addBooleanOption((option) => option
+      .setName('notify_user')
+      .setDescription('Should the user be notified via DMs that they were banned?')
+      .setRequired(true)),
+
+  new SlashCommandBuilder()
+    .setName('view')
+    .setDescription('View Commands')
     .addSubcommand((subcommand) => subcommand
-      .setName('add')
-      .setDescription('Warn a user')
-      .addStringOption((option) => option
-        .setName('user')
-        .setDescription('The @mention or ID of the user to warn')
-        .setRequired(true))
-      .addStringOption((option) => option
-        .setName('reason')
-        .setDescription('The reason for the warning (use \\n for a newline)')
-        .setRequired(true))
-      .addBooleanOption((option) => option
-        .setName('notify_user')
-        .setDescription('Should the user be notified via DMs that they were warned?')
-        .setRequired(true)))
-    .addSubcommand((subcommand) => subcommand
-      .setName('view')
-      .setDescription('View all warnings in the guild, or a user\'s warnings if specified')
-      .addStringOption((option) => option
-        .setName('user')
-        .setDescription('The @mention or ID of the user to view warnings of')
-        .setRequired(false)))
-    .addSubcommand((subcommand) => subcommand
-      .setName('remove')
-      .setDescription('Remove a warning from a user')
+      .setName('ban')
+      .setDescription('View all bans in the guild, a user\'s bans, or a specific ban')
       .addStringOption((option) => option
         .setName('id')
-        .setDescription('The ID of the warning to remove')
-        .setRequired(true))),
+        .setDescription('The @mention, User ID, or Ban ID to view')
+        .setRequired(false)))
+    .addSubcommand((subcommand) => subcommand
+      .setName('warning')
+      .setDescription('View all warnings in the guild, a user\'s warnings, or a specific warning')
+      .addStringOption((option) => option
+        .setName('id')
+        .setDescription('The @mention, User ID, or Warning ID to view')
+        .setRequired(false))),
+
+  new SlashCommandBuilder()
+    .setName('unban')
+    .setDescription('Unban a user and mark their ban as removed')
+    .addStringOption((option) => option
+      .setName('user_id')
+      .setDescription('The ID of the user to unban')
+      .setRequired(true)),
+
+  new SlashCommandBuilder()
+    .setName('warn')
+    .setDescription('Warn a user')
+    .addUserOption((option) => option
+      .setName('user')
+      .setDescription('The @mention or ID of the user to warn')
+      .setRequired(true))
+    .addBooleanOption((option) => option
+      .setName('notify_user')
+      .setDescription('Should the user be notified via DMs that they were warned?')
+      .setRequired(true)),
+
+  new SlashCommandBuilder()
+    .setName('unwarn')
+    .setDescription('Remove a warning from a user')
+    .addStringOption((option) => option
+      .setName('warning_id')
+      .setDescription('The ID of the warning to remove')
+      .setRequired(true)),
 
   new SlashCommandBuilder()
     .setName('rank')
