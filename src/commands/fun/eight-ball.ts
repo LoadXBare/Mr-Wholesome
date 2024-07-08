@@ -1,18 +1,9 @@
+import { Command } from '@commands/command.js';
 import { EmbedColours } from '@lib/config.js';
-import { ChatInputCommandInteraction, ColorResolvable, EmbedBuilder } from 'discord.js';
+import { ColorResolvable, EmbedBuilder } from 'discord.js';
 
-export default class EightBallCommand {
-  interaction: ChatInputCommandInteraction;
-
-  constructor(interaction: ChatInputCommandInteraction) {
-    this.interaction = interaction;
-  }
-
-  handle() {
-    this.#handleEightBallCommand();
-  }
-
-  async #handleEightBallCommand() {
+export class EightBallCommandHandler extends Command {
+  async handle() {
     await this.interaction.deferReply();
 
     const question = this.interaction.options.getString('question', true);
@@ -31,10 +22,7 @@ export default class EightBallCommand {
 
       // Neutral
       { response: 'Reply hazy, try again.', colour: 'Yellow' },
-      { response: 'Ask again later.', colour: 'Yellow' },
       { response: 'Better not tell you now.', colour: 'Yellow' },
-      { response: 'Cannot predict now.', colour: 'Yellow' },
-      { response: 'Concentrate and ask again.', colour: 'Yellow' },
 
       // Negative
       { response: "Don't count on it.", colour: 'Red' },
@@ -45,15 +33,14 @@ export default class EightBallCommand {
     ];
 
     const randomResponse = responses.at(Math.round(Math.random() * responses.length));
-    const embedDescription = [
-      `**Question** — *${question}*`,
-      `## ${randomResponse?.response}`,
-    ].join('\n');
 
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription)
-      .setColor(randomResponse?.colour ?? EmbedColours.Info);
+    const eightBallEmbed = new EmbedBuilder()
+      .setDescription([
+        `**Question** — *${question}*`,
+        `## ${randomResponse?.response}`,
+      ].join('\n'))
+      .setColor(randomResponse?.colour || EmbedColours.Info);
 
-    await this.interaction.editReply({ embeds: [embed] });
+    await this.interaction.editReply({ embeds: [eightBallEmbed] });
   }
 }

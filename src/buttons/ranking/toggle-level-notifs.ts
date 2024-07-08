@@ -3,27 +3,23 @@ import { EmbedColours, database } from "@lib/config.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, EmbedBuilder } from "discord.js";
 
 export default class ToggleLevelNotifButton {
-  interaction: ButtonInteraction;
+  private interaction: ButtonInteraction;
 
   constructor(interaction: ButtonInteraction) {
     this.interaction = interaction;
   }
 
-  handle() {
-    this.#toggleLevelNotif();
-  }
-
-  async #toggleLevelNotif() {
+  async handle() {
     await this.interaction.deferReply({ ephemeral: true });
     const buttonData = await levelNotifButtonData.get(this.interaction.message.id);
 
-    if (!buttonData) return this.#handleError();
+    if (!buttonData) return this.handleError();
 
     const { ownerID, levelNotifState } = buttonData;
     const clickNotFromOwner = this.interaction.user.id !== ownerID;
-    if (clickNotFromOwner) return this.#handleClickNotFromOwner();
+    if (clickNotFromOwner) return this.handleClickNotFromOwner();
 
-    const successfulUpdate = await this.#updateLevelNotifStateInDatabase(!levelNotifState);
+    const successfulUpdate = await this.updateLevelNotifStateInDatabase(!levelNotifState);
 
     let embed: EmbedBuilder;
     if (successfulUpdate) {
@@ -35,7 +31,7 @@ export default class ToggleLevelNotifButton {
         .setDescription(embedDescription)
         .setColor(EmbedColours.Positive);
 
-      await this.#disableButtonReusability();
+      await this.disableButtonReusability();
       await levelNotifButtonData.del(this.interaction.message.id);
     }
     else {
@@ -51,16 +47,16 @@ export default class ToggleLevelNotifButton {
     await this.interaction.editReply({ embeds: [embed] });
   }
 
-  async #handleClickNotFromOwner() {
+  private async handleClickNotFromOwner() {
     await this.interaction.editReply({ content: 'This button does not belong to you.' });
   }
 
-  async #handleError() {
+  private async handleError() {
     await this.interaction.editReply({ content: 'Button data cannot be found, __no changes have been made__.\n\n*LoadXBare has been notified.*' });
-    await this.#disableButtonReusability();
+    await this.disableButtonReusability();
   }
 
-  async #disableButtonReusability() {
+  private async disableButtonReusability() {
     const button = new ActionRowBuilder<ButtonBuilder>()
       .setComponents(
         new ButtonBuilder()
@@ -74,8 +70,8 @@ export default class ToggleLevelNotifButton {
   }
 
   // == Database Methods ==
-  async #updateLevelNotifStateInDatabase(levelNotifState: boolean) {
-    const guildID = this.interaction.guildId ?? '';
+  private async updateLevelNotifStateInDatabase(levelNotifState: boolean) {
+    const guildID = this.interaction.guildId!;
     const userID = this.interaction.user.id;
 
     const memberRank = await database.rank.upsert({

@@ -89,3 +89,4 @@ class MessageDeleteHandler extends EventHandler {
 client.on(Events.MessageDelete, (message) => {
   new MessageDeleteHandler(message).handle();
 });
+// TODO: Change all "## ... " to heading("...", X)

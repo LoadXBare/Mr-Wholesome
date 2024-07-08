@@ -1,14 +1,18 @@
 import { EmbedColours } from "@lib/config.js";
-import { ColorResolvable, EmbedBuilder, ModalSubmitInteraction, User } from "discord.js";
+import { ColorResolvable, EmbedBuilder, Guild, ModalSubmitInteraction, User } from "discord.js";
 
-export class ModalHandler {
-  interaction: ModalSubmitInteraction;
+export abstract class ModalHandler {
+  protected interaction: ModalSubmitInteraction;
+  protected guild: Guild;
 
   constructor(interaction: ModalSubmitInteraction) {
     this.interaction = interaction;
+    this.guild = interaction.guild!;
   }
 
-  async handleError(errorString: string) {
+  abstract handle(): Promise<void>;
+
+  protected async handleError(errorString: string) {
     const errorEmbed = new EmbedBuilder()
       .setDescription(`❌ ${errorString}`)
       .setColor(EmbedColours.Negative);
@@ -17,7 +21,7 @@ export class ModalHandler {
     else await this.interaction.reply({ embeds: [errorEmbed] });
   }
 
-  async messageUser(user: User, content: string, colour: ColorResolvable) {
+  protected async messageUser(user: User, content: string, colour: ColorResolvable) {
     const messageEmbed = new EmbedBuilder()
       .setDescription(content)
       .setTimestamp()

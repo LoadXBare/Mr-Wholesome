@@ -1,21 +1,11 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { Command } from '@commands/command.js';
 
-export default class FoxCommand {
-  interaction: ChatInputCommandInteraction;
-
-  constructor(interaction: ChatInputCommandInteraction) {
-    this.interaction = interaction;
-  }
-
-  handle() {
-    this.#postRandomFox();
-  }
-
-  async #postRandomFox() {
+export class FoxCommandHandler extends Command {
+  async handle() {
     await this.interaction.deferReply();
 
     const response = await fetch('https://randomfox.ca/floof/');
-    const responseJSON = await response.json() as { image: string, link: string; };
+    const responseJSON = await response.json();
     const foxURL = responseJSON.image;
 
     await this.interaction.editReply(foxURL);

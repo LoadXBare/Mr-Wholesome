@@ -1,20 +1,18 @@
+import { Command } from "@commands/command.js";
 import { warnModalData } from "@lib/api.js";
 import { ActionRowBuilder, ChatInputCommandInteraction, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, User } from "discord.js";
 
-export default class WarnCommandHandler {
-  interaction: ChatInputCommandInteraction;
-  user: User;
-  notify_user: boolean;
+export class WarnCommandHandler extends Command {
+  private user: User;
+  private notify_user: boolean;
 
   constructor(interaction: ChatInputCommandInteraction) {
-    this.interaction = interaction;
+    super(interaction);
     this.user = interaction.options.getUser('user', true);
     this.notify_user = interaction.options.getBoolean('notify_user', true);
-
-    this.#displayWarnModal();
   }
 
-  async #displayWarnModal() {
+  async handle() {
     const warnModal = new ModalBuilder()
       .setCustomId(`warn:${this.interaction.id}`)
       .setTitle(`Warn ${this.user.username}`);

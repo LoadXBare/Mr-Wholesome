@@ -1,22 +1,20 @@
+import { Command } from "@commands/command.js";
 import { banModalData } from "@lib/api.js";
 import { ActionRowBuilder, ChatInputCommandInteraction, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, User } from "discord.js";
 
-export class BanCommandHandler {
-  interaction: ChatInputCommandInteraction;
-  user: User;
-  delete_messages: number;
-  notify_user: boolean;
+export class BanCommandHandler extends Command {
+  private user: User;
+  private delete_messages: number;
+  private notify_user: boolean;
 
   constructor(interaction: ChatInputCommandInteraction) {
-    this.interaction = interaction;
+    super(interaction);
     this.user = interaction.options.getUser('user', true);
     this.delete_messages = interaction.options.getInteger('delete_messages', true);
     this.notify_user = interaction.options.getBoolean('notify_user', true);
-
-    this.#displayBanModal();
   }
 
-  async #displayBanModal() {
+  async handle() {
     const banModal = new ModalBuilder()
       .setCustomId(`ban:${this.interaction.id}`)
       .setTitle(`Ban ${this.user.username}`);

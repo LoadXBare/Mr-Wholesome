@@ -5,16 +5,14 @@ import { ModalHandler } from "@modals/handler.js";
 import { bold, EmbedBuilder, heading, italic, ModalSubmitInteraction, User } from "discord.js";
 
 export class WarningModalHandler extends ModalHandler {
-  reason: string;
+  private reason: string;
 
   constructor(interaction: ModalSubmitInteraction) {
     super(interaction);
     this.reason = interaction.fields.getTextInputValue('reason') || 'No reason provided.';
-
-    this.#handleWarning();
   }
 
-  async #handleWarning() {
+  async handle(): Promise<void> {
     const [, id] = this.interaction.customId.split(':');
     console.log(id);
 
@@ -28,7 +26,7 @@ export class WarningModalHandler extends ModalHandler {
     let notified = false;
     if (warningData.notify_user) {
       const content = [
-        heading(`Warned in ${this.interaction.guild!.name}`),
+        heading(`Warned in ${this.guild.name}`),
         this.reason
       ].join('\n');
 
@@ -40,7 +38,7 @@ export class WarningModalHandler extends ModalHandler {
     ];
     if (!notified && warningData.notify_user) embedDescription.push('', italic('⚠️ User has DMs disabled, unable to notify.'));
 
-    const recorded = await this.#addWarnToDatabase(user);
+    const recorded = await this.addWarnToDatabase(user);
     if (!recorded) embedDescription.push('', italic('⚠️ An error occurred whilst adding the warning to the database.'));
 
     const embed = new EmbedBuilder()
@@ -51,10 +49,10 @@ export class WarningModalHandler extends ModalHandler {
   }
 
   // == Database Methods ==
-  async #addWarnToDatabase(user: User) {
+  private async addWarnToDatabase(user: User) {
     const authorID = this.interaction.user.id;
     const date = Date.now().toString();
-    const guildID = this.interaction.guildId!;
+    const guildID = this.guild.id;
     const warnedID = user.id;
     const reason = this.reason;
 

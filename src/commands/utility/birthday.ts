@@ -1,58 +1,49 @@
 import { client } from '@base';
+import { Command } from '@commands/command.js';
 import { EmbedColours, database } from '@lib/config.js';
 import { formatDate } from '@lib/utilities.js';
 import { Birthday } from '@prisma/client';
-import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 
-export default class BirthdayCommand {
-  interaction: ChatInputCommandInteraction;
-
-  constructor(interaction: ChatInputCommandInteraction) {
-    this.interaction = interaction;
-  }
-
-  handle() {
-    const command = this.interaction.options.getSubcommand();
-
-    if (command === 'set') this.#handleSetBirthday();
-    else if (command === 'upcoming') this.#handleUpcomingBirthdays();
-    else this.interaction.reply('Something went wrong :(');
-  }
-
-  async #handleSetBirthday() {
+export class BirthdayCommandHandler extends Command {
+  async handle() {
     await this.interaction.deferReply();
 
+    const command = this.interaction.options.getSubcommand();
+    if (command === 'set') this.handleSetBirthday();
+    else if (command === 'upcoming') this.handleUpcomingBirthdays();
+  }
+
+  private async handleSetBirthday() {
     const day = this.interaction.options.getInteger('day', true);
     const month = this.interaction.options.getInteger('month', true);
-    const birthday = await this.#setBirthdayInDatabase(this.interaction.user.id, day, month);
+    const birthday = await this.setBirthdayInDatabase(this.interaction.user.id, day, month);
 
     const embedDescription: Array<string> = [];
-    const embed = new EmbedBuilder();
+    const birthdaySetEmbed = new EmbedBuilder();
 
-    if (birthday !== undefined) {
-      embed.setColor(EmbedColours.Positive);
+    if (birthday) {
+      birthdaySetEmbed.setColor(EmbedColours.Positive);
       embedDescription.push(
         '## Successfully set birthday!',
         `Your birthday has been set to **${birthday.date}**.`,
       );
     } else {
-      embed.setColor(EmbedColours.Negative);
+      birthdaySetEmbed.setColor(EmbedColours.Negative);
       embedDescription.push(
         '## Unable to set birthday!',
         'An error occurred when attempting to set your birthday :(',
       );
     }
 
-    embed.setDescription(embedDescription.join('\n'));
+    birthdaySetEmbed.setDescription(embedDescription.join('\n'));
 
-    await this.interaction.editReply({ embeds: [embed] });
+    await this.interaction.editReply({ embeds: [birthdaySetEmbed] });
   }
 
-  async #handleUpcomingBirthdays() {
-    await this.interaction.deferReply();
-
+  private async handleUpcomingBirthdays() {
     const upcomingDayLimit = this.interaction.options.getNumber('days', false) ?? 14;
-    const upcomingBirthdays = await this.#fetchUpcomingBirthdaysFromDatabase(upcomingDayLimit);
+    const upcomingBirthdays = await this.fetchUpcomingBirthdaysFromDatabase(upcomingDayLimit);
     const upcomingBirthdaysList: Array<string> = [];
     upcomingBirthdays.forEach((birthday) => {
       const birthdayUser = client.users.resolve(birthday.userID);
@@ -70,15 +61,15 @@ export default class BirthdayCommand {
     else embedDescription.push(`There are ${upcomingBirthdaysList.length} birthdays in the next ${upcomingDayLimit} days!`);
     embedDescription.push(upcomingBirthdaysList.join('\n'));
 
-    const embed = new EmbedBuilder()
+    const upcomingBirthdaysEmbed = new EmbedBuilder()
       .setDescription(embedDescription.join('\n'))
       .setColor(EmbedColours.Info);
 
-    await this.interaction.editReply({ embeds: [embed] });
+    await this.interaction.editReply({ embeds: [upcomingBirthdaysEmbed] });
   }
 
   // == Datebase Methods ==
-  async #setBirthdayInDatabase(userID: string, day: number, month: number) {
+  private async setBirthdayInDatabase(userID: string, day: number, month: number) {
     const date = formatDate(day, month);
     const result = await database.birthday.upsert({
       where: { userID },
@@ -89,7 +80,7 @@ export default class BirthdayCommand {
     return result;
   }
 
-  async #fetchUpcomingBirthdaysFromDatabase(days: number) {
+  private async fetchUpcomingBirthdaysFromDatabase(days: number) {
     const upcomingDays = new Array(days)
       .fill(new Date().getUTCDate())
       .map((value, index) => formatDate(value + index, new Date().getUTCMonth()));

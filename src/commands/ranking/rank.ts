@@ -1,16 +1,16 @@
+import { Command } from "@commands/command.js";
 import { database } from "@lib/config.js";
 import { xpRequiredForLevel } from "@lib/ranking-handler.js";
 import { displayName } from "@lib/utilities.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
 
-export default class RankCommand {
-  interaction: ChatInputCommandInteraction;
-  canvas: Canvas;
-  canvasContext: SKRSContext2D;
+export class RankCommandHandler extends Command {
+  private canvas: Canvas;
+  private canvasContext: SKRSContext2D;
 
   constructor(interaction: ChatInputCommandInteraction) {
-    this.interaction = interaction;
+    super(interaction);
 
     GlobalFonts.registerFromPath('assets/fonts/Ubuntu-Medium.ttf', 'ubuntu-medium');
     GlobalFonts.registerFromPath('assets/fonts/TwitterColorEmoji-SVGinOT.ttf', 'twitter-emoji');
@@ -18,24 +18,20 @@ export default class RankCommand {
     this.canvasContext = this.canvas.getContext('2d');
   }
 
-  handle() {
-    this.#postUserRank();
-  }
-
-  async #postUserRank() {
+  async handle() {
     await this.interaction.deferReply();
 
-    const attachment = await this.#createUserRankImage();
+    const userRankImage = await this.createUserRankImage();
 
-    await this.interaction.editReply({ files: [attachment] });
+    await this.interaction.editReply({ files: [userRankImage] });
   }
 
-  async #intialiseCanvas() {
+  private async intialiseCanvas() {
     const backgroundImage = await loadImage('assets/rank/rank.png');
     this.canvasContext.drawImage(backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
   }
 
-  async #drawAvatar() {
+  private async drawAvatar() {
     const response = await fetch(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }));
     const avatar = await loadImage(await response.arrayBuffer());
     const avatarX = 50;
@@ -58,7 +54,7 @@ export default class RankCommand {
     this.canvasContext.drawImage(avatarOutline, 0, 0, this.canvas.width, this.canvas.height);
   }
 
-  async #drawProgressBar(percent: number, xp: number, xpNeeded: number) {
+  private async drawProgressBar(percent: number, xp: number, xpNeeded: number) {
     const barX = 452;
     const barY = 258;
     const barWidth = 800;
@@ -90,7 +86,7 @@ export default class RankCommand {
     this.canvasContext.drawImage(progressBarOutline, 0, 0, this.canvas.width, this.canvas.height);
   }
 
-  async #drawRankInfo(level: number) {
+  private async drawRankInfo(level: number) {
     const progressBarX = 452;
     const progressBarY = 258;
     const progressBarWidth = 800;
@@ -98,7 +94,7 @@ export default class RankCommand {
     const aboveBarX = progressBarX + progressBarWidth / 2;
     const aboveBarY = progressBarY - 20;
 
-    const userPosition = await this.#fetchRankPositionFromDatabase();
+    const userPosition = await this.fetchRankPositionFromDatabase();
 
     const usernameText = displayName(this.interaction);
     const levelText = `Level ${level}`;
@@ -118,7 +114,7 @@ export default class RankCommand {
 
   }
 
-  #fetchLevelProgress(xp: number, level: number) {
+  private fetchLevelProgress(xp: number, level: number) {
     const currentLevelTotalXP = xpRequiredForLevel(level);
     const nextLevelTotalXP = xpRequiredForLevel(level + 1);
     const xpNeededForEntireCurrentLevel = nextLevelTotalXP - currentLevelTotalXP;
@@ -132,14 +128,14 @@ export default class RankCommand {
     };
   }
 
-  async #createUserRankImage() {
-    const { xp, xpLevel } = await this.#fetchMemberRankFromDatabase();
-    const { percent, xpNeeded } = this.#fetchLevelProgress(xp, xpLevel);
+  private async createUserRankImage() {
+    const { xp, xpLevel } = await this.fetchMemberRankFromDatabase();
+    const { percent, xpNeeded } = this.fetchLevelProgress(xp, xpLevel);
 
-    await this.#intialiseCanvas();
-    await this.#drawAvatar();
-    await this.#drawProgressBar(percent, xp, xpNeeded);
-    await this.#drawRankInfo(xpLevel);
+    await this.intialiseCanvas();
+    await this.drawAvatar();
+    await this.drawProgressBar(percent, xp, xpNeeded);
+    await this.drawRankInfo(xpLevel);
 
     const imageAltText = `You are Level ${xpLevel} with ${xp} XP! ${xpNeeded - xp} XP until Level ${xpLevel + 1}!`;
     const attachment = new AttachmentBuilder(await this.canvas.encode('jpeg'), { name: 'rank.jpeg', description: imageAltText });
@@ -147,8 +143,8 @@ export default class RankCommand {
   }
 
   // == Database Methods ==
-  async #fetchMemberRankFromDatabase() {
-    const guildID = this.interaction.guild?.id ?? '';
+  private async fetchMemberRankFromDatabase() {
+    const guildID = this.guild.id;
     const userID = this.interaction.user.id;
 
     const memberRank = await database.rank.upsert({
@@ -160,11 +156,11 @@ export default class RankCommand {
     return memberRank;
   }
 
-  async #fetchRankPositionFromDatabase() {
-    const guildID = this.interaction.guild?.id ?? '';
+  private async fetchRankPositionFromDatabase() {
+    const guildID = this.guild.id;
     const userID = this.interaction.user.id;
 
-    const guildMembers = await this.interaction.guild?.members.fetch();
+    const guildMembers = await this.guild.members.fetch();
     const guildMemberIDs = guildMembers?.map((member) => member.id);
 
     const guildRanks = await database.rank.findMany({ where: { guildID }, orderBy: { xp: 'desc' } });

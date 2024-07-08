@@ -1,22 +1,12 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { Command } from '@commands/command.js';
 
-export default class CatCommand {
-  interaction: ChatInputCommandInteraction;
-
-  constructor(interaction: ChatInputCommandInteraction) {
-    this.interaction = interaction;
-  }
-
-  handle() {
-    this.#postRandomCat();
-  }
-
-  async #postRandomCat() {
+export class CatCommandHandler extends Command {
+  async handle() {
     await this.interaction.deferReply();
 
     const response = await fetch('https://api.thecatapi.com/v1/images/search');
-    const responseJSON = await response.json() as Array<{ id: string, url: string, width: number, height: number; }>;
-    const catURL = responseJSON.at(0)?.url ?? 'Could not fetch URL :(';
+    const responseJSON = await response.json();
+    const catURL = responseJSON.at(0)?.url || 'Could not fetch URL :(';
 
     await this.interaction.editReply(catURL);
   }

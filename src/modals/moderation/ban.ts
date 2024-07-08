@@ -4,17 +4,15 @@ import { database } from "@lib/config.js";
 import { ModalHandler } from "@modals/handler.js";
 import { bold, EmbedBuilder, heading, italic, ModalSubmitInteraction, User } from "discord.js";
 
-export default class BanModalHandler extends ModalHandler {
-  reason: string;
+export class BanModalHandler extends ModalHandler {
+  private reason: string;
 
   constructor(interaction: ModalSubmitInteraction) {
     super(interaction);
     this.reason = interaction.fields.getTextInputValue('reason') || 'No reason provided.';
-
-    this.#handleBan();
   }
 
-  async #handleBan() {
+  async handle() {
     const [, id] = this.interaction.customId.split(':');
 
     const banData = await banModalData.get(id);
@@ -27,14 +25,14 @@ export default class BanModalHandler extends ModalHandler {
     let notified = false;
     if (banData.notify_user) {
       const content = [
-        heading(`Banned from ${this.interaction.guild!.name}`),
+        heading(`Banned from ${this.guild.name}`),
         this.reason
       ].join('\n');
 
       notified = await this.messageUser(user, content, 'Red');
     }
 
-    const banned = await this.interaction.guild!.members.ban(user, { deleteMessageSeconds: banData.delete_messages, reason: this.reason }).then(() => true).catch(() => false);
+    const banned = await this.guild.members.ban(user, { deleteMessageSeconds: banData.delete_messages, reason: this.reason }).then(() => true).catch(() => false);
     if (!banned) return this.handleError(`An error occurred whilst trying to ban ${user.username}. Please try again.`);
 
     const embedDescription = [
@@ -42,7 +40,7 @@ export default class BanModalHandler extends ModalHandler {
     ];
     if (!notified && banData.notify_user) embedDescription.push('', italic('⚠️ User has DMs disabled, unable to notify.'));
 
-    const recorded = await this.#addBanToDatabase(user);
+    const recorded = await this.addBanToDatabase(user);
     if (!recorded) embedDescription.push('', italic('⚠️ An error occurred whilst adding the ban to the database.'));
 
     const embed = new EmbedBuilder()
@@ -53,14 +51,14 @@ export default class BanModalHandler extends ModalHandler {
   }
 
   // == Database Methods ==
-  async #addBanToDatabase(user: User) {
+  private async addBanToDatabase(user: User) {
     const result = await database.ban.create({
       data: {
         authorID: this.interaction.user.id,
         bannedID: user.id,
         date: Date.now().toString(),
         reason: this.reason,
-        guildID: this.interaction.guildId!,
+        guildID: this.guild.id,
       }
     }).then(() => true).catch(() => false);
 

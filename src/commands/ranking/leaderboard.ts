@@ -1,59 +1,53 @@
+import { Command } from "@commands/command.js";
 import { EmbedColours, database } from "@lib/config.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { Rank } from "@prisma/client";
 import { AttachmentBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 
-export default class LeaderboardCommand {
-  interaction: ChatInputCommandInteraction;
-  canvas: Canvas;
-  canvasContext: SKRSContext2D;
-  page: number;
+export class LeaderboardCommandHandler extends Command {
+  private canvas: Canvas;
+  private canvasContext: SKRSContext2D;
+  private page: number;
 
   constructor(interaction: ChatInputCommandInteraction) {
-    this.interaction = interaction;
+    super(interaction);
 
     GlobalFonts.registerFromPath('assets/fonts/Ubuntu-Medium.ttf', 'ubuntu-medium');
     GlobalFonts.registerFromPath('assets/fonts/TwitterColorEmoji-SVGinOT.ttf', 'twitter-emoji');
     this.canvas = new Canvas(620, 610);
     this.canvasContext = this.canvas.getContext('2d');
     this.page = this.interaction.options.getInteger('page', false) ?? 1;
-
   }
 
-  handle() {
-    this.#postLeaderboard();
-  }
-
-  async #postLeaderboard() {
+  async handle() {
     await this.interaction.deferReply();
 
-    const attachment = await this.#createLeaderboardImage();
-    const ranks = await this.#getRanksFromDatabase(false);
+    const leaderboardImage = await this.createLeaderboardImage();
+    const ranks = await this.getRanksFromDatabase(false);
     const pageCount = Math.ceil(ranks.length / 10);
     const memberRank = ranks.find((rank) => rank.userID === this.interaction.user.id);
     const memberPosition = ranks.findIndex((rank) => rank.userID === this.interaction.user.id) + 1;
-    const embedDescription = [
-      `### Server Rankings for ${this.interaction.guild?.name ?? ''}`,
-      `You are rank **#${memberPosition}** with a total of **${memberRank?.xp} XP**`
-    ];
 
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription.join('\n'))
+    const leaderboardEmbed = new EmbedBuilder()
+      .setDescription([
+        `### Server Rankings for ${this.guild.name}`,
+        `You are rank **#${memberPosition}** with a total of **${memberRank?.xp} XP**`
+      ].join('\n'))
       .setImage('attachment://leaderboard.png')
-      .setThumbnail(this.interaction.guild?.iconURL() ?? '')
+      .setThumbnail(this.guild.iconURL())
       .setFooter({ text: `Page ${this.page} / ${pageCount} • Run "/leaderboard ${this.page + 1}" to go to page ${this.page + 1} of the leaderboard` })
       .setColor(EmbedColours.Positive);
 
-    this.interaction.editReply({ files: [attachment], embeds: [embed] });
+    this.interaction.editReply({ files: [leaderboardImage], embeds: [leaderboardEmbed] });
   }
 
-  async #intialiseCanvas() {
+  private async intialiseCanvas() {
     const backgroundImage = await loadImage('assets/leaderboard/leaderboard.png');
     this.canvasContext.drawImage(backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
   }
 
-  async #drawBars() {
-    const ranks = await this.#getRanksFromDatabase();
+  private async drawBars() {
+    const ranks = await this.getRanksFromDatabase();
     const ranksLength = ranks.length;
 
     if (ranksLength === 0) {
@@ -76,12 +70,12 @@ export default class LeaderboardCommand {
       const rankPosition = (this.page - 1) * 10 + index + 1;
 
       this.canvasContext.drawImage(barImageToDraw, barX, barY + (index * (barHeight + barSpacing)), barWidth, barHeight);
-      this.#drawBarText(rank, rankPosition);
+      this.drawBarText(rank, rankPosition);
     });
 
   }
 
-  #drawBarText(rank: Rank, rankPosition: number) {
+  private drawBarText(rank: Rank, rankPosition: number) {
     const barTextX = 20;
     const barTextY = 43;
     const barTextSpacing = 60;
@@ -109,14 +103,14 @@ export default class LeaderboardCommand {
 
     // Draw Member Name
     const xpTextWidth = this.canvasContext.measureText(`${memberXP} XP`).width;
-    const member = this.interaction.guild?.members.cache.get(rank.userID);
+    const member = this.guild.members.cache.get(rank.userID);
     const memberName = member?.displayName ?? 'Unknown User';
     this.canvasContext.fillText(memberName, barTextX + 50, barTextY + (rankPosition - 1) * barTextSpacing, xpTextX - xpTextWidth - 50 - 10 - barTextX);
   }
 
-  async #createLeaderboardImage() {
-    await this.#intialiseCanvas();
-    await this.#drawBars();
+  private async createLeaderboardImage() {
+    await this.intialiseCanvas();
+    await this.drawBars();
 
     const imageAltText = 'Server Leaderboard';
     const attachment = new AttachmentBuilder(await this.canvas.encode('png'), { name: 'leaderboard.png', description: imageAltText });
@@ -124,8 +118,8 @@ export default class LeaderboardCommand {
   }
 
   // == Database Methods ==
-  async #getRanksFromDatabase(pageSlicing = true) {
-    const guildID = this.interaction.guild?.id ?? '';
+  private async getRanksFromDatabase(pageSlicing = true) {
+    const guildID = this.guild.id;
     const userID = this.interaction.user.id;
 
     await database.rank.upsert({
@@ -134,7 +128,7 @@ export default class LeaderboardCommand {
       update: {},
     });
 
-    const guildMembers = await this.interaction.guild?.members.fetch();
+    const guildMembers = await this.guild.members.fetch();
     const guildMemberIDs = guildMembers?.map((member) => member.id);
 
     const guildRanks = await database.rank.findMany({ where: { guildID }, orderBy: { xp: 'desc' }, });
