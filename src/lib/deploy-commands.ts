@@ -1,5 +1,5 @@
 import { styleLog } from '@lib/utilities.js';
-import { REST, Routes, SlashCommandBuilder } from 'discord.js';
+import { PermissionFlagsBits, REST, Routes, SlashCommandBuilder } from 'discord.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -7,7 +7,8 @@ dotenv.config();
 const commands = [
   new SlashCommandBuilder()
     .setName('ping')
-    .setDescription('View Mr Wholesome\'s ping'),
+    .setDescription('View Mr Wholesome\'s ping')
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('8ball')
@@ -16,7 +17,8 @@ const commands = [
       .setName('question')
       .setDescription('The question to ask the 8ball')
       .setRequired(true)
-      .setMinLength(1)),
+      .setMinLength(1))
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('birthday')
@@ -56,23 +58,28 @@ const commands = [
         .setDescription('The number of days ahead to look for upcoming birthdays')
         .setMinValue(2)
         .setMaxValue(30)
-        .setRequired(false))),
+        .setRequired(false)))
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('cat')
-    .setDescription('Post a random cat image'),
+    .setDescription('Post a random cat image')
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('dog')
-    .setDescription('Post a random dog image'),
+    .setDescription('Post a random dog image')
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('fox')
-    .setDescription('Post a random fox image'),
+    .setDescription('Post a random fox image')
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('reading')
-    .setDescription('View your reading for the day'),
+    .setDescription('View your reading for the day')
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('ban')
@@ -97,7 +104,9 @@ const commands = [
     .addBooleanOption((option) => option
       .setName('notify_user')
       .setDescription('Should the user be notified via DMs that they were banned?')
-      .setRequired(true)),
+      .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('view')
@@ -115,7 +124,9 @@ const commands = [
       .addStringOption((option) => option
         .setName('id')
         .setDescription('The @mention, User ID, or Warning ID to view')
-        .setRequired(false))),
+        .setRequired(false)))
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('unban')
@@ -123,7 +134,9 @@ const commands = [
     .addStringOption((option) => option
       .setName('user_id')
       .setDescription('The ID of the user to unban')
-      .setRequired(true)),
+      .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('warn')
@@ -135,7 +148,9 @@ const commands = [
     .addBooleanOption((option) => option
       .setName('notify_user')
       .setDescription('Should the user be notified via DMs that they were warned?')
-      .setRequired(true)),
+      .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('unwarn')
@@ -143,11 +158,14 @@ const commands = [
     .addStringOption((option) => option
       .setName('warning_id')
       .setDescription('The ID of the warning to remove')
-      .setRequired(true)),
+      .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('rank')
-    .setDescription('View your server rank'),
+    .setDescription('View your server rank')
+    .setDMPermission(false),
 
   new SlashCommandBuilder()
     .setName('leaderboard')
@@ -156,7 +174,8 @@ const commands = [
       .setName('page')
       .setDescription('The page number of the leaderboard to view')
       .setMinValue(1)
-      .setRequired(false)),
+      .setRequired(false))
+    .setDMPermission(false),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');
