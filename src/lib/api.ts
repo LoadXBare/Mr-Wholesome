@@ -77,6 +77,33 @@ export const warnModalData = {
   del: warnModalDataDel
 };
 
+
+// === Ticket Panel Modal Data ===
+
+const ticketPanelModalDataKeyV = new Keyv('sqlite://data.sqlite', { namespace: 'ticketPanelModalData' });
+
+async function ticketPanelModalDataGet(modalInteractionID: string) {
+  const data = await ticketPanelModalDataKeyV.get(modalInteractionID) as { name: string, categoryID: string, moderatorRoleID: string; } | undefined;
+  return data;
+}
+
+async function ticketPanelModalDataSet(modalInteractionID: string, name: string, categoryID: string, moderatorRoleID: string) {
+  const result = await ticketPanelModalDataKeyV.set(modalInteractionID, { name, categoryID, moderatorRoleID });
+  return result;
+}
+
+async function ticketPanelModalDataDel(modalInteractionID: string) {
+  const result = await ticketPanelModalDataKeyV.delete(modalInteractionID);
+  return result;
+}
+
+export const ticketPanelModalData = {
+  get: ticketPanelModalDataGet,
+  set: ticketPanelModalDataSet,
+  del: ticketPanelModalDataDel
+};
+
+
 // === Birthday Scheduler ===
 
 const birthdayCheckKeyV = new Keyv('sqlite://data.sqlite', { namespace: 'birthdayCheck' });
@@ -95,3 +122,4 @@ export const lastBirthdayCheck = {
   get: lastBirthdayCheckGet,
   set: lastBirthdayCheckSet
 };
+// keyv sqlite is bloated, just move these to prisma db

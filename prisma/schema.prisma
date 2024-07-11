@@ -47,21 +47,24 @@ model Rank {
 }
 
 model Ticket {
-  ticketID      String      @id @default(uuid())
-  ticketPanelID String
-  authorID      String
-  open          Boolean     @default(true)
-  TicketPanel   TicketPanel @relation(fields: [ticketPanelID], references: [ticketPanelID], onDelete: Cascade)
+  timeCreated     String  @id
+  ticketPanelName String
+  authorID        String
+  channelID       String  @unique
+  addedUsers      String  @default("[]")
+  open            Boolean @default(true)
 }
 
 model TicketPanel {
-  ticketPanelID   String   @id @default(uuid())
+  timeCreated     String @id
+  name            String
   guildID         String
   categoryID      String
+  moderatorRoleID String
   panelEmbedJSON  String
   ticketEmbedJSON String
-  name            String   @unique
-  tickets         Ticket[]
+
+  @@unique([name, guildID])
 }
 
 model Warning {

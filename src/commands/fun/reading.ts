@@ -1,7 +1,6 @@
 import { Command } from '@commands/command.js';
-import { displayName } from '@lib/utilities.js';
+import { displayName, getRandomIntegerFromSeed } from '@lib/utilities.js';
 import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
-import { Chance } from 'chance';
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
 
 export class ReadingCommandHandler extends Command {
@@ -84,13 +83,12 @@ export class ReadingCommandHandler extends Command {
   }
 
   private generateStarReading() {
-    const seed = `${this.interaction.user.id} ${new Date().toDateString()}`;
-    const chance = new Chance(seed);
+    const seed = `${this.interaction.user.id}${new Date().toDateString()}`;
 
-    const love = chance.integer({ min: 0, max: 10 }) / 2;
-    const success = chance.integer({ min: 0, max: 10 }) / 2;
-    const luck = chance.integer({ min: 0, max: 10 }) / 2;
-    const wealth = chance.integer({ min: 0, max: 10 }) / 2;
+    const love = getRandomIntegerFromSeed(`${seed}love`, 0, 10) / 2;
+    const success = getRandomIntegerFromSeed(`${seed}success`, 0, 10) / 2;
+    const luck = getRandomIntegerFromSeed(`${seed}luck`, 0, 10) / 2;
+    const wealth = getRandomIntegerFromSeed(`${seed}wealth`, 0, 10) / 2;
     const overall = Math.round((love + success + luck + wealth) / 4 * 2) / 2; // Rounded to nearest 0.5
 
     return {

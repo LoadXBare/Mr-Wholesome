@@ -1,7 +1,6 @@
 import { levelNotifButtonData } from "@lib/api.js";
 import { ChannelIDs, EmbedColours, database, xpCooldownCache } from "@lib/config.js";
-import { displayName, styleLog } from "@lib/utilities.js";
-import { Chance } from "chance";
+import { displayName, getRandomIntegerFromSeed, styleLog } from "@lib/utilities.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, TextChannel } from "discord.js";
 
 export default class RankingHandler {
@@ -23,10 +22,9 @@ export default class RankingHandler {
     const memberRank = await this.#fetchMemberRankFromDatabase();
     if (!memberRank) return;
 
-    const xpPerMessage = { min: 5, max: 15 };
     const currentXP = memberRank.xp;
-    const chance = new Chance();
-    const xp = currentXP + chance.integer(xpPerMessage);
+    const seed = Date.now().toString();
+    const xp = currentXP + getRandomIntegerFromSeed(seed, 5, 15);
 
     const currentLevel = memberRank.xpLevel;
     const levelNotifs = memberRank.levelNotifs;

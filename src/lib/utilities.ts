@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import {
   Attachment,
   ChatInputCommandInteraction,
@@ -97,7 +98,7 @@ export function getRelativeTimeString(date: Date | number) {
  * @returns Empty promise after specified delay has elapsed
  */
 export async function sleep(ms: number) {
-  new Promise((r) => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 /**
@@ -131,6 +132,18 @@ export function displayName(data: Message | ChatInputCommandInteraction) {
   }
 
   return '[Unknown]';
+}
+
+export function getRandomIntegerFromSeed(seed: string, min: number, max: number): number {
+  // Create a SHA-256 hash from the seed string
+  const hash = createHash('sha256').update(seed).digest('hex');
+
+  // Convert the hash to a number and map it to the desired range
+  const hashNumber = parseInt(hash.slice(0, 8), 16);
+  const range = max - min + 1;
+  const randomNumber = (hashNumber % range) + min;
+
+  return randomNumber;
 }
 
 export function formatDate(day: number, month: number) {

@@ -1,5 +1,5 @@
 import { styleLog } from '@lib/utilities.js';
-import { PermissionFlagsBits, REST, Routes, SlashCommandBuilder } from 'discord.js';
+import { ChannelType, PermissionFlagsBits, REST, Routes, SlashCommandBuilder } from 'discord.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -149,7 +149,7 @@ const commands = [
       .setName('notify_user')
       .setDescription('Should the user be notified via DMs that they were warned?')
       .setRequired(true))
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
     .setDMPermission(false),
 
   new SlashCommandBuilder()
@@ -159,7 +159,7 @@ const commands = [
       .setName('warning_id')
       .setDescription('The ID of the warning to remove')
       .setRequired(true))
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
     .setDMPermission(false),
 
   new SlashCommandBuilder()
@@ -176,6 +176,68 @@ const commands = [
       .setMinValue(1)
       .setRequired(false))
     .setDMPermission(false),
+
+  new SlashCommandBuilder()
+    .setName('ticket-panel')
+    .setDescription('Ticket Panel Commands')
+    .addSubcommand((subcommand) => subcommand
+      .setName('create')
+      .setDescription('Create a ticket panel')
+      .addStringOption((option) => option
+        .setName('name')
+        .setDescription('The name of the ticket panel')
+        .setRequired(true))
+      .addChannelOption((option) => option
+        .setName('category')
+        .setDescription('The category tickets will be created in')
+        .addChannelTypes(ChannelType.GuildCategory)
+        .setRequired(true))
+      .addRoleOption((option) => option
+        .setName('moderator-role')
+        .setDescription('The role that will be able to view and manage tickets')
+        .setRequired(true)))
+    .addSubcommand((subcommand) => subcommand
+      .setName('delete')
+      .setDescription('Delete a ticket panel')
+      .addStringOption((option) => option
+        .setName('name')
+        .setDescription('The name of the ticket panel to delete')
+        .setRequired(true)))
+    .addSubcommand((subcommand) => subcommand
+      .setName('post')
+      .setDescription('Post a ticket panel in a given channel')
+      .addStringOption((option) => option
+        .setName('name')
+        .setDescription('The name of the ticket panel to post')
+        .setRequired(true))
+      .addChannelOption((option) => option
+        .setName('channel')
+        .setDescription('The channel to post the ticket panel in')
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(true)))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+    .setDMPermission(false),
+
+  new SlashCommandBuilder()
+    .setName('ticket')
+    .setDescription('Ticket Commands')
+    .addSubcommand((subcommand) => subcommand
+      .setName('add_user')
+      .setDescription('Add a user to this ticket (must be in a ticket channel)')
+      .addUserOption((option) => option
+        .setName('user')
+        .setDescription('The user to add to the ticket')
+        .setRequired(true)))
+    .addSubcommand((subcommand) => subcommand
+      .setName('remove_user')
+      .setDescription('Remove a user from this ticket (must be in a ticket channel)')
+      .addUserOption((option) => option
+        .setName('user')
+        .setDescription('The user to remove from the ticket')
+        .setRequired(true)))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+    .setDMPermission(false),
+
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');

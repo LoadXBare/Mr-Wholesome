@@ -33,3 +33,4 @@ export class BanCommandHandler extends Command {
     await banModalData.set(this.interaction.id, this.user.id, this.delete_messages, this.notify_user);
   }
 }
+// TODO: Use buttons to confirm the ban, do same with warn

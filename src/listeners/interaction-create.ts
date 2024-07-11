@@ -1,5 +1,6 @@
 import { client } from '@base';
-import ToggleLevelNotifButton from '@buttons/ranking/toggle-level-notifs.js';
+import { ToggleLevelNotifButtonHandler } from '@buttons/ranking/toggle-level-notifs.js';
+import { ticketButtonHandler } from '@buttons/tickets/handler.js';
 import { CatCommandHandler } from '@commands/fun/cat.js';
 import { DogCommandHandler } from '@commands/fun/dog.js';
 import { EightBallCommandHandler } from '@commands/fun/eight-ball.js';
@@ -13,10 +14,12 @@ import { WarnCommandHandler } from '@commands/moderation/warn.js';
 import { LeaderboardCommandHandler } from '@commands/ranking/leaderboard.js';
 import { RankCommandHandler } from '@commands/ranking/rank.js';
 import { BirthdayCommandHandler } from '@commands/utility/birthday.js';
+import { TicketPanelCommandHandler } from '@commands/utility/ticket-panel.js';
 import { ViewCommandHandler } from '@commands/utility/view.js';
 import { EventHandler } from '@lib/config.js';
 import { BanModalHandler } from '@modals/moderation/ban.js';
 import { WarningModalHandler } from '@modals/moderation/warn.js';
+import { TicketPanelModalHandler } from '@modals/utility/ticket-panel.js';
 import { Events, Interaction } from 'discord.js';
 
 class InteractionCreateHandler extends EventHandler {
@@ -60,6 +63,7 @@ class InteractionCreateHandler extends EventHandler {
 
     // Utility
     else if (cmd === 'birthday') new BirthdayCommandHandler(chatInputInteraction).handle();
+    else if (cmd === 'ticket-panel') new TicketPanelCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'view') new ViewCommandHandler(chatInputInteraction).handle();
 
     // Unknown Command / Not Implemented
@@ -71,7 +75,9 @@ class InteractionCreateHandler extends EventHandler {
     const buttonInteraction = this.interaction;
     const customId = buttonInteraction.customId;
 
-    if (customId === 'toggle-level-notif') new ToggleLevelNotifButton(buttonInteraction).handle();
+    if (customId === 'toggle-level-notif') new ToggleLevelNotifButtonHandler(buttonInteraction).handle();
+    if (customId.startsWith('ticket:')) new ticketButtonHandler(buttonInteraction).handle();
+    console.log('Button Clicked:', customId);
   }
 
   async #handleModal() {
@@ -80,6 +86,7 @@ class InteractionCreateHandler extends EventHandler {
 
     if (modalInteraction.customId.startsWith('ban:')) new BanModalHandler(modalInteraction).handle();
     else if (modalInteraction.customId.startsWith('warn:')) new WarningModalHandler(modalInteraction).handle();
+    else if (modalInteraction.customId.startsWith('ticket-panel:')) new TicketPanelModalHandler(modalInteraction).handle();
   }
 }
 

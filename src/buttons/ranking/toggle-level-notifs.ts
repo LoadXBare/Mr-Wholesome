@@ -1,14 +1,9 @@
+import { ButtonHandler } from "@buttons/button-handler.js";
 import { levelNotifButtonData } from "@lib/api.js";
 import { EmbedColours, database } from "@lib/config.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, EmbedBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder } from "discord.js";
 
-export default class ToggleLevelNotifButton {
-  private interaction: ButtonInteraction;
-
-  constructor(interaction: ButtonInteraction) {
-    this.interaction = interaction;
-  }
-
+export class ToggleLevelNotifButtonHandler extends ButtonHandler {
   async handle() {
     await this.interaction.deferReply({ ephemeral: true });
     const buttonData = await levelNotifButtonData.get(this.interaction.message.id);
