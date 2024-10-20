@@ -19,6 +19,7 @@ export class RankCommandHandler extends CommandHandler {
   }
 
   async handle() {
+    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
     await this.interaction.deferReply();
 
     const userRankImage = await this.createUserRankImage();

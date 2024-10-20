@@ -2,6 +2,7 @@ import { CommandHandler } from '@commands/command.js';
 
 export class DogCommandHandler extends CommandHandler {
   async handle() {
+    if (!this.checkChannelEligibility(true, true)) return this.postChannelIneligibleMessage(true);
     await this.interaction.deferReply();
 
     const response = await fetch('https://api.thedogapi.com/v1/images/search').catch(() => null);

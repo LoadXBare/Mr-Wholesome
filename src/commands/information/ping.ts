@@ -6,6 +6,7 @@ import { EmbedBuilder } from 'discord.js';
 
 export class PingCommandHandler extends CommandHandler {
   async handle() {
+    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
     await this.interaction.deferReply();
 
     const interactionResponse = await this.interaction.channel!.send('uwu');

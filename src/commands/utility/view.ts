@@ -7,9 +7,9 @@ import { chatInputApplicationCommandMention, ChatInputCommandInteraction, EmbedB
 
 export class ViewCommandHandler extends CommandHandler {
   async handle() {
-    const subcommand = this.interaction.options.getSubcommand(true);
     await this.interaction.deferReply();
 
+    const subcommand = this.interaction.options.getSubcommand(true);
     if (subcommand === 'ban') new BanViewer(this.interaction).handle();
     else if (subcommand === 'warning') new WarningViewer(this.interaction).handle();
   }

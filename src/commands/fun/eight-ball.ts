@@ -5,6 +5,7 @@ import { ColorResolvable, EmbedBuilder } from 'discord.js';
 
 export class EightBallCommandHandler extends CommandHandler {
   async handle() {
+    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
     await this.interaction.deferReply();
 
     const question = this.interaction.options.getString('question', true);

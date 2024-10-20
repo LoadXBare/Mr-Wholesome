@@ -2,6 +2,7 @@ import { CommandHandler } from '@commands/command.js';
 
 export class CatCommandHandler extends CommandHandler {
   async handle() {
+    if (!this.checkChannelEligibility(true, true)) return this.postChannelIneligibleMessage(true);
     await this.interaction.deferReply();
 
     const response = await fetch('https://api.thecatapi.com/v1/images/search').catch(() => null);

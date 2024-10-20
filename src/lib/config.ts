@@ -30,6 +30,8 @@ export const UserIDs = {
 export const ChannelIDs = {
   Birthday: process.env.BIRTHDAY_CHANNEL_ID ?? '',
   Memes: process.env.MEMES_CHANNEL_ID ?? '',
+  ComfyVibes: process.env.COMFY_VIBES_CHANNEL_ID ?? '',
+  BotSpam: process.env.BOT_SPAM_CHANNEL_ID ?? '',
   ModerationLogs: process.env.MODERATION_LOGS_CHANNEL_ID ?? '',
   LevelUp: process.env.LEVEL_UP_CHANNEL_ID ?? '',
 };

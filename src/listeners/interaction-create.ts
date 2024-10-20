@@ -15,6 +15,7 @@ import { LeaderboardCommandHandler } from '@commands/ranking/leaderboard.js';
 import { RankCommandHandler } from '@commands/ranking/rank.js';
 import { BirthdayCommandHandler } from '@commands/utility/birthday.js';
 import { TicketPanelCommandHandler } from '@commands/utility/ticket-panel.js';
+import { TicketCommandHandler } from '@commands/utility/ticket.js';
 import { ViewCommandHandler } from '@commands/utility/view.js';
 import { EventHandler } from '@lib/config.js';
 import { BanModalHandler } from '@modals/moderation/ban.js';
@@ -65,6 +66,7 @@ class InteractionCreateHandler extends EventHandler {
     // Utility
     else if (cmd === 'birthday') new BirthdayCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'ticket-panel') new TicketPanelCommandHandler(chatInputInteraction).handle();
+    else if (cmd === 'ticket') new TicketCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'view') new ViewCommandHandler(chatInputInteraction).handle();
 
     // Unknown Command / Not Implemented

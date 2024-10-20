@@ -8,6 +8,7 @@ import { EmbedBuilder } from 'discord.js';
 
 export class BirthdayCommandHandler extends CommandHandler {
   async handle() {
+    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
     await this.interaction.deferReply();
 
     const command = this.interaction.options.getSubcommand();

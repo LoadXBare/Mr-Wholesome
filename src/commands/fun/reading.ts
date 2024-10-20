@@ -18,6 +18,7 @@ export class ReadingCommandHandler extends CommandHandler {
   }
 
   async handle() {
+    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
     await this.interaction.deferReply();
 
     const cursed = this.todayIsCursedDay ? 'cursed ' : '';
