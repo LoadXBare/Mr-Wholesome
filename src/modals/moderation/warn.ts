@@ -2,7 +2,7 @@ import { client } from "@base";
 import { warnModalData } from "@lib/api.js";
 import { database, EmbedColours } from "@lib/config.js";
 import { ModalHandler } from "@modals/handler.js";
-import { bold, EmbedBuilder, heading, italic, ModalSubmitInteraction, User } from "discord.js";
+import { bold, EmbedBuilder, heading, italic, Message, ModalSubmitInteraction, User } from "discord.js";
 
 export class WarningModalHandler extends ModalHandler {
   private reason: string;
@@ -23,20 +23,20 @@ export class WarningModalHandler extends ModalHandler {
     const user = await client.users.fetch(warningData.userID).catch(() => { });
     if (!user) return this.handleError(`User of ID ${bold(warningData.userID)} not found. Please try again.`);
 
-    let notified = false;
+    let notifiedMessage: Message<false> | boolean = false;
     if (warningData.notify_user) {
       const content = [
         heading(`Warned in ${this.guild.name}`),
         this.reason
       ].join('\n');
 
-      notified = await this.messageUser(user, content, 'Yellow');
+      notifiedMessage = await this.messageUser(user, content, 'Yellow');
     }
 
     const embedDescription = [
-      `✅ ${user.username} has been${notified ? ' notified and' : ''} warned in the server.`,
+      `✅ ${user.username} has been${notifiedMessage ? ' notified and' : ''} warned in the server.`,
     ];
-    if (!notified && warningData.notify_user) embedDescription.push('', italic('⚠️ User has DMs disabled, unable to notify.'));
+    if (!notifiedMessage && warningData.notify_user) embedDescription.push('', italic('⚠️ User has DMs disabled, unable to notify.'));
 
     const recorded = await this.addWarnToDatabase(user);
     if (!recorded) embedDescription.push('', italic('⚠️ An error occurred whilst adding the warning to the database.'));

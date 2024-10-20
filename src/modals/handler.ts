@@ -27,7 +27,7 @@ export abstract class ModalHandler {
       .setTimestamp()
       .setColor(colour);
 
-    const messaged = await user.send({ embeds: [messageEmbed] }).then(() => true).catch(() => false);
-    return messaged;
+    const message = await user.send({ embeds: [messageEmbed] }).catch(() => false);
+    return message;
   }
 }
