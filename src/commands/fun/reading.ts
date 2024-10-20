@@ -1,9 +1,9 @@
-import { Command } from '@commands/command.js';
+import { CommandHandler } from '@commands/command.js';
 import { displayName, getRandomIntegerFromSeed } from '@lib/utilities.js';
 import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
 
-export class ReadingCommandHandler extends Command {
+export class ReadingCommandHandler extends CommandHandler {
   private canvas: Canvas;
   private canvasContext: SKRSContext2D;
   private todayIsCursedDay: boolean;
@@ -60,7 +60,8 @@ export class ReadingCommandHandler extends Command {
   private async drawAvatar() {
     const cursed = this.todayIsCursedDay ? 'cursed-' : '';
 
-    const response = await fetch(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }));
+    const response = await fetch(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }))
+      .catch(() => fetch('assets/reading/avatar-error.png'));
     const avatar = await loadImage(await response.arrayBuffer());
     const avatarX = 517;
     const avatarY = 97;
@@ -91,9 +92,7 @@ export class ReadingCommandHandler extends Command {
     const wealth = getRandomIntegerFromSeed(`${seed}wealth`, 0, 10) / 2;
     const overall = Math.round((love + success + luck + wealth) / 4 * 2) / 2; // Rounded to nearest 0.5
 
-    return {
-      love, success, luck, wealth, overall,
-    };
+    return { love, success, luck, wealth, overall };
   }
 
   private async initialiseCanvas() {

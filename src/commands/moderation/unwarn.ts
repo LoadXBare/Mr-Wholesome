@@ -1,8 +1,8 @@
-import { Command } from "@commands/command.js";
+import { CommandHandler } from "@commands/command.js";
 import { database } from "@lib/config.js";
-import { bold, ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 
-export class UnwarnCommandHandler extends Command {
+export class UnwarnCommandHandler extends CommandHandler {
   private warningID: string;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -11,27 +11,18 @@ export class UnwarnCommandHandler extends Command {
   }
 
   async handle() {
-    const warning = await this.getWarningFromDatabase();
+    const warning = await database.warning.findUnique({ where: { date: this.warningID } }).catch(() => null);
+
     if (!warning) {
-      await this.interaction.reply(`${bold(this.warningID)} is not a valid warning ID!`);
-      return;
+      return this.handleError(`**${this.warningID}** is not a valid warning ID!`);
     }
 
-    await this.removeWarningFromDatabase();
-    await this.interaction.reply(`✅ Warning ${bold(this.warningID)} has been removed.`);
-  }
+    const warningDeleteSuccessful = await database.warning.delete({ where: { date: this.warningID }, }).catch(() => false).then(() => true);
 
-  // == Database Methods ==
-  private async getWarningFromDatabase() {
-    const date = this.warningID;
+    if (!warningDeleteSuccessful) {
+      return this.handleError('Error deleting warning from WARNING table!', true, 'unwarn.js');
+    }
 
-    const warning = await database.warning.findUnique({ where: { date }, });
-    return warning;
-  }
-
-  private async removeWarningFromDatabase() {
-    const date = this.warningID;
-
-    await database.warning.delete({ where: { date }, });
+    await this.interaction.reply(`✅ Warning **${this.warningID}** has been removed.`);
   }
 }

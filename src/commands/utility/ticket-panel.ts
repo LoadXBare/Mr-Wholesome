@@ -1,9 +1,9 @@
-import { Command } from "@commands/command.js";
+import { CommandHandler } from "@commands/command.js";
 import { ticketPanelModalData } from "@lib/api.js";
 import { database } from "@lib/config.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 
-export class TicketPanelCommandHandler extends Command {
+export class TicketPanelCommandHandler extends CommandHandler {
   async handle() {
     const subcommand = this.interaction.options.getSubcommand(true);
 
@@ -55,9 +55,9 @@ export class TicketPanelCommandHandler extends Command {
     const channel = this.interaction.options.getChannel('channel', true, [ChannelType.GuildText]);
 
     const ticketPanel = await database.ticketPanel.findUnique({ where: { name_guildID: { name: name, guildID: this.guild.id } } });
+
     if (!ticketPanel) {
-      await this.interaction.reply({ content: 'Ticket panel not found' });
-      return;
+      return this.handleError('Error fetching ticket panel from TICKET_PANEL table!', true, 'ticket-panel.js');
     }
 
     const ticketPanelEmbed = JSON.parse(ticketPanel.panelEmbedJSON);
@@ -69,10 +69,10 @@ export class TicketPanelCommandHandler extends Command {
       .setStyle(ButtonStyle.Primary);
     const createButtonActionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(createTicketButton);
 
-    const posted = await channel.send({ embeds: [ticketPanelEmbed], components: [createButtonActionRow] });
+    const posted = await channel.send({ embeds: [ticketPanelEmbed], components: [createButtonActionRow] }).catch(() => false);
+
     if (!posted) {
-      await this.interaction.reply({ content: 'Failed to post ticket panel' });
-      return;
+      return this.handleError('Failed to post ticket panel to channel!', true, 'ticket-panel.js');
     }
 
     await this.interaction.reply({ content: `✅ Ticket panel "${name}" posted in ${channel} successfully.` });

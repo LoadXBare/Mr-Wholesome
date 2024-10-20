@@ -7,12 +7,11 @@ import { database } from "@lib/config.js";
  * @returns True if the channel has events ignored, or false otherwise
  */
 export async function channelIgnoresEvents(guildID: string | null, channelID: string | null) {
-  if (guildID === null || channelID === null) return true;
+  if (!guildID || !channelID) return true;
 
-  const guildConfig = await database.guildConfig.findFirst({
+  const guildConfig = await database.guildConfig.findUnique({
     where: { guildID },
-  });
-  // .catch((e) => log('An error occurred while fetching from the database!', false, e));
+  }).catch(() => null);
 
   const eventIgnoredChannelIDs = guildConfig?.eventIgnoredChannelIDs.split(',') ?? [];
   return eventIgnoredChannelIDs.includes(channelID);

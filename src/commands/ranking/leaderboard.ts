@@ -1,10 +1,11 @@
-import { Command } from "@commands/command.js";
+import { CommandHandler } from "@commands/command.js";
 import { EmbedColours, database } from "@lib/config.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { Rank } from "@prisma/client";
+import { stripIndents } from "common-tags";
 import { AttachmentBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 
-export class LeaderboardCommandHandler extends Command {
+export class LeaderboardCommandHandler extends CommandHandler {
   private canvas: Canvas;
   private canvasContext: SKRSContext2D;
   private page: number;
@@ -16,23 +17,23 @@ export class LeaderboardCommandHandler extends Command {
     GlobalFonts.registerFromPath('assets/fonts/TwitterColorEmoji-SVGinOT.ttf', 'twitter-emoji');
     this.canvas = new Canvas(620, 610);
     this.canvasContext = this.canvas.getContext('2d');
-    this.page = this.interaction.options.getInteger('page', false) ?? 1;
+    this.page = this.interaction.options.getInteger('page', false) || 1;
   }
 
   async handle() {
     await this.interaction.deferReply();
 
     const leaderboardImage = await this.createLeaderboardImage();
-    const ranks = await this.getRanksFromDatabase(false);
+    const ranks = await this.getRanks(false);
     const pageCount = Math.ceil(ranks.length / 10);
     const memberRank = ranks.find((rank) => rank.userID === this.interaction.user.id);
     const memberPosition = ranks.findIndex((rank) => rank.userID === this.interaction.user.id) + 1;
 
     const leaderboardEmbed = new EmbedBuilder()
-      .setDescription([
-        `### Server Rankings for ${this.guild.name}`,
-        `You are rank **#${memberPosition}** with a total of **${memberRank?.xp} XP**`
-      ].join('\n'))
+      .setDescription(stripIndents`
+      ## Server Rankings for ${this.guild.name}
+      You are rank **#${memberPosition}** with a total of **${memberRank?.xp} XP**`
+      )
       .setImage('attachment://leaderboard.png')
       .setThumbnail(this.guild.iconURL())
       .setFooter({ text: `Page ${this.page} / ${pageCount} • Run "/leaderboard ${this.page + 1}" to go to page ${this.page + 1} of the leaderboard` })
@@ -47,7 +48,7 @@ export class LeaderboardCommandHandler extends Command {
   }
 
   private async drawBars() {
-    const ranks = await this.getRanksFromDatabase();
+    const ranks = await this.getRanks();
     const ranksLength = ranks.length;
 
     if (ranksLength === 0) {
@@ -104,7 +105,7 @@ export class LeaderboardCommandHandler extends Command {
     // Draw Member Name
     const xpTextWidth = this.canvasContext.measureText(`${memberXP} XP`).width;
     const member = this.guild.members.cache.get(rank.userID);
-    const memberName = member?.displayName ?? 'Unknown User';
+    const memberName = member?.displayName || 'Unknown User';
     this.canvasContext.fillText(memberName, barTextX + 50, barTextY + (rankPosition - 1) * barTextSpacing, xpTextX - xpTextWidth - 50 - 10 - barTextX);
   }
 
@@ -117,8 +118,7 @@ export class LeaderboardCommandHandler extends Command {
     return attachment;
   }
 
-  // == Database Methods ==
-  private async getRanksFromDatabase(pageSlicing = true) {
+  private async getRanks(pageSlicing = true) {
     const guildID = this.guild.id;
     const userID = this.interaction.user.id;
 
@@ -137,6 +137,7 @@ export class LeaderboardCommandHandler extends Command {
     if (!pageSlicing) {
       return filteredRanks;
     }
+
     const sliceStart = (this.page - 1) * 10;
     const sliceEnd = this.page * 10;
     const slicedRanks = filteredRanks.slice(sliceStart, sliceEnd);

@@ -1,5 +1,5 @@
 import { styleLog } from '@lib/utilities.js';
-import { ChannelType, PermissionFlagsBits, REST, Routes, SlashCommandBuilder } from 'discord.js';
+import { ApplicationCommandType, ChannelType, ContextMenuCommandBuilder, PermissionFlagsBits, REST, Routes, SlashCommandBuilder } from 'discord.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -236,6 +236,12 @@ const commands = [
         .setDescription('The user to remove from the ticket')
         .setRequired(true)))
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+    .setDMPermission(false),
+
+  new ContextMenuCommandBuilder()
+    .setName('Ban User')
+    .setType(ApplicationCommandType.User)
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .setDMPermission(false),
 
 ].map((command) => command.toJSON());

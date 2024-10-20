@@ -1,13 +1,11 @@
-import { ButtonInteraction, Guild } from "discord.js";
+import { BaseInteractionHandler } from "@lib/config.js";
+import { ButtonInteraction } from "discord.js";
 
-export abstract class ButtonHandler {
+export abstract class ButtonHandler extends BaseInteractionHandler {
   protected interaction: ButtonInteraction;
-  protected guild: Guild;
 
   constructor(interaction: ButtonInteraction) {
+    super(interaction);
     this.interaction = interaction;
-    this.guild = interaction.guild!;
   }
-
-  abstract handle(): Promise<void>;
 }

@@ -1,8 +1,9 @@
-import { Command } from '@commands/command.js';
+import { CommandHandler } from '@commands/command.js';
 import { EmbedColours } from '@lib/config.js';
+import { stripIndents } from 'common-tags';
 import { ColorResolvable, EmbedBuilder } from 'discord.js';
 
-export class EightBallCommandHandler extends Command {
+export class EightBallCommandHandler extends CommandHandler {
   async handle() {
     await this.interaction.deferReply();
 
@@ -34,13 +35,12 @@ export class EightBallCommandHandler extends Command {
 
     const randomResponse = responses.at(Math.round(Math.random() * responses.length));
 
-    const eightBallEmbed = new EmbedBuilder()
-      .setDescription([
-        `**Question** — *${question}*`,
-        `## ${randomResponse?.response}`,
-      ].join('\n'))
-      .setColor(randomResponse?.colour || EmbedColours.Info);
+    const embeds = [new EmbedBuilder()
+      .setDescription(stripIndents`
+        **Question** — *${question}*
+        ## ${randomResponse?.response || 'No response found.'}`)
+      .setColor(randomResponse?.colour || EmbedColours.Info)];
 
-    await this.interaction.editReply({ embeds: [eightBallEmbed] });
+    await this.interaction.editReply({ embeds });
   }
 }

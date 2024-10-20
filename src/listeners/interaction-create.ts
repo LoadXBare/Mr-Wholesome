@@ -7,7 +7,7 @@ import { EightBallCommandHandler } from '@commands/fun/eight-ball.js';
 import { FoxCommandHandler } from '@commands/fun/fox.js';
 import { ReadingCommandHandler } from '@commands/fun/reading.js';
 import { PingCommandHandler } from '@commands/information/ping.js';
-import { BanCommandHandler } from '@commands/moderation/ban.js';
+import { BanCommandHandler, ContextMenuBanCommandHandler } from '@commands/moderation/ban.js';
 import { UnbanCommandHandler } from '@commands/moderation/unban.js';
 import { UnwarnCommandHandler } from '@commands/moderation/unwarn.js';
 import { WarnCommandHandler } from '@commands/moderation/warn.js';
@@ -34,6 +34,7 @@ class InteractionCreateHandler extends EventHandler {
     this.#handleChatInputCommand();
     this.#handleButton();
     this.#handleModal();
+    this.#handleUserContextMenu();
   }
 
   async #handleChatInputCommand() {
@@ -87,6 +88,13 @@ class InteractionCreateHandler extends EventHandler {
     if (modalInteraction.customId.startsWith('ban:')) new BanModalHandler(modalInteraction).handle();
     else if (modalInteraction.customId.startsWith('warn:')) new WarningModalHandler(modalInteraction).handle();
     else if (modalInteraction.customId.startsWith('ticket-panel:')) new TicketPanelModalHandler(modalInteraction).handle();
+  }
+
+  async #handleUserContextMenu() {
+    if (!this.interaction.isUserContextMenuCommand()) return;
+    const contextMenuInteraction = this.interaction;
+
+    if (this.interaction.commandName === 'Ban User') new ContextMenuBanCommandHandler(contextMenuInteraction).handle();
   }
 }
 

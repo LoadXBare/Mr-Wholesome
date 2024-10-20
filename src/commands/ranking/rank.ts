@@ -1,11 +1,11 @@
-import { Command } from "@commands/command.js";
+import { CommandHandler } from "@commands/command.js";
 import { database } from "@lib/config.js";
 import { xpRequiredForLevel } from "@lib/ranking-handler.js";
 import { displayName } from "@lib/utilities.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
 
-export class RankCommandHandler extends Command {
+export class RankCommandHandler extends CommandHandler {
   private canvas: Canvas;
   private canvasContext: SKRSContext2D;
 
@@ -23,6 +23,10 @@ export class RankCommandHandler extends Command {
 
     const userRankImage = await this.createUserRankImage();
 
+    if (!userRankImage) {
+      return;
+    }
+
     await this.interaction.editReply({ files: [userRankImage] });
   }
 
@@ -32,7 +36,8 @@ export class RankCommandHandler extends Command {
   }
 
   private async drawAvatar() {
-    const response = await fetch(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }));
+    const response = await fetch(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }))
+      .catch(() => fetch('assets/rank/avatar-error.png'));
     const avatar = await loadImage(await response.arrayBuffer());
     const avatarX = 50;
     const avatarY = 50;
@@ -94,7 +99,7 @@ export class RankCommandHandler extends Command {
     const aboveBarX = progressBarX + progressBarWidth / 2;
     const aboveBarY = progressBarY - 20;
 
-    const userPosition = await this.fetchRankPositionFromDatabase();
+    const userPosition = await this.fetchRankPosition() || '???';
 
     const usernameText = displayName(this.interaction);
     const levelText = `Level ${level}`;
@@ -129,7 +134,17 @@ export class RankCommandHandler extends Command {
   }
 
   private async createUserRankImage() {
-    const { xp, xpLevel } = await this.fetchMemberRankFromDatabase();
+    const memberRank = await database.rank.upsert({
+      where: { userID_guildID: { guildID: this.guild.id, userID: this.interaction.user.id } },
+      create: { guildID: this.guild.id, userID: this.interaction.user.id },
+      update: {},
+    }).catch(() => null);
+
+    if (!memberRank) {
+      return this.handleError('Error upserting ranks from RANK table!', true, 'rank.js');
+    }
+
+    const { xp, xpLevel } = memberRank;
     const { percent, xpNeeded } = this.fetchLevelProgress(xp, xpLevel);
 
     await this.intialiseCanvas();
@@ -142,29 +157,25 @@ export class RankCommandHandler extends Command {
     return attachment;
   }
 
-  // == Database Methods ==
-  private async fetchMemberRankFromDatabase() {
+  private async fetchRankPosition() {
     const guildID = this.guild.id;
     const userID = this.interaction.user.id;
 
-    const memberRank = await database.rank.upsert({
-      where: { userID_guildID: { guildID, userID } },
-      create: { guildID, userID },
-      update: {},
-    });
+    const guildMembers = await this.guild.members.fetch().catch(() => null);
 
-    return memberRank;
-  }
+    if (!guildMembers) {
+      return this.handleError('Error fetching members from guild!', true, 'rank.js');
+    }
 
-  private async fetchRankPositionFromDatabase() {
-    const guildID = this.guild.id;
-    const userID = this.interaction.user.id;
+    const guildMemberIDs = guildMembers.map((member) => member.id);
 
-    const guildMembers = await this.guild.members.fetch();
-    const guildMemberIDs = guildMembers?.map((member) => member.id);
+    const guildRanks = await database.rank.findMany({ where: { guildID }, orderBy: { xp: 'desc' } }).catch(() => null);
 
-    const guildRanks = await database.rank.findMany({ where: { guildID }, orderBy: { xp: 'desc' } });
-    const filteredRanks = guildRanks.filter((rank) => guildMemberIDs?.includes(rank.userID));
+    if (!guildRanks) {
+      return this.handleError('Error fetching ranks from RANK table!', true, 'rank.js');
+    }
+
+    const filteredRanks = guildRanks.filter((rank) => guildMemberIDs.includes(rank.userID));
 
     const memberRankPosition = filteredRanks.findIndex((rank) => rank.userID === userID) + 1;
     return memberRankPosition;

@@ -1,13 +1,11 @@
-import { ChatInputCommandInteraction, Guild } from "discord.js";
+import { BaseInteractionHandler } from "@lib/config.js";
+import { ChatInputCommandInteraction } from "discord.js";
 
-export abstract class Command {
+export abstract class CommandHandler extends BaseInteractionHandler {
   protected interaction: ChatInputCommandInteraction;
-  protected guild: Guild;
 
   constructor(interaction: ChatInputCommandInteraction) {
+    super(interaction);
     this.interaction = interaction;
-    this.guild = interaction.guild!;
   }
-
-  abstract handle(): Promise<void>;
 }

@@ -1,9 +1,9 @@
 import { client } from "@base";
-import { Command } from "@commands/command.js";
+import { CommandHandler } from "@commands/command.js";
 import { database } from "@lib/config.js";
-import { bold, ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 
-export class UnbanCommandHandler extends Command {
+export class UnbanCommandHandler extends CommandHandler {
   private userID: string;
 
   constructor(interaction: ChatInputCommandInteraction) {
@@ -12,32 +12,33 @@ export class UnbanCommandHandler extends Command {
   }
 
   async handle() {
-    const user = await client.users.fetch(this.userID).catch(() => { });
+    const user = await client.users.fetch(this.userID).catch(() => null);
+
     if (!user) {
-      await this.interaction.reply(`${bold(this.userID)} is not a valid User ID!`);
-      return;
+      return this.handleError(`**${this.userID}** is not a valid User ID!`);
     }
 
-    const userIsBanned = await this.guild.bans.fetch(user).catch(() => { });
+    const userIsBanned = await this.guild.bans.fetch(user).catch(() => null);
+
     if (!userIsBanned) {
-      await this.interaction.reply(`${bold(user.username)} is not banned!`);
-      return;
+      return this.handleError(`**${user.username}** is not banned!`);
     }
 
-    const unbanned = await this.guild.bans.remove(user);
+    const unbanned = await this.guild.bans.remove(user).catch(() => false).then(() => true);
+
     if (!unbanned) {
-      await this.interaction.reply(`Failed to unban ${bold(user.username)}!`);
-      return;
+      return this.handleError('Failed to unban user.', true, 'unban.js');
     }
 
-    await this.updateBanInDatabase();
-    await this.interaction.reply(`✅ ${bold(user.username)} has been unbanned.`);
-  }
+    const banUpdateSuccessful = await database.ban.update({
+      where: { date: this.userID },
+      data: { unbanned: true }
+    }).catch(() => false).then(() => true);
 
-  // == Database Methods ==
-  private async updateBanInDatabase() {
-    const date = this.userID;
+    if (!banUpdateSuccessful) {
+      return this.handleError('Error updating ban in BAN table!', true, 'unban.js');
+    }
 
-    await database.ban.update({ where: { date }, data: { unbanned: true } });
+    await this.interaction.reply(`✅ **${user.username}** has been unbanned.`);
   }
 }
