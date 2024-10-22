@@ -13,9 +13,8 @@ datasource db {
 // --- USER MODELS --- //
 
 model Birthday {
-  birthdayID String @id @default(uuid())
-  userID     String @unique
-  date       String
+  userID String @id
+  date   String
 }
 
 // --- GUILD MODELS --- //
