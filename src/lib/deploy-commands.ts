@@ -238,6 +238,11 @@ const commands = [
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
     .setDMPermission(false),
 
+  new SlashCommandBuilder()
+    .setName('writing')
+    .setDescription('View your message statistics on the server')
+    .setDMPermission(false),
+
   new ContextMenuCommandBuilder()
     .setName('Ban User')
     .setType(ApplicationCommandType.User)

@@ -84,10 +84,10 @@ model Notes {
 }
 
 model MemberStats {
-  userID                 String
-  guildID                String
-  messageCount           Int
-  messageCountByHourJSON String
+  userID          String
+  guildID         String
+  messageCount    Int    @default(0)
+  messagesPerHour String
 
   @@id([userID, guildID])
 }

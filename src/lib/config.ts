@@ -8,10 +8,11 @@ export const xpCooldownCache: { [userID: string]: number; } = {};
 export const akialytesGuild = await client.guilds.fetch(process.env.AKIALYTES_GUILD_ID ?? '');
 export const EmbedColours = {
   Positive: Colors.Green,
-  Neutral: Colors.Blue,
+  Neutral: Colors.Aqua,
   Negative: Colors.Red,
   Info: Colors.Purple,
 };
+export const baseEmbed = new EmbedBuilder().setColor(EmbedColours.Neutral).toJSON();
 export const Emotes = {
   Bonque: '<:akiaBonque:1072610966598066237>',
   Arson: '<a:arson:1010942526976430191>',

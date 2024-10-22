@@ -6,6 +6,7 @@ import { DogCommandHandler } from '@commands/fun/dog.js';
 import { EightBallCommandHandler } from '@commands/fun/eight-ball.js';
 import { FoxCommandHandler } from '@commands/fun/fox.js';
 import { ReadingCommandHandler } from '@commands/fun/reading.js';
+import { WritingCommandHandler } from '@commands/fun/writing.js';
 import { PingCommandHandler } from '@commands/information/ping.js';
 import { BanCommandHandler, ContextMenuBanCommandHandler } from '@commands/moderation/ban.js';
 import { UnbanCommandHandler } from '@commands/moderation/unban.js';
@@ -49,6 +50,7 @@ class InteractionCreateHandler extends EventHandler {
     else if (cmd === '8ball') new EightBallCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'fox') new FoxCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'reading') new ReadingCommandHandler(chatInputInteraction).handle();
+    else if (cmd === 'writing') new WritingCommandHandler(chatInputInteraction).handle();
 
     // Information
     else if (cmd === 'ping') new PingCommandHandler(chatInputInteraction).handle();

@@ -1,6 +1,7 @@
 import { client } from '@base';
 import { ChannelIDs, Emotes, EventHandler, UserIDs } from '@lib/config.js';
 import { channelIgnoresEvents } from '@lib/database-utilities.js';
+import MessageStatisticsHandler from '@lib/message-statistics-handler.js';
 import RankingHandler from '@lib/ranking-handler.js';
 import { styleLog } from '@lib/utilities.js';
 import { Events, Message } from 'discord.js';
@@ -24,6 +25,7 @@ class MessageCreateHandler extends EventHandler {
     this.#reactWithArson();
     this.#useSlashCommands();
     this.#handleRanking();
+    this.handleMessageStatistics();
   }
 
   // Automatically crosspost any message sent in Announcement channels
@@ -81,9 +83,14 @@ class MessageCreateHandler extends EventHandler {
       .catch((e) => styleLog(`Error replying to message! [${this.message.url}]`, false, 'message-create.js', e));
   }
 
-  // Handle everything related to ranking (it is lengthy so I contained it within its own class)
+  // Handle everything related to member ranking
   async #handleRanking() {
     new RankingHandler(this.message).handle();
+  }
+
+  // Handle everything related to tracking member message statistics
+  private handleMessageStatistics() {
+    new MessageStatisticsHandler(this.message).handle();
   }
 }
 

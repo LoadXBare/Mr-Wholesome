@@ -1,5 +1,5 @@
 import { BaseInteractionHandler, ChannelIDs } from "@lib/config.js";
-import { channelMention, ChatInputCommandInteraction } from "discord.js";
+import { channelMention, ChatInputCommandInteraction, GuildMember } from "discord.js";
 
 export abstract class CommandHandler extends BaseInteractionHandler {
   protected interaction: ChatInputCommandInteraction;
@@ -7,6 +7,15 @@ export abstract class CommandHandler extends BaseInteractionHandler {
   constructor(interaction: ChatInputCommandInteraction) {
     super(interaction);
     this.interaction = interaction;
+  }
+
+  protected async fetchMemberDisplayName() {
+    if (!this.interaction.inGuild()) return this.interaction.user.displayName;
+    const member = this.interaction.member;
+
+    if (member instanceof GuildMember) return member.displayName;
+    const guildMember = await this.interaction.guild!.members.fetch(member.user.id);
+    return guildMember.displayName;
   }
 
   protected postChannelIneligibleMessage(comfyVibes: boolean) {
