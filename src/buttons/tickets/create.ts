@@ -21,6 +21,7 @@ export class createTicketButtonHandler extends ButtonHandler {
 
 
     const user = this.interaction.user;
+    const bot = this.interaction.client.user;
     const ticketChannel = await this.guild.channels.create({
       name: `❌${user.username}`,
       type: ChannelType.GuildText,
@@ -47,6 +48,8 @@ export class createTicketButtonHandler extends ButtonHandler {
     };
     await ticketChannel.permissionOverwrites.create(user, permissionOverwrites);
     await ticketChannel.permissionOverwrites.create(moderatorRole, permissionOverwrites);
+    await ticketChannel.permissionOverwrites.create(bot, permissionOverwrites);
+    await ticketChannel.permissionOverwrites.create(ticketChannel.guild.roles.everyone, { ViewChannel: false });
 
     const formattedJSON = ticketPanel.ticketEmbedJSON.replace('{user}', userMention(user.id));
     const ticketEmbed = JSON.parse(formattedJSON);
