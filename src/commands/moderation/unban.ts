@@ -13,7 +13,6 @@ export class UnbanCommandHandler extends CommandHandler {
 
   async handle() {
     const user = await client.users.fetch(this.userID).catch(() => null);
-
     if (!user) {
       return this.handleError(`**${this.userID}** is not a valid User ID!`);
     }
@@ -30,8 +29,20 @@ export class UnbanCommandHandler extends CommandHandler {
       return this.handleError('Failed to unban user.', true, 'unban.js');
     }
 
+    const latestUserBan = await database.ban.findFirst({
+      where: {
+        bannedID: this.userID,
+        guildID: this.guild.id,
+        unbanned: false
+      }
+    }).catch(() => null);
+
+    if (!latestUserBan) {
+      return this.handleError('Error fetching ban from BAN table!', true, 'unban.js');
+    }
+
     const banUpdateSuccessful = await database.ban.update({
-      where: { date: this.userID },
+      where: { date: latestUserBan.date },
       data: { unbanned: true }
     }).catch(() => false).then(() => true);
 

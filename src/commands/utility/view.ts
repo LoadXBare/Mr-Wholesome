@@ -3,7 +3,7 @@ import { CommandHandler } from "@commands/command.js";
 import { database, EmbedColours } from "@lib/config.js";
 import { Ban, Warning } from "@prisma/client";
 import { stripIndents } from "common-tags";
-import { chatInputApplicationCommandMention, ChatInputCommandInteraction, EmbedBuilder, time, User } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, time, User } from "discord.js";
 
 export class ViewCommandHandler extends CommandHandler {
   async handle() {
@@ -51,7 +51,7 @@ class BanViewer extends CommandHandler {
         ${ban.unbanned ? '### [This user has since been unbanned]\n' : ''}
         ${ban.reason}
         
-        *You can ${ban.unbanned ? 'delete this ban' : `unban ${user.username}`} using ${chatInputApplicationCommandMention('ban', 'remove', '1258736685680951296')}!*`
+        ${ban.unbanned ? '' : `*You can unban ${user.username} using /unban ${user.id}`}`
       )
       .setColor(EmbedColours.Info)
     ];
@@ -75,9 +75,10 @@ class BanViewer extends CommandHandler {
     for await (const ban of bans) {
       const bannedUser = user ? user : await client.users.fetch(ban.bannedID);
       const date = new Date(Number(ban.date));
+      const active = ban.unbanned ? '🟥' : '🟩';
 
       embedDescription.push(
-        `**${time(date, 'R')}** — Ban ID: **${ban.date}**`,
+        `${active} **${time(date, 'R')}** — Ban ID: **${ban.date}**`,
         `**${bannedUser.username}** — User ID: **${bannedUser.id}**`,
         ''
       );
@@ -85,6 +86,7 @@ class BanViewer extends CommandHandler {
 
     const embeds = [new EmbedBuilder()
       .setDescription(embedDescription.join('\n'))
+      .setFooter({ text: '🟩 = active, 🟥 = unbanned' })
       .setColor(EmbedColours.Info)];
 
     await this.interaction.editReply({ embeds });
