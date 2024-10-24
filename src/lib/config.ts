@@ -22,7 +22,7 @@ export const Emotes = {
   Thinking: '<:Thinking:1263844433091362918>'
 };
 export const Images = {
-  WatchedUser: 'https://cdn.discordapp.com/attachments/1010934331725852723/1254528002708996217/alert.png?ex=6679d1bf&is=6678803f&hm=4cdeec033e6d945b910f8975200f70fed4c9d5133e4d07add2be79223023421c&'
+  WatchedUser: 'https://cdn.discordapp.com/attachments/1297278175046533247/1298572168338083930/ic_fluent_person_note_24_filled.png?ex=671a0d13&is=6718bb93&hm=b494bb3f608a08225c554c78b37fe61e37fe3e116f90814ed29c7c3067f900f5&'
 };
 export const UserIDs = {
   Bot: process.env.BOT_ID ?? '',

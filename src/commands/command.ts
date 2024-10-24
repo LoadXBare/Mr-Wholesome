@@ -1,5 +1,5 @@
 import { BaseInteractionHandler, ChannelIDs } from "@lib/config.js";
-import { channelMention, ChatInputCommandInteraction, GuildMember } from "discord.js";
+import { channelMention, ChatInputCommandInteraction, escapeMarkdown, GuildMember } from "discord.js";
 
 export abstract class CommandHandler extends BaseInteractionHandler {
   protected interaction: ChatInputCommandInteraction;
@@ -9,13 +9,20 @@ export abstract class CommandHandler extends BaseInteractionHandler {
     this.interaction = interaction;
   }
 
-  protected async fetchMemberDisplayName() {
-    if (!this.interaction.inGuild()) return this.interaction.user.displayName;
+  protected async fetchMemberDisplayName(userID?: string) {
+    const escapeAllMarkdown = (text: string) => escapeMarkdown(text, { bulletedList: true, heading: true, maskedLink: true, numberedList: true });
+
+    if (userID) {
+      const guildMember = await this.guild.members.fetch(userID);
+      return escapeAllMarkdown(guildMember.displayName);
+    }
+
+    if (!this.interaction.inGuild()) return escapeAllMarkdown(this.interaction.user.displayName);
     const member = this.interaction.member;
 
-    if (member instanceof GuildMember) return member.displayName;
-    const guildMember = await this.interaction.guild!.members.fetch(member.user.id);
-    return guildMember.displayName;
+    if (member instanceof GuildMember) return escapeAllMarkdown(member.displayName);
+    const guildMember = await this.guild.members.fetch(member.user.id);
+    return escapeAllMarkdown(guildMember.displayName);
   }
 
   protected postChannelIneligibleMessage(comfyVibes: boolean) {

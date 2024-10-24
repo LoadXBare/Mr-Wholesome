@@ -125,6 +125,13 @@ const commands = [
         .setName('id')
         .setDescription('The @mention, User ID, or Warning ID to view')
         .setRequired(false)))
+    .addSubcommand((subcommand) => subcommand
+      .setName('watchlist')
+      .setDescription('View all notes in the guild, a user\'s notes, or a specific note')
+      .addStringOption((option) => option
+        .setName('id')
+        .setDescription('The @mention, User ID or Note ID to view')
+        .setRequired(false)))
     .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .setDMPermission(false),
 
@@ -241,6 +248,26 @@ const commands = [
   new SlashCommandBuilder()
     .setName('writing')
     .setDescription('View your message statistics on the server')
+    .setDMPermission(false),
+
+  new SlashCommandBuilder()
+    .setName('watchlist')
+    .setDescription('Watchlist Commands')
+    .addSubcommand((subcommand) => subcommand
+      .setName('add_note')
+      .setDescription('Add a note to a user')
+      .addUserOption((option) => option
+        .setName('user')
+        .setDescription('The user to add a note for')
+        .setRequired(true)))
+    .addSubcommand((subcommand) => subcommand
+      .setName('delete_note')
+      .setDescription('Delete a watchlist note')
+      .addStringOption((option) => option
+        .setName('id')
+        .setDescription('The id of the note to delete')
+        .setRequired(true)))
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
     .setDMPermission(false),
 
   new ContextMenuCommandBuilder()

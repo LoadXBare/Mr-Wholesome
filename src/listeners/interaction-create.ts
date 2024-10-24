@@ -12,6 +12,7 @@ import { BanCommandHandler, ContextMenuBanCommandHandler } from '@commands/moder
 import { UnbanCommandHandler } from '@commands/moderation/unban.js';
 import { UnwarnCommandHandler } from '@commands/moderation/unwarn.js';
 import { WarnCommandHandler } from '@commands/moderation/warn.js';
+import { WatchlistCommandHandler } from '@commands/moderation/watchlist.js';
 import { LeaderboardCommandHandler } from '@commands/ranking/leaderboard.js';
 import { RankCommandHandler } from '@commands/ranking/rank.js';
 import { BirthdayCommandHandler } from '@commands/utility/birthday.js';
@@ -21,6 +22,7 @@ import { ViewCommandHandler } from '@commands/utility/view.js';
 import { EventHandler } from '@lib/config.js';
 import { BanModalHandler } from '@modals/moderation/ban.js';
 import { WarningModalHandler } from '@modals/moderation/warn.js';
+import { WatchlistModalHandler } from '@modals/moderation/watchlist.js';
 import { TicketPanelModalHandler } from '@modals/utility/ticket-panel.js';
 import { Events, Interaction } from 'discord.js';
 
@@ -60,6 +62,7 @@ class InteractionCreateHandler extends EventHandler {
     else if (cmd === 'unban') new UnbanCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'warn') new WarnCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'unwarn') new UnwarnCommandHandler(chatInputInteraction).handle();
+    else if (cmd === 'watchlist') new WatchlistCommandHandler(chatInputInteraction).handle();
 
     // Ranking
     else if (cmd === 'leaderboard') new LeaderboardCommandHandler(chatInputInteraction).handle();
@@ -92,6 +95,7 @@ class InteractionCreateHandler extends EventHandler {
     if (modalInteraction.customId.startsWith('ban:')) new BanModalHandler(modalInteraction).handle();
     else if (modalInteraction.customId.startsWith('warn:')) new WarningModalHandler(modalInteraction).handle();
     else if (modalInteraction.customId.startsWith('ticket-panel:')) new TicketPanelModalHandler(modalInteraction).handle();
+    else if (modalInteraction.customId.startsWith('watchlist:')) new WatchlistModalHandler(modalInteraction).handle();
   }
 
   async #handleUserContextMenu() {

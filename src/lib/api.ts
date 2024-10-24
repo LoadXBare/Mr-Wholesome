@@ -103,6 +103,31 @@ export const ticketPanelModalData = {
   del: ticketPanelModalDataDel
 };
 
+// === Watchlist Modal Data ===
+
+const watchlistModalDataKeyV = new Keyv('sqlite://data.sqlite', { namespace: 'watchlistModalData' });
+
+async function watchlistModalDataGet(modalInteractionID: string) {
+  const data = await watchlistModalDataKeyV.get(modalInteractionID) as { userID: string; } | undefined;
+  return data;
+}
+
+async function watchlistModalDataSet(modalInteractionID: string, userID: string) {
+  const result = await watchlistModalDataKeyV.set(modalInteractionID, { userID });
+  return result;
+}
+
+async function watchlistModalDataDel(modalInteractionID: string) {
+  const result = await watchlistModalDataKeyV.delete(modalInteractionID);
+  return result;
+}
+
+export const watchlistModalData = {
+  get: watchlistModalDataGet,
+  set: watchlistModalDataSet,
+  del: watchlistModalDataDel
+};
+
 
 // === Birthday Scheduler ===
 

@@ -75,11 +75,10 @@ model Warning {
 }
 
 model Notes {
-  noteID    String @id @default(uuid())
+  date      String @id
   authorID  String
   watchedID String
   guildID   String
-  date      BigInt
   noteText  String
 }
 
