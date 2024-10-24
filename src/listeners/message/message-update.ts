@@ -1,12 +1,12 @@
 import { client } from '@base';
-import { EmbedColours, EventHandler, Images, database } from '@lib/config.js';
+import { EmbedColours, EventHandler, Images, baseEmbed, database } from '@lib/config.js';
 import { channelIgnoresEvents } from '@lib/database-utilities.js';
 import { storeAttachments } from '@lib/utilities.js';
-import { diffChars } from 'diff';
+import { stripIndents } from 'common-tags';
+import { Change, diffChars } from 'diff';
 import {
   ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder,
-  Events, Message, PartialMessage, bold,
-  strikethrough,
+  Events, Message, PartialMessage
 } from 'discord.js';
 
 class MessageUpdateHandler extends EventHandler {
@@ -29,31 +29,74 @@ class MessageUpdateHandler extends EventHandler {
     this.#logRemovedMessageAttachment();
   }
 
-  async #logEditedMessage() {
-    if (this.oldMessage.content === this.newMessage.content) return;
-    const contentDifference = diffChars(this.oldMessage.content ?? '', this.newMessage.content ?? '');
+  private findEditIndexes(contentDifference: Array<Change>) {
+    const indexes = {
+      firstEdit: 0,
+      lastEdit: -1
+    };
 
-    const formattedContentDifference: Array<string> = [];
-    contentDifference.forEach((difference) => {
-      if (difference.added) formattedContentDifference.push(bold(difference.value));
-      else if (difference.removed) formattedContentDifference.push(strikethrough(difference.value));
-      else formattedContentDifference.push(difference.value);
+    let charCount = 0;
+    contentDifference.forEach((diff, index) => {
+      charCount += diff.count ?? 0;
+      console.log(diff, charCount);
+      if (index === 1) {
+        const firstDiff = contentDifference[0];
+        if (firstDiff.added || firstDiff.removed) indexes.firstEdit = 0;
+        else indexes.firstEdit = charCount - (diff.count ?? 0);
+      }
+
+      if (index === contentDifference.length - 2) {
+        const lastDiff = contentDifference[index + 1];
+        if (lastDiff.added || lastDiff.removed) indexes.lastEdit = charCount + (lastDiff.count ?? 0);
+        else indexes.lastEdit = charCount;
+      }
     });
 
-    const embedDescription = [
-      `## Message Edited in ${this.newMessage.channel}`,
-      '### Changes',
-      formattedContentDifference.join(''),
-    ].join('\n');
+    return indexes;
+  }
 
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription)
+  async #logEditedMessage() {
+    const oldContent = this.oldMessage.content ?? '';
+    const newContent = this.newMessage.content ?? '';
+    if (oldContent === newContent) return;
+
+    const contentDifference = diffChars(oldContent, newContent);
+    const { firstEdit, lastEdit } = this.findEditIndexes(contentDifference);
+    // Embed description max length is 4096, so each one should be at most 2000 to leave 96 characters for writing "Before" and "After" as well as "..." 
+    const contentMaxLength = 2000;
+
+    const oldContentFormatted = [oldContent.slice(
+      firstEdit < 10 ? 0 : firstEdit - 10,
+      lastEdit + 10 > oldContent.length ? oldContent.length : lastEdit + 10
+    )];
+    const newContentFormatted = [newContent.slice(
+      firstEdit < 10 ? 0 : firstEdit - 10,
+      lastEdit + 10 > newContent.length ? newContent.length : lastEdit + 10
+    )];
+
+    if (oldContentFormatted[0].length > contentMaxLength) oldContentFormatted[0] = oldContentFormatted[0].slice(0, contentMaxLength - 1);
+    if (newContentFormatted[0].length > contentMaxLength) newContentFormatted[0] = newContentFormatted[0].slice(0, contentMaxLength - 1);
+
+    if (firstEdit > 10) {
+      oldContentFormatted.unshift('...');
+      newContentFormatted.unshift('...');
+    }
+    if (lastEdit < oldContent.length - 10) oldContentFormatted.push('...');
+    if (lastEdit < newContent.length - 10) newContentFormatted.push('...');
+
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`Message edited in ${this.newMessage.channel}`)
+      .setDescription(stripIndents`
+          ## Before
+          ${oldContentFormatted.join('')}
+          ## After
+          ${newContentFormatted.join('')}
+      `)
       .setFooter({
         text: `@${this.newMessage.author?.username} • User ID: ${this.newMessage.author?.id}`,
         iconURL: this.newMessage.author?.displayAvatarURL(),
       })
-      .setTimestamp()
-      .setColor(EmbedColours.Neutral);
+      .setTimestamp();
 
     const jumpButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
