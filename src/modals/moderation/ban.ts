@@ -1,6 +1,5 @@
-import { client } from "@base";
 import { banModalData } from "@lib/api.js";
-import { database } from "@lib/config.js";
+import { baseEmbed, database } from "@lib/config.js";
 import { ModalHandler } from "@modals/handler.js";
 import { bold, EmbedBuilder, heading, italic, Message, ModalSubmitInteraction, User } from "discord.js";
 
@@ -19,7 +18,7 @@ export class BanModalHandler extends ModalHandler {
     if (!banData) return this.handleError('Ban data cannot be found. Please try again.');
     await banModalData.del(id);
 
-    const user = await client.users.fetch(banData.userID).catch(() => { });
+    const user = await this.interaction.client.users.fetch(banData.userID).catch(() => { });
     if (!user) return this.handleError(`User of ID ${bold(banData.userID)} not found. Please try again.`);
 
     let notifiedMessage: Message<false> | boolean = false;
@@ -54,9 +53,8 @@ export class BanModalHandler extends ModalHandler {
     const recorded = await this.addBanToDatabase(user);
     if (!recorded) embedDescription.push('', italic('⚠️ An error occurred whilst adding the ban to the database.'));
 
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription.join('\n'))
-      .setColor('Green');
+    const embed = new EmbedBuilder(baseEmbed)
+      .setDescription(embedDescription.join('\n'));
 
     await this.interaction.reply({ embeds: [embed] });
   }

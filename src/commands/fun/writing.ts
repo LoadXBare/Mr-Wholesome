@@ -23,16 +23,15 @@ export class WritingCommandHandler extends CommandHandler {
     const parsedHourlyMessages = this.parseHourlyMessages(messagesPerHour);
     const { mostActiveHourString, mostActiveHourCount } = this.findMostActiveHourAndCount(parsedHourlyMessages);
     const writingAttachment = await this.createWritingAttachment(parsedHourlyMessages);
-    const memberDisplayName = await this.fetchMemberDisplayName();
 
+    const displayName = this.interaction.user.displayName;
     const embed = new EmbedBuilder(baseEmbed)
-      .setTitle(`${memberDisplayName}'s Writing Statistics`)
-      .setDescription(stripIndents`
-        Total Message Count: **${messageCount}**
-        Most Active Hour: **${mostActiveHourString}** (**${mostActiveHourCount} messages**)
-      `)
-      .setImage('attachment://chart.png')
-      .setColor('Aqua');
+      .setTitle(`${displayName}'s Writing Statistics`)
+      .setDescription(stripIndents
+        `Total Message Count: **${messageCount}**
+        Most Active Hour: **${mostActiveHourString}** (**${mostActiveHourCount} messages**)`
+      )
+      .setImage('attachment://chart.png');
     await this.interaction.editReply({ embeds: [embed], files: [writingAttachment] });
   }
 

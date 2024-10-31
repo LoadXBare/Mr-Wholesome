@@ -1,5 +1,5 @@
 import { client } from '@base';
-import { EmbedColours, EventHandler, Images, database } from '@lib/config.js';
+import { EmbedColours, EventHandler, Images, baseEmbed, database } from '@lib/config.js';
 import { channelIgnoresEvents } from '@lib/database-utilities.js';
 import { storeAttachments } from '@lib/utilities.js';
 import {
@@ -40,11 +40,11 @@ class MessageDeleteHandler extends EventHandler {
     }
 
     const embedDescription = [
-      `## Message Deleted in ${this.message.channel}`,
       `### Deleted by ${userWhoDeletedMessage}`,
     ];
 
-    const embed = new EmbedBuilder()
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`Message Deleted in ${this.message.channel}`)
       .setFooter({
         text: `@${this.message.author?.username} • Author ID: ${this.message.author?.id}`,
         iconURL: this.message.author?.displayAvatarURL(),

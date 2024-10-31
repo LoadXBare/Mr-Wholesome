@@ -1,6 +1,7 @@
 import { client } from '@base';
-import { EmbedColours, EventHandler, Images, RoleIDs, database } from '@lib/config.js';
+import { EventHandler, Images, RoleIDs, baseEmbed, database } from '@lib/config.js';
 import { getRelativeTimeString, sleep, styleLog } from '@lib/utilities.js';
+import { stripIndents } from 'common-tags';
 import { EmbedBuilder, Events, GuildMember } from 'discord.js';
 
 class GuildMemberAddHandler extends EventHandler {
@@ -17,23 +18,20 @@ class GuildMemberAddHandler extends EventHandler {
   }
 
   async #logMemberJoined() {
-    const embedDescription = [
-      '## Member Joined',
-      '### Member',
-      this.member.user,
-      '### Account Created',
-      getRelativeTimeString(this.member.user.createdAt),
-    ].join('\n');
-
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription)
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle('Member Joined')
+      .setDescription(stripIndents
+        `### Member
+        ${this.member.user}
+        ### Account Created
+        ${getRelativeTimeString(this.member.user.createdAt)}`
+      )
       .setThumbnail(this.member.user.displayAvatarURL())
       .setFooter({
         text: `@${this.member.user.username} • User ID: ${this.member.user.id}`,
         iconURL: this.member.user.displayAvatarURL(),
       })
-      .setTimestamp()
-      .setColor(EmbedColours.Positive);
+      .setTimestamp();
 
     const watchlist = await this.#fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.member.id);

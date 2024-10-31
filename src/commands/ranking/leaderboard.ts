@@ -1,5 +1,5 @@
 import { CommandHandler } from "@commands/command.js";
-import { EmbedColours, database } from "@lib/config.js";
+import { baseEmbed, database } from "@lib/config.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { Rank } from "@prisma/client";
 import { stripIndents } from "common-tags";
@@ -30,15 +30,14 @@ export class LeaderboardCommandHandler extends CommandHandler {
     const memberRank = ranks.find((rank) => rank.userID === this.interaction.user.id);
     const memberPosition = ranks.findIndex((rank) => rank.userID === this.interaction.user.id) + 1;
 
-    const leaderboardEmbed = new EmbedBuilder()
-      .setDescription(stripIndents`
-      ## Server Rankings for ${this.guild.name}
-      You are rank **#${memberPosition}** with a total of **${memberRank?.xp} XP**`
+    const leaderboardEmbed = new EmbedBuilder(baseEmbed)
+      .setTitle(`Server Rankings for ${this.guild.name}`)
+      .setDescription(stripIndents
+        `You are rank **#${memberPosition}** with a total of **${memberRank?.xp} XP**`
       )
       .setImage('attachment://leaderboard.png')
       .setThumbnail(this.guild.iconURL())
-      .setFooter({ text: `Page ${this.page} / ${pageCount} • Run "/leaderboard ${this.page + 1}" to go to page ${this.page + 1} of the leaderboard` })
-      .setColor(EmbedColours.Positive);
+      .setFooter({ text: `Page ${this.page} / ${pageCount} • Run "/leaderboard ${this.page + 1}" to go to page ${this.page + 1} of the leaderboard` });
 
     this.interaction.editReply({ files: [leaderboardImage], embeds: [leaderboardEmbed] });
   }

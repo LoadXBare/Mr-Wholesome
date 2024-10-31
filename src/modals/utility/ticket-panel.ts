@@ -1,5 +1,5 @@
 import { ticketPanelModalData } from "@lib/api.js";
-import { database } from "@lib/config.js";
+import { baseEmbed, database } from "@lib/config.js";
 import { ModalHandler } from "@modals/handler.js";
 import { stripIndents } from "common-tags";
 import { chatInputApplicationCommandMention, Colors, EmbedBuilder, ModalSubmitInteraction } from "discord.js";
@@ -23,13 +23,13 @@ export class TicketPanelModalHandler extends ModalHandler {
     if (!ticketPanelData) return this.handleError('Ticket panel data cannot be found. Please try again.');
     await ticketPanelModalData.del(id);
 
-    const panelEmbed = new EmbedBuilder()
+    const panelEmbed = new EmbedBuilder(baseEmbed)
       .setTitle(this.title)
       .setDescription(this.description)
       .setColor(Colors.Blue);
     const panelEmbedJSON = JSON.stringify(panelEmbed);
 
-    const ticketEmbed = new EmbedBuilder()
+    const ticketEmbed = new EmbedBuilder(baseEmbed)
       .setDescription(this.ticketDesription)
       .setColor(Colors.Blue);
     const ticketEmbedJSON = JSON.stringify(ticketEmbed);

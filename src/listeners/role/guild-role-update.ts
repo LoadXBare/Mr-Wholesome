@@ -1,5 +1,5 @@
 import { client } from '@base';
-import { EmbedColours, EventHandler } from '@lib/config.js';
+import { baseEmbed, EventHandler } from '@lib/config.js';
 import { EmbedBuilder, Events, Role } from 'discord.js';
 
 class GuildRoleUpdateHandler extends EventHandler {
@@ -32,7 +32,6 @@ class GuildRoleUpdateHandler extends EventHandler {
       .concat(newPermissions.filter((r) => !oldPermissions.includes(r)));
 
     const embedDescription = [
-      '## Role Updated',
       `### Role — ${this.newRole}`,
     ];
 
@@ -57,14 +56,14 @@ class GuildRoleUpdateHandler extends EventHandler {
     // No property changes or permission changes occurred (likely a position update)
     if (embedDescription.length < 3) return;
 
-    const embed = new EmbedBuilder()
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle('Role Updated')
       .setDescription(embedDescription.join('\n'))
       .setFooter({
         text: `${this.newRole.guild.name} • Role ID: ${this.newRole.id}`,
         iconURL: this.newRole.guild.iconURL() ?? undefined,
       })
-      .setTimestamp()
-      .setColor(EmbedColours.Neutral);
+      .setTimestamp();
 
     super.logChannel.send({ embeds: [embed] });
   }

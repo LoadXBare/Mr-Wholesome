@@ -1,6 +1,5 @@
-import { client } from '@base';
 import { CommandHandler } from '@commands/command.js';
-import { EmbedColours } from '@lib/config.js';
+import { baseEmbed } from '@lib/config.js';
 import { stripIndents } from 'common-tags';
 import { EmbedBuilder } from 'discord.js';
 
@@ -13,14 +12,13 @@ export class PingCommandHandler extends CommandHandler {
     const botLatency = interactionResponse.createdTimestamp - this.interaction.createdTimestamp;
     interactionResponse.delete();
 
-    const embeds = [new EmbedBuilder()
-      .setDescription(stripIndents`
-        ## Tweet! 🐦
-        **⌛ User <-> Bot Latency** — \`${botLatency}ms\`
-        **☁️ Bot <-> API Latency** — \`${client.ws.ping}ms\``
-      )
-      .setColor(EmbedColours.Info)];
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle('Tweet! 🐦')
+      .setDescription(stripIndents
+        `**⌛ User <-> Bot Latency** — \`${botLatency}ms\`
+        **☁️ Bot <-> API Latency** — \`${this.interaction.client.ws.ping}ms\``
+      );
 
-    await this.interaction.editReply({ embeds });
+    await this.interaction.editReply({ embeds: [embed] });
   }
 }

@@ -1,5 +1,6 @@
 import { client } from '@base';
-import { EmbedColours, EventHandler } from '@lib/config.js';
+import { baseEmbed, EventHandler } from '@lib/config.js';
+import { stripIndents } from 'common-tags';
 import { EmbedBuilder, Events, Role } from 'discord.js';
 
 class GuildRoleCreateHandler extends EventHandler {
@@ -23,20 +24,17 @@ class GuildRoleCreateHandler extends EventHandler {
       `- **Mentionable?** — \`${this.role.mentionable ? '✅' : '❌'}\``,
     ].join('\n');
 
-    const embedDescription = [
-      '## Role Created',
-      '### Properties',
-      roleProperties,
-    ].join('\n');
-
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription)
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle('Role Created')
+      .setDescription(stripIndents
+        `### Properties
+        ${roleProperties}`
+      )
       .setFooter({
         text: `${this.role.guild.name} • Role ID: ${this.role.id}`,
         iconURL: this.role.guild.iconURL() ?? undefined,
       })
-      .setTimestamp()
-      .setColor(EmbedColours.Positive);
+      .setTimestamp();
 
     super.logChannel.send({ embeds: [embed] });
   }

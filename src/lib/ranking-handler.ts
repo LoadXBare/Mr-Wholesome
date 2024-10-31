@@ -1,6 +1,7 @@
 import { levelNotifButtonData } from "@lib/api.js";
-import { ChannelIDs, EmbedColours, database, xpCooldownCache } from "@lib/config.js";
-import { displayName, getRandomIntegerFromSeed, styleLog } from "@lib/utilities.js";
+import { ChannelIDs, baseEmbed, database, xpCooldownCache } from "@lib/config.js";
+import { getRandomIntegerFromSeed, styleLog } from "@lib/utilities.js";
+import { stripIndents } from "common-tags";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, TextChannel } from "discord.js";
 
 export default class RankingHandler {
@@ -51,16 +52,15 @@ export default class RankingHandler {
     if (!(levelUpNotifChannel instanceof TextChannel)) return;
 
     const content = levelNotifs ? `${this.message.author}` : undefined;
-    const embedDescription = [
-      '# LEVEL UP!',
-      `**${displayName(this.message)}** has levelled up to **Level ${level}**!`,
-      '',
-      'For more information, use the `/rank` command.',
-    ].join('\n');
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription)
-      .setThumbnail(this.message.author.displayAvatarURL())
-      .setColor(EmbedColours.Positive);
+    const displayName = this.message.author.displayName;
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle('LEVLE UP!')
+      .setDescription(stripIndents
+        `**${displayName}** has levelled up to **Level ${level}**!
+        
+        For more information, use the \`/rank\` command.`
+      )
+      .setThumbnail(this.message.author.displayAvatarURL());
 
     const buttonLabel = levelNotifs ? 'Disable Ping' : 'Enable Ping';
     const button = new ActionRowBuilder<ButtonBuilder>()

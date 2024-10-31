@@ -1,13 +1,12 @@
-import { EmbedColours } from "@lib/config.js";
-import { ColorResolvable, EmbedBuilder, Guild, ModalSubmitInteraction, User } from "discord.js";
+import { BaseInteractionHandler, EmbedColours } from "@lib/config.js";
+import { ColorResolvable, EmbedBuilder, ModalSubmitInteraction, User } from "discord.js";
 
-export abstract class ModalHandler {
+export abstract class ModalHandler extends BaseInteractionHandler {
   protected interaction: ModalSubmitInteraction;
-  protected guild: Guild;
 
   constructor(interaction: ModalSubmitInteraction) {
+    super(interaction);
     this.interaction = interaction;
-    this.guild = interaction.guild!;
   }
 
   abstract handle(): Promise<void>;

@@ -1,6 +1,7 @@
 import { client } from '@base';
-import { EmbedColours, EventHandler, Images, database } from '@lib/config.js';
+import { EmbedColours, EventHandler, Images, baseEmbed, database } from '@lib/config.js';
 import { getRelativeTimeString } from '@lib/utilities.js';
+import { stripIndents } from 'common-tags';
 import {
   EmbedBuilder, Events, GuildMember, PartialGuildMember,
 } from 'discord.js';
@@ -19,18 +20,17 @@ class GuildMemberRemoveHandler extends EventHandler {
 
   async #logMemberLeave() {
     const memberRolesList = this.member.roles.cache.map((r) => `- ${r}`).join('\n');
-    const embedDescription = [
-      '## Member Left',
-      '### Member',
-      this.member.user,
-      '### Roles',
-      memberRolesList,
-      '### Join Date',
-      getRelativeTimeString(this.member.joinedAt ?? Date.now()),
-    ].join('\n');
 
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription)
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle('Member Left')
+      .setDescription(stripIndents
+        `### Member
+        ${this.member.user}
+        ### Roles
+        ${memberRolesList}
+        ### Join Date
+        ${getRelativeTimeString(this.member.joinedAt ?? Date.now())}`
+      )
       .setFooter({
         text: `@${this.member.user.username} • User ID: ${this.member.user.id}`,
         iconURL: this.member.user.displayAvatarURL(),

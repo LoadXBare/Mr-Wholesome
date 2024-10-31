@@ -1,6 +1,5 @@
-import { client } from "@base";
 import { warnModalData } from "@lib/api.js";
-import { database, EmbedColours } from "@lib/config.js";
+import { baseEmbed, database } from "@lib/config.js";
 import { ModalHandler } from "@modals/handler.js";
 import { bold, EmbedBuilder, heading, italic, Message, ModalSubmitInteraction, User } from "discord.js";
 
@@ -20,7 +19,7 @@ export class WarningModalHandler extends ModalHandler {
     if (!warningData) return this.handleError('Warning data cannot be found. Please try again.');
     await warnModalData.del(id);
 
-    const user = await client.users.fetch(warningData.userID).catch(() => { });
+    const user = await this.interaction.client.users.fetch(warningData.userID).catch(() => { });
     if (!user) return this.handleError(`User of ID ${bold(warningData.userID)} not found. Please try again.`);
 
     let notifiedMessage: Message<false> | boolean = false;
@@ -41,9 +40,8 @@ export class WarningModalHandler extends ModalHandler {
     const recorded = await this.addWarnToDatabase(user);
     if (!recorded) embedDescription.push('', italic('⚠️ An error occurred whilst adding the warning to the database.'));
 
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription.join('\n'))
-      .setColor(EmbedColours.Positive);
+    const embed = new EmbedBuilder(baseEmbed)
+      .setDescription(embedDescription.join('\n'));
 
     await this.interaction.reply({ embeds: [embed] });
   }

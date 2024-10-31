@@ -1,6 +1,6 @@
-import { client } from '@base';
 import { PrismaClient } from '@prisma/client';
-import { ButtonInteraction, ChatInputCommandInteraction, ColorResolvable, Colors, EmbedBuilder, Guild, TextChannel } from 'discord.js';
+import { ButtonInteraction, ChatInputCommandInteraction, ColorResolvable, Colors, EmbedBuilder, escapeMarkdown, Guild, ModalSubmitInteraction, TextChannel } from 'discord.js';
+import { client } from '../index.js';
 import { styleLog } from './utilities.js';
 
 export const database = new PrismaClient();
@@ -44,16 +44,19 @@ export const GuildIDs = {
   BotTesting: process.env.BOT_TESTING_GUILD_ID ?? '',
   Akialytes: process.env.AKIALYTES_GUILD_ID ?? '',
 };
+export function escapeAllFormatting(text: string | null) {
+  return escapeMarkdown(text ?? '', { bulletedList: true, heading: true, maskedLink: true, numberedList: true });
+}
 export class EventHandler {
   get logChannel() {
     return client.channels.resolve(process.env.MODERATION_LOGS_CHANNEL_ID ?? '') as TextChannel;
   }
 }
 export abstract class BaseInteractionHandler {
-  private baseInteraction: ButtonInteraction | ChatInputCommandInteraction;
+  private baseInteraction: ButtonInteraction | ChatInputCommandInteraction | ModalSubmitInteraction;
   protected guild: Guild;
 
-  constructor(interaction: ButtonInteraction | ChatInputCommandInteraction) {
+  constructor(interaction: ButtonInteraction | ChatInputCommandInteraction | ModalSubmitInteraction) {
     this.baseInteraction = interaction;
     this.guild = interaction.guild!;
   }
@@ -62,6 +65,11 @@ export abstract class BaseInteractionHandler {
 
   protected simpleEmbed(description: string, colour: ColorResolvable = EmbedColours.Info) {
     return new EmbedBuilder().setDescription(description).setColor(colour);
+  }
+
+  protected async userInGuild(userID: string) {
+    const member = await this.guild.members.fetch(userID).catch(() => null);
+    return member;
   }
 
   protected async handleError(error: string, log: boolean = false, filename?: string) {

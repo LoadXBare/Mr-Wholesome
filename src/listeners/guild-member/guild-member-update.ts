@@ -1,5 +1,6 @@
 import { client } from '@base';
-import { EmbedColours, Emotes, EventHandler, Images, database } from '@lib/config.js';
+import { Emotes, EventHandler, Images, baseEmbed, database, escapeAllFormatting } from '@lib/config.js';
+import { stripIndents } from 'common-tags';
 import {
   EmbedBuilder, Events, GuildMember, PartialGuildMember,
 } from 'discord.js';
@@ -21,26 +22,37 @@ class GuildMemberUpdateHandler extends EventHandler {
 
   async #logNicknameUpdate() {
     if (this.oldMember.nickname === this.newMember.nickname) return;
-    const oldNickname = this.oldMember.nickname;
-    const newNickname = this.newMember.nickname;
-    const embedDescription: Array<string> = [];
+    const oldNickname = escapeAllFormatting(this.oldMember.nickname);
+    const newNickname = escapeAllFormatting(this.newMember.nickname);
 
-    if (oldNickname === null) {
-      embedDescription.push('## Nickname Added', '### New Nickname', newNickname ?? '');
-    } else if (newNickname === null) {
-      embedDescription.push('## Nickname Reset', '### Old Nickname', oldNickname);
-    } else {
-      embedDescription.push('## Nickname Edited', '### Old Nickname', oldNickname, '### New Nickname', newNickname);
-    }
-
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription.join('\n'))
+    const embed = new EmbedBuilder(baseEmbed)
       .setFooter({
         text: `@${this.newMember.user.username} • User ID: ${this.newMember.user.id}`,
         iconURL: this.newMember.user.displayAvatarURL(),
       })
-      .setTimestamp()
-      .setColor(EmbedColours.Neutral);
+      .setTimestamp();
+
+    if (!oldNickname) {
+      embed.setTitle('Nickname Added');
+      embed.setDescription(stripIndents
+        `### New Nickname
+        ${newNickname}`
+      );
+    } else if (!newNickname) {
+      embed.setTitle('Nickname Reset');
+      embed.setDescription(stripIndents
+        `### Old Nickname
+        ${oldNickname}`
+      );
+    } else {
+      embed.setTitle('Nickname Changed');
+      embed.setDescription(stripIndents
+        `### Old Nickname
+        ${oldNickname}
+        ### New Nickname
+        ${newNickname}`
+      );
+    }
 
     const watchlist = await this.#fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMember.id);
@@ -56,8 +68,7 @@ class GuildMemberUpdateHandler extends EventHandler {
 
     const rolesDifference = oldRoles.difference(newRoles);
     const embedDescription = [
-      '## Member Roles Updated',
-      '### Role Changes',
+      '### Role Changes'
     ];
 
     rolesDifference.forEach((role) => {
@@ -67,14 +78,14 @@ class GuildMemberUpdateHandler extends EventHandler {
       else embedDescription.push(`${Emotes.Added} ${role}`);
     });
 
-    const embed = new EmbedBuilder()
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle('Member Roles Updated')
       .setDescription(embedDescription.join('\n'))
       .setFooter({
         text: `@${this.newMember.user.username} • User ID: ${this.newMember.user.id}`,
         iconURL: this.newMember.user.displayAvatarURL(),
       })
-      .setTimestamp()
-      .setColor(EmbedColours.Neutral);
+      .setTimestamp();
 
     const watchlist = await this.#fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMember.id);

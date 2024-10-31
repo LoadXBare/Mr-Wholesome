@@ -1,6 +1,5 @@
-import { client } from '@base';
 import { CommandHandler } from '@commands/command.js';
-import { EmbedColours, database } from '@lib/config.js';
+import { baseEmbed, database } from '@lib/config.js';
 import { formatDate } from '@lib/utilities.js';
 import { Birthday } from '@prisma/client';
 import { stripIndents } from 'common-tags';
@@ -31,15 +30,14 @@ export class BirthdayCommandHandler extends CommandHandler {
       return this.handleError('Failed to upsert birthday to BIRTHDAY table!', true, 'birthday.js');
     }
 
-    const embeds = [new EmbedBuilder()
-      .setDescription(stripIndents`
-        ## Successfully set birthday!
-        Your birthday has been set to **${birthday.date}**.`
-      )
-      .setColor(EmbedColours.Positive)
-    ];
+    const displayName = this.interaction.user.displayName;
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`${displayName}'s Birthday`)
+      .setDescription(stripIndents
+        `✅ Successfully set your birthday to **${birthday.date}**!`
+      );
 
-    await this.interaction.editReply({ embeds });
+    await this.interaction.editReply({ embeds: [embed] });
   }
 
   private async handleUpcomingBirthdays() {
@@ -51,23 +49,22 @@ export class BirthdayCommandHandler extends CommandHandler {
     }
 
     const upcomingBirthdaysList: Array<string> = [];
-    upcomingBirthdays.forEach((birthday) => {
-      const birthdayUser = client.users.resolve(birthday.userID);
+    for await (const birthday of upcomingBirthdays) {
+      const birthdayMember = await this.userInGuild(birthday.userID);
 
-      if (birthdayUser) {
-        upcomingBirthdaysList.push(`- **@${birthdayUser.username}** — ${birthday.date}`);
+      if (birthdayMember) {
+        upcomingBirthdaysList.push(`- **${birthdayMember.displayName}** — ${birthday.date}`);
       }
-    });
+    }
 
-    const embeds = [new EmbedBuilder()
-      .setDescription(stripIndents`
-        ## Upcoming Birthdays
-        There are ${upcomingBirthdaysList.length} birthdays in the next ${upcomingDayLimit} days!
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`Upcoming Birthdays in ${this.guild.name}`)
+      .setDescription(stripIndents
+        `There are ${upcomingBirthdaysList.length} birthdays in the next ${upcomingDayLimit} days!
         ${upcomingBirthdaysList.join('\n')}`
-      )
-      .setColor(EmbedColours.Info)];
+      );
 
-    await this.interaction.editReply({ embeds });
+    await this.interaction.editReply({ embeds: [embed] });
   }
 
   private async fetchUpcomingBirthdaysFromDatabase(days: number) {

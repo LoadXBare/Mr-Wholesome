@@ -1,5 +1,5 @@
 import { CommandHandler } from '@commands/command.js';
-import { EmbedColours } from '@lib/config.js';
+import { baseEmbed } from '@lib/config.js';
 import { stripIndents } from 'common-tags';
 import { ColorResolvable, EmbedBuilder } from 'discord.js';
 
@@ -34,14 +34,15 @@ export class EightBallCommandHandler extends CommandHandler {
       { response: 'Very doubtful.', colour: 'Red' },
     ];
 
-    const randomResponse = responses.at(Math.round(Math.random() * responses.length));
+    const randomResponse = responses.at(Math.round(Math.random() * responses.length)) ?? responses[0];
 
-    const embeds = [new EmbedBuilder()
-      .setDescription(stripIndents`
-        **Question** — *${question}*
-        ## ${randomResponse?.response || 'No response found.'}`)
-      .setColor(randomResponse?.colour || EmbedColours.Info)];
+    const embed = new EmbedBuilder(baseEmbed)
+      .setDescription(stripIndents
+        `**Question** — *${question}*
+        ## ${randomResponse.response || 'No response found.'}`
+      )
+      .setColor(randomResponse.colour);
 
-    await this.interaction.editReply({ embeds });
+    await this.interaction.editReply({ embeds: [embed] });
   }
 }

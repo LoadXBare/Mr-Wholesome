@@ -1,5 +1,5 @@
 import { client } from '@base';
-import { EmbedColours, EventHandler, Images, baseEmbed, database } from '@lib/config.js';
+import { EventHandler, Images, baseEmbed, database } from '@lib/config.js';
 import { channelIgnoresEvents } from '@lib/database-utilities.js';
 import { storeAttachments } from '@lib/utilities.js';
 import { stripIndents } from 'common-tags';
@@ -86,12 +86,12 @@ class MessageUpdateHandler extends EventHandler {
 
     const embed = new EmbedBuilder(baseEmbed)
       .setTitle(`Message edited in ${this.newMessage.channel}`)
-      .setDescription(stripIndents`
-          ## Before
+      .setDescription(stripIndents
+        `## Before
           ${oldContentFormatted.join('')}
           ## After
-          ${newContentFormatted.join('')}
-      `)
+          ${newContentFormatted.join('')}`
+      )
       .setFooter({
         text: `@${this.newMessage.author?.username} • User ID: ${this.newMessage.author?.id}`,
         iconURL: this.newMessage.author?.displayAvatarURL(),
@@ -118,21 +118,18 @@ class MessageUpdateHandler extends EventHandler {
     const removedAttachment = this.oldMessage.attachments.difference(this.newMessage.attachments);
 
     const storedAttachment = (await storeAttachments(removedAttachment, this.newMessage.client)).at(0);
-    const embedDescription = [
-      '## Message Attachment Removed',
-      `### in ${this.newMessage.channel}`,
-      '### Attachment',
-      storedAttachment?.maskedLink,
-    ].join('\n');
 
-    const embed = new EmbedBuilder()
-      .setDescription(embedDescription)
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`Message Attachment Removed in ${this.newMessage.channel}`)
+      .setDescription(stripIndents
+        `### Attachment
+        ${storedAttachment?.maskedLink}`
+      )
       .setFooter({
         text: `@${this.newMessage.author?.username} • Author ID: ${this.newMessage.author?.id}`,
         iconURL: this.newMessage.author?.displayAvatarURL(),
       })
-      .setTimestamp()
-      .setColor(EmbedColours.Neutral);
+      .setTimestamp();
 
     if (storedAttachment?.link !== '' && embeddableContentTypes.includes(storedAttachment?.type ?? '')) {
       embed.setImage(storedAttachment?.link ?? '');

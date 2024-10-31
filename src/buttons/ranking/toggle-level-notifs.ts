@@ -1,6 +1,6 @@
 import { ButtonHandler } from "@buttons/button-handler.js";
 import { levelNotifButtonData } from "@lib/api.js";
-import { EmbedColours, database } from "@lib/config.js";
+import { baseEmbed, database } from "@lib/config.js";
 import { stripIndents } from "common-tags";
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder } from "discord.js";
 
@@ -30,17 +30,18 @@ export class ToggleLevelNotifButtonHandler extends ButtonHandler {
       return this.handleError('Error updating level notification stat in RANK table!', true, 'toggle-level-notifs.js');
     }
 
-    const embeds = [new EmbedBuilder()
+    const displayName = this.interaction.user.displayName;
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`${displayName}'s Level Notifications`)
       .setDescription(stripIndents
-        `## Successfully ${!levelNotifState ? 'enabled' : 'disabled'} level up ping!
+        `✅ Successfully ${!levelNotifState ? 'enabled' : 'disabled'} level up ping!
         You will ${levelNotifState ? 'no longer' : 'now'} be pinged when you level up.`
-      )
-      .setColor(EmbedColours.Positive)];
+      );
 
     await this.disableButtonReusability();
     await levelNotifButtonData.del(this.interaction.message.id);
 
-    await this.interaction.editReply({ embeds });
+    await this.interaction.editReply({ embeds: [embed] });
   }
 
   private async disableButtonReusability() {
