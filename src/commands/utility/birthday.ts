@@ -68,9 +68,15 @@ export class BirthdayCommandHandler extends CommandHandler {
   }
 
   private async fetchUpcomingBirthdaysFromDatabase(days: number) {
-    const upcomingDays = new Array(days)
-      .fill(new Date().getUTCDate())
-      .map((value, index) => formatDate(value + index, new Date().getUTCMonth()));
+    const upcomingDays: Array<string> = [];
+    let currentDate = new Date();
+    for (let i = 0; i < days; i++) {
+      const day = currentDate.getUTCDate();
+      const month = currentDate.getUTCMonth();
+      upcomingDays.push(formatDate(day, month));
+
+      currentDate.setUTCDate(day + 1);
+    }
 
     const birthdays = await database.birthday.findMany().catch(() => null);
 
