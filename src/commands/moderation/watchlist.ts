@@ -12,7 +12,7 @@ export class WatchlistCommandHandler extends CommandHandler {
 
   private async handleAddNote() {
     const user = this.interaction.options.getUser('user', true);
-    const displayName = await this.fetchMemberDisplayName(user.id);
+    const displayName = this.interaction.user.displayName;
 
     const watchlistModal = new ModalBuilder()
       .setCustomId(`watchlist:${this.interaction.id}`)
@@ -39,7 +39,7 @@ export class WatchlistCommandHandler extends CommandHandler {
     const result = await this.deleteNoteFromDatabase(noteID);
     if (!result) return this.handleError(`**${noteID}** is not a valid Note ID`);
 
-    const displayName = await this.fetchMemberDisplayName(result.watchedID);
+    const displayName = this.interaction.user.displayName;
     const embed = new EmbedBuilder(baseEmbed)
       .setTitle(`${displayName}'s Watchlist`)
       .setDescription(`✅ Successfully deleted note of ID **${noteID}** from **${displayName}**`);

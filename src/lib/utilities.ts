@@ -1,10 +1,9 @@
 import { createHash } from 'crypto';
 import {
   Attachment,
-  ChatInputCommandInteraction,
   Client,
   Collection,
-  GuildMember, Message, TextChannel,
+  Message, TextChannel,
   inlineCode
 } from 'discord.js';
 
@@ -118,20 +117,6 @@ export function nth(number: number) {
   const suffixCategory = new Intl.PluralRules('en', { type: 'ordinal' }).select(number);
 
   return suffixes[suffixCategory];
-}
-
-export function displayName(data: Message | ChatInputCommandInteraction) {
-  if (data instanceof Message) {
-    if (data.member instanceof GuildMember) return data.member.displayName;
-    else return data.author.username;
-  }
-
-  else if (data instanceof ChatInputCommandInteraction) {
-    if (data.member instanceof GuildMember) return data.member.displayName;
-    else return data.user.username;
-  }
-
-  return '[Unknown]';
 }
 
 export function getRandomIntegerFromSeed(seed: string, min: number, max: number): number {

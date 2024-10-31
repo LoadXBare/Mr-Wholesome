@@ -1,5 +1,5 @@
 import { CommandHandler } from '@commands/command.js';
-import { displayName, getRandomIntegerFromSeed } from '@lib/utilities.js';
+import { getRandomIntegerFromSeed } from '@lib/utilities.js';
 import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
 
@@ -23,7 +23,7 @@ export class ReadingCommandHandler extends CommandHandler {
 
     const cursed = this.todayIsCursedDay ? 'cursed ' : '';
     const attachment = await this.createUserReadingImage();
-    const userName = displayName(this.interaction);
+    const userName = this.interaction.user.displayName;
 
     await this.interaction.editReply({ content: `## Here is your ${cursed}reading for ${new Date().toDateString()}, ${userName}...`, files: [attachment] });
   }

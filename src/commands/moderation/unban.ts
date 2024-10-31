@@ -1,4 +1,3 @@
-import { client } from "@base";
 import { CommandHandler } from "@commands/command.js";
 import { database } from "@lib/config.js";
 import { ChatInputCommandInteraction } from "discord.js";
@@ -12,7 +11,7 @@ export class UnbanCommandHandler extends CommandHandler {
   }
 
   async handle() {
-    const user = await client.users.fetch(this.userID).catch(() => null);
+    const user = await this.interaction.client.users.fetch(this.userID).catch(() => null);
     if (!user) {
       return this.handleError(`**${this.userID}** is not a valid User ID!`);
     }

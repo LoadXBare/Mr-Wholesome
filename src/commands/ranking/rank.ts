@@ -1,7 +1,6 @@
 import { CommandHandler } from "@commands/command.js";
 import { database } from "@lib/config.js";
 import { xpRequiredForLevel } from "@lib/ranking-handler.js";
-import { displayName } from "@lib/utilities.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
 
@@ -102,7 +101,7 @@ export class RankCommandHandler extends CommandHandler {
 
     const userPosition = await this.fetchRankPosition() || '???';
 
-    const usernameText = displayName(this.interaction);
+    const usernameText = this.interaction.user.displayName;
     const levelText = `Level ${level}`;
     const userPositionText = `Rank #${userPosition}`;
 
