@@ -1,9 +1,8 @@
-import { client } from "@base";
 import { CommandHandler } from "@commands/command.js";
-import { baseEmbed, database, EmbedColours } from "@lib/config.js";
+import { baseEmbed, database } from "@lib/config.js";
 import { Ban, Notes, Warning } from "@prisma/client";
 import { stripIndents } from "common-tags";
-import { ChatInputCommandInteraction, EmbedBuilder, GuildMember, time, User } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, time, User } from "discord.js";
 
 export class ViewCommandHandler extends CommandHandler {
   async handle() {
@@ -25,72 +24,102 @@ class BanViewer extends CommandHandler {
   }
 
   async handle() {
-    if (!this.id) return this.viewBans();
+    if (!this.id) return this.viewGuildBans();
 
     const ban = await database.ban.findUnique({ where: { date: this.id } }).catch(() => null);
-    const user = await client.users.fetch(this.id).catch(() => null);
+    const user = await this.interaction.client.users.fetch(this.id).catch(() => null);
 
     if (ban) this.viewBan(ban);
-    else if (user) this.viewBans(user);
+    else if (user) this.viewUserBans(user);
     else this.handleError(`**${this.id}** is not a valid @mention, User ID, or Warning ID!`);
   }
 
   private async viewBan(ban: Ban) {
     const date = new Date(Number(ban.date));
-    const author = await client.users.fetch(ban.authorID).catch(() => null);
-    const user = await client.users.fetch(ban.bannedID).catch(() => null);
+    const author = await this.interaction.client.users.fetch(ban.authorID).catch(() => null);
+    const user = await this.interaction.client.users.fetch(ban.bannedID).catch(() => null);
 
     if (!author || !user) {
       return this.handleError('Error fetching user data from Discord API!', true, 'view.js');
     }
 
-    const embeds = [new EmbedBuilder()
-      .setDescription(stripIndents`
-        ## ${time(date, 'R')} — Ban ID: ${ban.date}
-        **${user.username}** — User ID: **${user.id}**
-        Banned By: **${author.username}**
-        ${ban.unbanned ? '### [This user has since been unbanned]\n' : ''}
-        ${ban.reason}
-        
-        ${ban.unbanned ? '' : `*You can unban ${user.username} using /unban ${user.id}`}`
+    const displayName = user.displayName;
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`${ban.unbanned ? '🟥' : '🟩'} ${displayName}'s Ban`)
+      .setDescription(stripIndents
+        `### Ban Reason
+        ${ban.reason}`
       )
-      .setColor(EmbedColours.Info)
-    ];
+      .addFields([
+        { name: 'Time', value: time(date, 'R'), inline: true },
+        { name: 'Ban ID', value: ban.date, inline: true },
+        { name: 'Banned', value: `@${user.username} — User ID: ${user.id}` },
+        { name: 'Author', value: `@${author.username} — User ID: ${author.id}` }
+      ])
+      .setFooter({ text: '🟩 = active, 🟥 = unbanned' });
 
-    await this.interaction.editReply({ embeds });
+    await this.interaction.editReply({ embeds: [embed] });
   }
 
-  private async viewBans(user?: User) {
+  private async viewGuildBans() {
     const bans = await database.ban.findMany({
-      where: { guildID: this.guild.id, bannedID: user?.id },
+      where: { guildID: this.guild.id },
       orderBy: { date: 'desc' }
     }).catch(() => null);
 
-    if (!bans) {
-      return this.handleError('Error fetching bans from BAN table!', true, 'view.js');
-    }
+    if (!bans) { return this.handleError('Error fetching bans from BAN table!', true, 'view.js'); }
 
-    const embedDescription = [
-      `## ${bans.length} ban(s) for ${user ? user.username : this.guild.name}`
-    ];
+    const embedDescription: Array<string> = [];
     for await (const ban of bans) {
-      const bannedUser = user ? user : await client.users.fetch(ban.bannedID);
+      const bannedUser = await this.interaction.client.users.fetch(ban.bannedID);
+      const displayName = bannedUser.displayName;
       const date = new Date(Number(ban.date));
       const active = ban.unbanned ? '🟥' : '🟩';
 
-      embedDescription.push(
-        `${active} **${time(date, 'R')}** — Ban ID: **${ban.date}**`,
-        `**${bannedUser.username}** — User ID: **${bannedUser.id}**`,
-        ''
+      embedDescription.push(stripIndents
+        `${active} **${displayName}** — ${time(date, 'R')}
+        ├ **User ID:** ${ban.bannedID}
+        └ **Ban ID:** ${ban.date}`
       );
     }
 
-    const embeds = [new EmbedBuilder()
-      .setDescription(embedDescription.join('\n'))
-      .setFooter({ text: '🟩 = active, 🟥 = unbanned' })
-      .setColor(EmbedColours.Info)];
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`Bans in ${this.guild.name}`)
+      .setThumbnail(this.guild.iconURL())
+      .setDescription(embedDescription.join('\n\n'))
+      .setFooter({ text: '🟩 = active, 🟥 = unbanned' });
 
-    await this.interaction.editReply({ embeds });
+    await this.interaction.editReply({ embeds: [embed] });
+  }
+
+  private async viewUserBans(user: User) {
+    const displayName = user.displayName;
+    const userBans = await database.ban.findMany({
+      where: { guildID: this.guild.id, bannedID: user.id },
+      orderBy: { date: 'desc' }
+    }).catch(() => null);
+
+    if (!userBans) return this.handleError('Error fetching bans from BAN table', true, 'view.js');
+
+    const embedDescription: Array<string> = [];
+    if (userBans.length === 0) embedDescription.push(`${displayName} has never been banned`);
+
+    userBans.forEach((ban, index) => {
+      const active = ban.unbanned ? '🟥' : '🟩';
+      embedDescription.push(stripIndents
+        `${active} **Ban ${index + 1}**
+        ├ **Time:** ${time(new Date(Number(ban.date)), 'R')}
+        └ **Ban ID:** ${ban.date}`
+      );
+    });
+
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`${displayName}'s Bans`)
+      .setThumbnail(user.displayAvatarURL())
+      .setDescription(embedDescription.join('\n\n'))
+      .setFooter({ text: '🟩 = active, 🟥 = unbanned' });
+
+    await this.interaction.editReply({ embeds: [embed] });
   }
 }
 
@@ -103,67 +132,103 @@ class WarningViewer extends CommandHandler {
   }
 
   async handle() {
-    if (!this.id) return this.viewWarnings();
+    if (!this.id) return this.viewGuildWarnings();
 
     const warning = await database.warning.findUnique({ where: { date: this.id } }).catch(() => null);
-    const user = await client.users.fetch(this.id).catch(() => null);
+    const user = await this.interaction.client.users.fetch(this.id).catch(() => null);
 
     if (warning) this.viewWarning(warning);
-    else if (user) this.viewWarnings(user);
+    else if (user) this.viewUserWarnings(user);
     else this.handleError(`**${this.id}** is not a valid @mention, User ID, or Warning ID!`);
   }
 
   private async viewWarning(warning: Warning) {
     const date = new Date(Number(warning.date));
-    const author = await client.users.fetch(warning.authorID).catch(() => null);
-    const user = await client.users.fetch(warning.warnedID).catch(() => null);
+    const author = await this.interaction.client.users.fetch(warning.authorID).catch(() => null);
+    const warned = await this.interaction.client.users.fetch(warning.warnedID).catch(() => null);
 
-    if (!author || !user) {
-      return this.handleError('Error fetching user data from Discord API!', true, 'view.js');
-    }
+    if (!author || !warned) return this.handleError('Error fetching user data from Discord API!', true, 'view.js');
 
-    const embeds = [new EmbedBuilder()
-      .setDescription(stripIndents`
-        ## ${time(date, 'R')} — Warn ID: ${warning.date}
-        **${user.username}** — User ID: **${user.id}**
-        Warned By: **${author.username}**
-        
-        ${warning.reason}`
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`${warned.displayName}'s Warning`)
+      .setThumbnail(warned.displayAvatarURL())
+      .setDescription(stripIndents
+        `### Warning Reason
+      ${warning.reason}`
       )
-      .setColor(EmbedColours.Info)];
+      .addFields([
+        { name: 'Time', value: time(date, 'R'), inline: true },
+        { name: 'Warning ID', value: warning.date, inline: true },
+        { name: 'Warned', value: `@${warned.username} — User ID: ${warned.id}` },
+        { name: 'Author', value: `@${author.username} — User ID: ${author.id}` }
+      ]);
 
-    await this.interaction.editReply({ embeds });
+    await this.interaction.editReply({ embeds: [embed] });
   }
 
-  private async viewWarnings(user?: User) {
+  private async viewGuildWarnings() {
     const warnings = await database.warning.findMany({
-      where: { guildID: this.guild.id, warnedID: user?.id },
+      where: { guildID: this.guild.id },
       orderBy: { date: 'desc' }
     }).catch(() => null);
+    if (!warnings) return this.handleError('Error fetching warnings from WARNING table!', true, 'view.js');
 
-    if (!warnings) {
-      return this.handleError('Error fetching warnings from WARNING table!', true, 'view.js');
-    }
-
-    const embedDescription = [
-      `## ${warnings.length} warning(s) for ${user ? user.username : this.guild.name}`
-    ];
+    const accumulator = new Map<string, { name: string, id: string, amount: number, latest: string; }>();
     for await (const warning of warnings) {
-      const warnedUser = user ? user : await client.users.fetch(warning.warnedID);
-      const date = new Date(Number(warning.date));
+      const warnedUser = await this.interaction.client.users.fetch(warning.warnedID);
+      const displayName = warnedUser.displayName;
+      const mappedWarning = accumulator.get(warning.warnedID);
 
-      embedDescription.push(
-        `**${time(date, 'R')}** — Warn ID: **${warning.date}**`,
-        `**${warnedUser.username}** — User ID: **${warnedUser.id}**`,
-        ''
-      );
+      if (mappedWarning) {
+        mappedWarning.amount++;
+        if (mappedWarning.latest < warning.date) mappedWarning.latest = warning.date;
+      } else {
+        accumulator.set(warning.warnedID, { amount: 1, id: warning.warnedID, name: displayName, latest: warning.date });
+      }
     }
 
-    const embeds = [new EmbedBuilder()
-      .setDescription(embedDescription.join('\n'))
-      .setColor(EmbedColours.Info)];
+    const embedDescription: Array<string> = [];
+    accumulator.forEach((value) => {
+      embedDescription.push(stripIndents
+        `**${value.name}** — ${value.amount} warning(s)
+        ├ **User ID:** ${value.id}
+        └ **Latest Warning:** ${time(new Date(Number(value.latest)), 'R')}`
+      );
+    });
 
-    await this.interaction.editReply({ embeds });
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`Warnings in ${this.guild.name}`)
+      .setThumbnail(this.guild.iconURL())
+      .setDescription(embedDescription.join('\n\n'));
+
+    await this.interaction.editReply({ embeds: [embed] });
+  }
+
+  private async viewUserWarnings(user: User) {
+    const displayName = user.displayName;
+    const userWarnings = await database.warning.findMany({
+      where: { guildID: this.guild.id, warnedID: user.id },
+      orderBy: { date: 'desc' }
+    });
+    if (!userWarnings) return this.handleError('Error fetching warnings from WARNING table', true, 'view.js');
+
+    const embedDescription: Array<string> = [];
+    if (userWarnings.length === 0) embedDescription.push(`${displayName} has no warnings`);
+
+    userWarnings.forEach((warning, index) => {
+      embedDescription.push(stripIndents
+        `**Warning ${index + 1}**
+          ├ **Time:** ${time(new Date(Number(warning.date)), 'R')}
+          └ **Warning ID:** ${warning.date}`
+      );
+    });
+
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`${displayName}'s Warnings`)
+      .setThumbnail(user.displayAvatarURL())
+      .setDescription(embedDescription.join('\n\n'));
+
+    await this.interaction.editReply({ embeds: [embed] });
   }
 }
 
@@ -179,32 +244,32 @@ class WatchlistViewer extends CommandHandler {
     if (!this.id) return this.viewGuildNotes();
 
     const note = await database.notes.findUnique({ where: { date: this.id } }).catch(() => null);
-    const member = await this.guild.members.fetch(this.id).catch(() => null);
+    const user = await this.interaction.client.users.fetch(this.id).catch(() => null);
 
     if (note) this.viewNote(note);
-    else if (member) this.viewMemberNotes(member);
+    else if (user) this.viewUserNotes(user);
     else this.handleError(`**${this.id}** is not a valid @mention, User ID or Note ID`);
   }
 
   private async viewNote(note: Notes) {
     const date = new Date(Number(note.date));
-    const author = await this.guild.members.fetch(note.authorID).catch(() => null);
-    const watched = await this.guild.members.fetch(note.watchedID).catch(() => null);
+    const author = await this.interaction.client.users.fetch(note.authorID).catch(() => null);
+    const watched = await this.interaction.client.users.fetch(note.watchedID).catch(() => null);
 
     if (!author || !watched) return this.handleError('Error fetching user data from Discord API', true, 'view.js');
 
     const embed = new EmbedBuilder(baseEmbed)
       .setTitle(`${watched.displayName}'s Watchlist`)
       .setThumbnail(watched.displayAvatarURL())
-      .setDescription(stripIndents`
-        ### Note Text
-        ${note.noteText}  
-        `)
+      .setDescription(stripIndents
+        `### Note Text
+        ${note.noteText}`
+      )
       .addFields([
         { name: 'Time', value: time(date, 'R'), inline: true },
         { name: 'Note ID', value: note.date, inline: true },
-        { name: 'Watched', value: `@${watched.user.username} — User ID: ${watched.id}` },
-        { name: 'Author', value: `@${author.user.username} — User ID: ${author.id}` }
+        { name: 'Watched', value: `@${watched.username} — User ID: ${watched.id}` },
+        { name: 'Author', value: `@${author.username} — User ID: ${author.id}` }
       ]);
 
     await this.interaction.editReply({ embeds: [embed] });
@@ -212,35 +277,32 @@ class WatchlistViewer extends CommandHandler {
 
   private async viewGuildNotes() {
     const notes = await database.notes.findMany({
-      where: {
-        guildID: this.guild.id
-      },
-      orderBy: {
-        date: 'desc'
-      }
-    });
+      where: { guildID: this.guild.id },
+      orderBy: { date: 'desc' }
+    }).catch(() => null);
     if (!notes) return this.handleError('Error fetching notes from NOTES table', true, 'view.js');
 
     const accumulator = new Map<string, { name: string, id: string, amount: number, latest: string; }>();
     for await (const note of notes) {
-      const watchedName = await this.fetchMemberDisplayName(note.watchedID);
+      const watchedUser = await this.interaction.client.users.fetch(note.watchedID);
+      const displayName = watchedUser.displayName;
       const mappedNote = accumulator.get(note.watchedID);
 
       if (mappedNote) {
         mappedNote.amount++;
         if (mappedNote.latest < note.date) mappedNote.latest = note.date;
       } else {
-        accumulator.set(note.watchedID, { amount: 1, id: note.watchedID, name: watchedName, latest: note.date });
+        accumulator.set(note.watchedID, { amount: 1, id: note.watchedID, name: displayName, latest: note.date });
       }
     }
 
     const embedDescription: Array<string> = [];
     accumulator.forEach((value) => {
-      embedDescription.push(stripIndents`
-        **${value.name}** — ${value.amount} note(s)
+      embedDescription.push(stripIndents
+        `**${value.name}** — ${value.amount} note(s)
         ├ **User ID:** ${value.id}
-        └ **Latest Note:** ${time(new Date(Number(value.latest)), 'R')}
-        `);
+        └ **Latest Note:** ${time(new Date(Number(value.latest)), 'R')}`
+      );
     });
 
     const embed = new EmbedBuilder(baseEmbed)
@@ -251,33 +313,28 @@ class WatchlistViewer extends CommandHandler {
     await this.interaction.editReply({ embeds: [embed] });
   }
 
-  private async viewMemberNotes(member: GuildMember) {
-    const memberName = await this.fetchMemberDisplayName(member.id);
-    const memberNotes = await database.notes.findMany({
-      where: {
-        guildID: this.guild.id,
-        watchedID: member.id
-      },
-      orderBy: {
-        date: 'desc'
-      }
+  private async viewUserNotes(user: User) {
+    const displayName = user.displayName;
+    const userNotes = await database.notes.findMany({
+      where: { guildID: this.guild.id, watchedID: user.id },
+      orderBy: { date: 'desc' }
     });
-    if (!memberNotes) return this.handleError('Error fetching notes from NOTES table', true, 'view.js');
+    if (!userNotes) return this.handleError('Error fetching notes from NOTES table', true, 'view.js');
 
     const embedDescription: Array<string> = [];
-    if (memberNotes.length === 0) embedDescription.push(`${memberName} has no notes and therefore isn't on the watchlist`);
+    if (userNotes.length === 0) embedDescription.push(`${displayName} has no notes and therefore isn't on the watchlist`);
 
-    memberNotes.forEach((note, index) => {
-      embedDescription.push(stripIndents`
-        **Note ${index + 1}**
+    userNotes.forEach((note, index) => {
+      embedDescription.push(stripIndents
+        `**Note ${index + 1}**
         ├ **Time:** ${time(new Date(Number(note.date)), 'R')}
-        └ **Note ID:** ${note.date}
-      `);
+        └ **Note ID:** ${note.date}`
+      );
     });
 
     const embed = new EmbedBuilder(baseEmbed)
-      .setTitle(`${memberName}'s Watchlist`)
-      .setThumbnail(member.displayAvatarURL())
+      .setTitle(`${displayName}'s Watchlist`)
+      .setThumbnail(user.displayAvatarURL())
       .setDescription(embedDescription.join('\n\n'));
 
     await this.interaction.editReply({ embeds: [embed] });
