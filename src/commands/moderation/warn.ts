@@ -1,6 +1,6 @@
-import { CommandHandler } from "@commands/command.js";
-import { warnModalData } from "@lib/api.js";
 import { ActionRowBuilder, ChatInputCommandInteraction, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, User } from "discord.js";
+import { warnModalData } from "../../lib/api.js";
+import { CommandHandler } from "../command.js";
 
 export class WarnCommandHandler extends CommandHandler {
   private user: User;

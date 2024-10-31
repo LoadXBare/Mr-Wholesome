@@ -1,8 +1,8 @@
-import { ButtonHandler } from "@buttons/button-handler.js";
-import { levelNotifButtonData } from "@lib/api.js";
-import { baseEmbed, database } from "@lib/config.js";
 import { stripIndents } from "common-tags";
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder } from "discord.js";
+import { levelNotifButtonData } from "../../lib/api.js";
+import { baseEmbed, database } from "../../lib/config.js";
+import { ButtonHandler } from "../button-handler.js";
 
 export class ToggleLevelNotifButtonHandler extends ButtonHandler {
   async handle() {

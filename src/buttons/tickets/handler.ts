@@ -1,4 +1,4 @@
-import { ButtonHandler } from "@buttons/button-handler.js";
+import { ButtonHandler } from "../button-handler.js";
 import { closeTicketButtonHandler } from "./close.js";
 import { createTicketButtonHandler } from "./create.js";
 import { deleteTicketButtonHandler } from "./delete.js";

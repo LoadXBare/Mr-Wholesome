@@ -25,23 +25,6 @@
 		"rootDir": "src",
 		"outDir": "dist",
 		"baseUrl": "src",
-		"paths": {
-			"@base": [
-				"./index.js"
-			],
-			"@buttons/*": [
-				"buttons/*"
-			],
-			"@commands/*": [
-				"commands/*"
-			],
-			"@lib/*": [
-				"lib/*"
-			],
-			"@modals/*": [
-				"modals/*"
-			]
-		},
 		"skipLibCheck": true
 	}
 }

@@ -1,5 +1,5 @@
-import { BaseInteractionHandler, ChannelIDs } from "@lib/config.js";
 import { channelMention, ChatInputCommandInteraction } from "discord.js";
+import { BaseInteractionHandler, ChannelIDs } from "../lib/config.js";
 
 export abstract class CommandHandler extends BaseInteractionHandler {
   protected interaction: ChatInputCommandInteraction;

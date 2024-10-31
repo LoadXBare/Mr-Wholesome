@@ -1,10 +1,10 @@
-import { client } from '@base';
-import { EmbedColours, EventHandler, Images, baseEmbed, database } from '@lib/config.js';
-import { channelIgnoresEvents } from '@lib/database-utilities.js';
-import { storeAttachments } from '@lib/utilities.js';
 import {
   AuditLogEvent, EmbedBuilder, Events, Message, PartialMessage,
 } from 'discord.js';
+import { client } from '../../index.js';
+import { EmbedColours, EventHandler, Images, baseEmbed, database } from '../../lib/config.js';
+import { channelIgnoresEvents } from '../../lib/database-utilities.js';
+import { storeAttachments } from '../../lib/utilities.js';
 
 class MessageDeleteHandler extends EventHandler {
   message: Message | PartialMessage;

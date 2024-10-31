@@ -1,6 +1,6 @@
-import { ButtonHandler } from "@buttons/button-handler.js";
-import { database } from "@lib/config.js";
 import { PermissionOverwriteOptions, TextChannel } from "discord.js";
+import { database } from "../../lib/config.js";
+import { ButtonHandler } from "../button-handler.js";
 
 export class openTicketButtonHandler extends ButtonHandler {
   async handle() {

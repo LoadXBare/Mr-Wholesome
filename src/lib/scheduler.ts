@@ -1,9 +1,9 @@
-import { lastBirthdayCheck } from "@lib/api.js";
-import { ChannelIDs, RoleIDs, UserIDs, akialytesGuild, database } from "@lib/config.js";
-import { formatDate, styleLog } from "@lib/utilities.js";
 import { commaListsAnd } from "common-tags";
 import Cron from "croner";
 import { GuildMember, TextChannel } from "discord.js";
+import { lastBirthdayCheck } from "./api.js";
+import { ChannelIDs, RoleIDs, UserIDs, akialytesGuild, database } from "./config.js";
+import { formatDate, styleLog } from "./utilities.js";
 
 export default class Scheduler {
   start() {

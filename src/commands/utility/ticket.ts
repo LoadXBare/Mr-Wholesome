@@ -1,6 +1,6 @@
-import { CommandHandler } from "@commands/command.js";
-import { database } from "@lib/config.js";
 import { ChatInputCommandInteraction, PermissionOverwriteOptions, TextChannel, User } from "discord.js";
+import { database } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
 export class TicketCommandHandler extends CommandHandler {
   user: User;

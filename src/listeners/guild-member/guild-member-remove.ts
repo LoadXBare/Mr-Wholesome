@@ -1,10 +1,10 @@
-import { client } from '@base';
-import { EmbedColours, EventHandler, Images, baseEmbed, database } from '@lib/config.js';
-import { getRelativeTimeString } from '@lib/utilities.js';
 import { stripIndents } from 'common-tags';
 import {
   EmbedBuilder, Events, GuildMember, PartialGuildMember,
 } from 'discord.js';
+import { client } from '../../index.js';
+import { EmbedColours, EventHandler, Images, baseEmbed, database } from '../../lib/config.js';
+import { getRelativeTimeString } from '../../lib/utilities.js';
 
 class GuildMemberRemoveHandler extends EventHandler {
   member: GuildMember | PartialGuildMember;

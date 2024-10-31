@@ -1,8 +1,8 @@
-import { CommandHandler } from "@commands/command.js";
-import { baseEmbed, database } from "@lib/config.js";
 import { Ban, Notes, Warning } from "@prisma/client";
 import { stripIndents } from "common-tags";
 import { ChatInputCommandInteraction, EmbedBuilder, time, User } from "discord.js";
+import { baseEmbed, database } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
 export class ViewCommandHandler extends CommandHandler {
   async handle() {

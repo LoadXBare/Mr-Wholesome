@@ -1,4 +1,4 @@
-import { CommandHandler } from '@commands/command.js';
+import { CommandHandler } from '../command.js';
 
 export class DogCommandHandler extends CommandHandler {
   async handle() {

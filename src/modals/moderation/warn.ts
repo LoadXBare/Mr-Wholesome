@@ -1,7 +1,7 @@
-import { warnModalData } from "@lib/api.js";
-import { baseEmbed, database } from "@lib/config.js";
-import { ModalHandler } from "@modals/handler.js";
 import { bold, EmbedBuilder, heading, italic, Message, ModalSubmitInteraction, User } from "discord.js";
+import { warnModalData } from "../../lib/api.js";
+import { baseEmbed, database } from "../../lib/config.js";
+import { ModalHandler } from "../handler.js";
 
 export class WarningModalHandler extends ModalHandler {
   private reason: string;

@@ -1,6 +1,6 @@
-import { CommandHandler } from "@commands/command.js";
-import { banModalData } from "@lib/api.js";
 import { ActionRowBuilder, ChatInputCommandInteraction, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, User, UserContextMenuCommandInteraction } from "discord.js";
+import { banModalData } from "../../lib/api.js";
+import { CommandHandler } from "../command.js";
 
 export class BanCommandHandler extends CommandHandler {
   private user: User;

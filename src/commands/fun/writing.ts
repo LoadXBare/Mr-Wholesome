@@ -1,9 +1,9 @@
-import { CommandHandler } from "@commands/command.js";
-import { baseEmbed, database } from "@lib/config.js";
 import { createCanvas, loadImage } from "@napi-rs/canvas";
 import Chart, { ChartItem } from 'chart.js/auto';
 import { stripIndents } from "common-tags";
 import { AttachmentBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { baseEmbed, database } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
 export class WritingCommandHandler extends CommandHandler {
   private canvasWidth: number;

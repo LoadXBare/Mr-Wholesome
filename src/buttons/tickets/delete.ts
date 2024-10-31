@@ -1,7 +1,7 @@
-import { ButtonHandler } from "@buttons/button-handler.js";
-import { database } from "@lib/config.js";
-import { sleep } from "@lib/utilities.js";
 import { TextChannel, time } from "discord.js";
+import { database } from "../../lib/config.js";
+import { sleep } from "../../lib/utilities.js";
+import { ButtonHandler } from "../button-handler.js";
 
 export class deleteTicketButtonHandler extends ButtonHandler {
   async handle() {

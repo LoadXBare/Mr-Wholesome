@@ -1,6 +1,6 @@
-import { styleLog } from '@lib/utilities.js';
 import { ApplicationCommandType, ChannelType, ContextMenuCommandBuilder, PermissionFlagsBits, REST, Routes, SlashCommandBuilder } from 'discord.js';
 import * as dotenv from 'dotenv';
+import { styleLog } from './utilities.js';
 
 dotenv.config();
 

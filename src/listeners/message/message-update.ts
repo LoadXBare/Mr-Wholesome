@@ -1,13 +1,13 @@
-import { client } from '@base';
-import { EventHandler, Images, baseEmbed, database } from '@lib/config.js';
-import { channelIgnoresEvents } from '@lib/database-utilities.js';
-import { storeAttachments } from '@lib/utilities.js';
 import { stripIndents } from 'common-tags';
 import { Change, diffChars } from 'diff';
 import {
   ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder,
   Events, Message, PartialMessage
 } from 'discord.js';
+import { client } from '../../index.js';
+import { EventHandler, Images, baseEmbed, database } from '../../lib/config.js';
+import { channelIgnoresEvents } from '../../lib/database-utilities.js';
+import { storeAttachments } from '../../lib/utilities.js';
 
 class MessageUpdateHandler extends EventHandler {
   oldMessage: Message | PartialMessage;

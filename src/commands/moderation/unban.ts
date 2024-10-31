@@ -1,6 +1,6 @@
-import { CommandHandler } from "@commands/command.js";
-import { database } from "@lib/config.js";
 import { ChatInputCommandInteraction } from "discord.js";
+import { database } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
 export class UnbanCommandHandler extends CommandHandler {
   private userID: string;

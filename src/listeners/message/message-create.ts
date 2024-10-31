@@ -1,10 +1,10 @@
-import { client } from '@base';
-import { ChannelIDs, Emotes, EventHandler, UserIDs } from '@lib/config.js';
-import { channelIgnoresEvents } from '@lib/database-utilities.js';
-import MessageStatisticsHandler from '@lib/message-statistics-handler.js';
-import RankingHandler from '@lib/ranking-handler.js';
-import { styleLog } from '@lib/utilities.js';
 import { Events, Message } from 'discord.js';
+import { client } from '../../index.js';
+import { ChannelIDs, Emotes, EventHandler, UserIDs } from '../../lib/config.js';
+import { channelIgnoresEvents } from '../../lib/database-utilities.js';
+import MessageStatisticsHandler from '../../lib/message-statistics-handler.js';
+import RankingHandler from '../../lib/ranking-handler.js';
+import { styleLog } from '../../lib/utilities.js';
 
 class MessageCreateHandler extends EventHandler {
   message: Message;

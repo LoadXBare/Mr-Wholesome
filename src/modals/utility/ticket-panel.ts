@@ -1,8 +1,8 @@
-import { ticketPanelModalData } from "@lib/api.js";
-import { baseEmbed, database } from "@lib/config.js";
-import { ModalHandler } from "@modals/handler.js";
 import { stripIndents } from "common-tags";
 import { chatInputApplicationCommandMention, Colors, EmbedBuilder, ModalSubmitInteraction } from "discord.js";
+import { ticketPanelModalData } from "../../lib/api.js";
+import { baseEmbed, database } from "../../lib/config.js";
+import { ModalHandler } from "../handler.js";
 
 export class TicketPanelModalHandler extends ModalHandler {
   private title: string;

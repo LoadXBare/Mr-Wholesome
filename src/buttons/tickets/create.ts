@@ -1,6 +1,6 @@
-import { ButtonHandler } from "@buttons/button-handler.js";
-import { database } from "@lib/config.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, PermissionOverwriteOptions, userMention } from "discord.js";
+import { database } from "../../lib/config.js";
+import { ButtonHandler } from "../button-handler.js";
 
 export class createTicketButtonHandler extends ButtonHandler {
   async handle() {

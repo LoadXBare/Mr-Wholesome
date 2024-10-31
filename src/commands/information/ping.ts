@@ -1,7 +1,7 @@
-import { CommandHandler } from '@commands/command.js';
-import { baseEmbed } from '@lib/config.js';
 import { stripIndents } from 'common-tags';
 import { EmbedBuilder } from 'discord.js';
+import { baseEmbed } from '../../lib/config.js';
+import { CommandHandler } from '../command.js';
 
 export class PingCommandHandler extends CommandHandler {
   async handle() {

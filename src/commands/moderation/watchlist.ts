@@ -1,7 +1,7 @@
-import { CommandHandler } from "@commands/command.js";
-import { watchlistModalData } from "@lib/api.js";
-import { baseEmbed, database } from "@lib/config.js";
 import { ActionRowBuilder, EmbedBuilder, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { watchlistModalData } from "../../lib/api.js";
+import { baseEmbed, database } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
 export class WatchlistCommandHandler extends CommandHandler {
   public async handle() {

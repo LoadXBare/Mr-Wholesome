@@ -1,7 +1,7 @@
-import { CommandHandler } from "@commands/command.js";
-import { ticketPanelModalData } from "@lib/api.js";
-import { database } from "@lib/config.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ticketPanelModalData } from "../../lib/api.js";
+import { database } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
 export class TicketPanelCommandHandler extends CommandHandler {
   async handle() {

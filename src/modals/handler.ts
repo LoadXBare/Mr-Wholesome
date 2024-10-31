@@ -1,5 +1,5 @@
-import { BaseInteractionHandler, EmbedColours } from "@lib/config.js";
 import { ColorResolvable, EmbedBuilder, ModalSubmitInteraction, User } from "discord.js";
+import { BaseInteractionHandler, EmbedColours } from "../lib/config.js";
 
 export abstract class ModalHandler extends BaseInteractionHandler {
   protected interaction: ModalSubmitInteraction;

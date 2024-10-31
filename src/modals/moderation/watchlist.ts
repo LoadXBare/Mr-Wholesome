@@ -1,7 +1,7 @@
-import { watchlistModalData } from "@lib/api.js";
-import { baseEmbed, database } from "@lib/config.js";
-import { ModalHandler } from "@modals/handler.js";
 import { EmbedBuilder, GuildMember, ModalSubmitInteraction } from "discord.js";
+import { watchlistModalData } from "../../lib/api.js";
+import { baseEmbed, database } from "../../lib/config.js";
+import { ModalHandler } from "../handler.js";
 
 export class WatchlistModalHandler extends ModalHandler {
   private note: string;

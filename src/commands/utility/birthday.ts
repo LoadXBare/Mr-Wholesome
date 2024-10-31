@@ -1,9 +1,9 @@
-import { CommandHandler } from '@commands/command.js';
-import { baseEmbed, database } from '@lib/config.js';
-import { formatDate } from '@lib/utilities.js';
 import { Birthday } from '@prisma/client';
 import { stripIndents } from 'common-tags';
 import { EmbedBuilder } from 'discord.js';
+import { baseEmbed, database } from '../../lib/config.js';
+import { formatDate } from '../../lib/utilities.js';
+import { CommandHandler } from '../command.js';
 
 export class BirthdayCommandHandler extends CommandHandler {
   async handle() {

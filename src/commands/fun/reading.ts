@@ -1,7 +1,7 @@
-import { CommandHandler } from '@commands/command.js';
-import { getRandomIntegerFromSeed } from '@lib/utilities.js';
 import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { getRandomIntegerFromSeed } from '../../lib/utilities.js';
+import { CommandHandler } from '../command.js';
 
 export class ReadingCommandHandler extends CommandHandler {
   private canvas: Canvas;

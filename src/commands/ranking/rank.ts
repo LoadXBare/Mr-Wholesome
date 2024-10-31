@@ -1,8 +1,8 @@
-import { CommandHandler } from "@commands/command.js";
-import { database } from "@lib/config.js";
-import { xpRequiredForLevel } from "@lib/ranking-handler.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
+import { database } from "../../lib/config.js";
+import { xpRequiredForLevel } from "../../lib/ranking-handler.js";
+import { CommandHandler } from "../command.js";
 
 export class RankCommandHandler extends CommandHandler {
   private canvas: Canvas;

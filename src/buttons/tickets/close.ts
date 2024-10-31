@@ -1,6 +1,6 @@
-import { ButtonHandler } from "@buttons/button-handler.js";
-import { database, EmbedColours } from "@lib/config.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, TextChannel } from "discord.js";
+import { database, EmbedColours } from "../../lib/config.js";
+import { ButtonHandler } from "../button-handler.js";
 
 export class closeTicketButtonHandler extends ButtonHandler {
   async handle() {

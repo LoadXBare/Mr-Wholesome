@@ -1,9 +1,9 @@
-import { CommandHandler } from "@commands/command.js";
-import { baseEmbed, database } from "@lib/config.js";
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { Rank } from "@prisma/client";
 import { stripIndents } from "common-tags";
 import { AttachmentBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { baseEmbed, database } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
 export class LeaderboardCommandHandler extends CommandHandler {
   private canvas: Canvas;
