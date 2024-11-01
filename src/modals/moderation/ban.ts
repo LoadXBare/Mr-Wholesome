@@ -21,6 +21,9 @@ export class BanModalHandler extends ModalHandler {
     const user = await this.interaction.client.users.fetch(banData.userID).catch(() => { });
     if (!user) return this.handleError(`User of ID ${bold(banData.userID)} not found. Please try again.`);
 
+    const guildBans = await this.guild.bans.fetch();
+    if (guildBans.has(user.id)) return this.handleError(`**${user.displayName}** is already banned.`);
+
     let notifiedMessage: Message<false> | boolean = false;
     if (banData.notify_user) {
       const content = [
