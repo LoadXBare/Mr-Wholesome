@@ -48,7 +48,7 @@ export default class RankingHandler {
   }
 
   async #handleLevelUp(level: number, levelNotifs: boolean) {
-    const levelUpNotifChannel = this.message.guild?.channels.resolve(ChannelIDs.LevelUp);
+    const levelUpNotifChannel = await this.message.guild?.channels.fetch(ChannelIDs.LevelUp);
     if (!(levelUpNotifChannel instanceof TextChannel)) return;
 
     const content = levelNotifs ? `${this.message.author}` : undefined;
