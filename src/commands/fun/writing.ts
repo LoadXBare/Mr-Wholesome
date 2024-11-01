@@ -1,4 +1,4 @@
-import { createCanvas, loadImage } from "@napi-rs/canvas";
+import { createCanvas, GlobalFonts, loadImage } from "@napi-rs/canvas";
 import Chart, { ChartItem } from 'chart.js/auto';
 import { stripIndents } from "common-tags";
 import { AttachmentBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
@@ -49,6 +49,7 @@ export class WritingCommandHandler extends CommandHandler {
 
   private createChartCanvas(hourlyMessages: Array<number>) {
     const dataLabels = Array.from({ length: 24 }, (_, i) => `${i % 12 === 0 ? 12 : i % 12}${i < 12 ? 'am' : 'pm'}`);
+    GlobalFonts.registerFromPath('assets/fonts/Ubuntu-Medium.ttf', 'ubuntu-medium');
     const canvas = createCanvas(1343, 720);
     const canvasContext = canvas.getContext('2d') as unknown as ChartItem; // canvasContext needs to be cast to ChartItem for Chart.js to render with '@napi-rs/canvas' context
 
@@ -71,26 +72,26 @@ export class WritingCommandHandler extends CommandHandler {
             grid: { display: false },
             ticks: {
               color: 'white',
-              font: { size: 18, weight: 'bold' }
+              font: { family: 'ubuntu-medium', size: 18, weight: 'bold' }
             },
             title: {
               display: true,
               text: 'Time of Day [UTC]',
               color: 'white',
-              font: { size: 16, weight: 'bold' }
+              font: { family: 'ubuntu-medium', size: 16, weight: 'bold' }
             }
           },
           y: {
             grid: { display: false },
             ticks: {
               color: 'white',
-              font: { size: 18, weight: 'bold' }
+              font: { family: 'ubuntu-medium', size: 18, weight: 'bold' }
             },
             title: {
               display: true,
               text: 'Number of Messages',
               color: 'white',
-              font: { size: 16, weight: 'bold' }
+              font: { family: 'ubuntu-medium', size: 16, weight: 'bold' }
             },
             beginAtZero: true
           }
