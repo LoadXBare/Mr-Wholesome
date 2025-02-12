@@ -1,6 +1,7 @@
 import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { getRandomIntegerFromSeed } from '../../lib/utilities.js';
+import { Emotes } from '../../lib/config.js';
+import { getRandomIntegerFromSeed, sleep } from '../../lib/utilities.js';
 import { CommandHandler } from '../command.js';
 
 export class ReadingCommandHandler extends CommandHandler {
@@ -24,6 +25,15 @@ export class ReadingCommandHandler extends CommandHandler {
     const cursed = this.todayIsCursedDay ? 'cursed ' : '';
     const attachment = await this.createUserReadingImage();
     const userName = this.interaction.user.displayName;
+
+    await this.interaction.editReply(`# Contacting spirits... ${Emotes.Ghost}`);
+    await sleep(3000);
+
+    await this.interaction.editReply(`# Querying bird gods... ${Emotes.Bird}`);
+    await sleep(3000);
+
+    await this.interaction.editReply(`# Almost done, finalising results... ${Emotes.Chart}`);
+    await sleep(3000);
 
     await this.interaction.editReply({ content: `## Here is your ${cursed}reading for ${new Date().toDateString()}, ${userName}...`, files: [attachment] });
   }
