@@ -1,10 +1,10 @@
-import { Events, Message } from 'discord.js';
+import { Events, ForumChannel, Message } from 'discord.js';
 import { client } from '../../index.js';
 import { ChannelIDs, Emotes, EventHandler, UserIDs } from '../../lib/config.js';
 import { channelIgnoresEvents } from '../../lib/database-utilities.js';
 import MessageStatisticsHandler from '../../lib/message-statistics-handler.js';
 import RankingHandler from '../../lib/ranking-handler.js';
-import { styleLog } from '../../lib/utilities.js';
+import { sleep, styleLog } from '../../lib/utilities.js';
 
 class MessageCreateHandler extends EventHandler {
   message: Message;
@@ -26,6 +26,7 @@ class MessageCreateHandler extends EventHandler {
     this.#useSlashCommands();
     this.#handleRanking();
     this.handleMessageStatistics();
+    this.handleModOnlyForumChannel();
   }
 
   // Automatically crosspost any message sent in Announcement channels
@@ -91,6 +92,27 @@ class MessageCreateHandler extends EventHandler {
   // Handle everything related to tracking member message statistics
   private handleMessageStatistics() {
     new MessageStatisticsHandler(this.message).handle();
+  }
+
+  private async handleModOnlyForumChannel() {
+    if (!this.message.channel.isThread()) return;
+    if (!(this.message.channel.parent instanceof ForumChannel)) return;
+
+    const availableTags = this.message.channel.parent.availableTags;
+    const appliedTags = this.message.channel.appliedTags;
+    const modPostTag = availableTags.filter((tag) => tag.name === 'Mod Post');
+    if (modPostTag.length !== 1) return;
+
+    const threadIsModPost = appliedTags.findIndex((tag) => tag === modPostTag[0].id) !== -1 ? true : false;
+    if (!threadIsModPost) return;
+
+    const authorIsMod = this.message.member?.permissions.has('BanMembers');
+    if (authorIsMod) return;
+
+    const reply = await this.message.reply({ content: 'You must be a moderator to post in forum channels with the "Mod Post" tag!\n-# Deleting in 5 seconds.', allowedMentions: { repliedUser: true } });
+    await this.message.delete();
+    await sleep(5000);
+    await reply.delete();
   }
 }
 
