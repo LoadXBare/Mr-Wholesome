@@ -13,7 +13,6 @@ export class WarningModalHandler extends ModalHandler {
 
   async handle(): Promise<void> {
     const [, id] = this.interaction.customId.split(':');
-    console.log(id);
 
     const warningData = await warnModalData.get(id);
     if (!warningData) return this.handleError('Warning data cannot be found. Please try again.');

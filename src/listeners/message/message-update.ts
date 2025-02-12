@@ -38,7 +38,6 @@ class MessageUpdateHandler extends EventHandler {
     let charCount = 0;
     contentDifference.forEach((diff, index) => {
       charCount += diff.count ?? 0;
-      console.log(diff, charCount);
       if (index === 1) {
         const firstDiff = contentDifference[0];
         if (firstDiff.added || firstDiff.removed) indexes.firstEdit = 0;
