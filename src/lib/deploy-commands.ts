@@ -270,11 +270,16 @@ const commands = [
     .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
     .setDMPermission(false),
 
+  new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('View a list of all available commands')
+    .setDMPermission(false),
+
   new ContextMenuCommandBuilder()
     .setName('Ban User')
     .setType(ApplicationCommandType.User)
     .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
-    .setDMPermission(false),
+    .setDMPermission(false)
 
 ].map((command) => command.toJSON());
 

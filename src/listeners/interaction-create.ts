@@ -1,3 +1,4 @@
+import { HelpCommandHandler } from 'commands/information/help.js';
 import { Events, Interaction } from 'discord.js';
 import { ToggleLevelNotifButtonHandler } from '../buttons/ranking/toggle-level-notifs.js';
 import { ticketButtonHandler } from '../buttons/tickets/handler.js';
@@ -55,6 +56,7 @@ class InteractionCreateHandler extends EventHandler {
     else if (cmd === 'writing') new WritingCommandHandler(chatInputInteraction).handle();
 
     // Information
+    else if (cmd === 'help') new HelpCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'ping') new PingCommandHandler(chatInputInteraction).handle();
 
     // Moderation
@@ -85,7 +87,6 @@ class InteractionCreateHandler extends EventHandler {
 
     if (customId === 'toggle-level-notif') new ToggleLevelNotifButtonHandler(buttonInteraction).handle();
     if (customId.startsWith('ticket:')) new ticketButtonHandler(buttonInteraction).handle();
-    console.log('Button Clicked:', customId);
   }
 
   async #handleModal() {
