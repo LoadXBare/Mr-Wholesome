@@ -14,12 +14,13 @@ export const EmbedColours = {
 };
 export const baseEmbed = new EmbedBuilder().setColor(EmbedColours.Neutral).toJSON();
 export const Emotes = {
-  Bonque: '<:akiaBonque:1072610966598066237>',
-  Arson: '<a:arson:1010942526976430191>',
-  Error: '<:error:1023986711971242054>',
-  Added: '<:added:1113169938933358592>',
-  Removed: '<:removed:1113169940858556487>',
-  Thinking: '<:Thinking:1263844433091362918>'
+  Bonque: '<:bonque:1301832610338570250>',
+  Arson: '<a:arson:1301833900464672768>',
+  Added: '<:added:1301833955355394089>',
+  Removed: '<:removed:1301834001287479307>',
+  Ghost: '<a:ghost:1301829229184421888>',
+  Bird: '<a:bird:1301829214227398728>',
+  Chart: '<a:chart:1301829199576956939>'
 };
 export const Images = {
   WatchedUser: 'https://cdn.discordapp.com/attachments/1297278175046533247/1298572168338083930/ic_fluent_person_note_24_filled.png?ex=671a0d13&is=6718bb93&hm=b494bb3f608a08225c554c78b37fe61e37fe3e116f90814ed29c7c3067f900f5&'
