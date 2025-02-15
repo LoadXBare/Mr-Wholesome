@@ -1,4 +1,4 @@
-import { Events, ForumChannel, Message } from 'discord.js';
+import { AttachmentBuilder, Events, ForumChannel, Message } from 'discord.js';
 import { client } from '../../index.js';
 import { ChannelIDs, Emotes, EventHandler, UserIDs } from '../../lib/config.js';
 import { channelIgnoresEvents } from '../../lib/database-utilities.js';
@@ -27,6 +27,7 @@ class MessageCreateHandler extends EventHandler {
     this.#handleRanking();
     this.handleMessageStatistics();
     this.handleModOnlyForumChannel();
+    this.akiaSnoGif();
   }
 
   // Automatically crosspost any message sent in Announcement channels
@@ -113,6 +114,15 @@ class MessageCreateHandler extends EventHandler {
     await this.message.delete();
     await sleep(5000);
     await reply.delete();
+  }
+
+  private async akiaSnoGif() {
+    const channelIsIRLStuff = this.message.channelId === ChannelIDs.IRLStuff;
+    const authorIsAkia = this.message.author.id === UserIDs.Akialyne;
+    if (!(channelIsIRLStuff && authorIsAkia)) return;
+
+    const snoAttachment = new AttachmentBuilder('./assets/SNO.gif');
+    await this.message.reply({ files: [snoAttachment] });
   }
 }
 
