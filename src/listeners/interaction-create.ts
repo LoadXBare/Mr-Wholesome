@@ -26,6 +26,7 @@ import { BanModalHandler } from '../modals/moderation/ban.js';
 import { WarningModalHandler } from '../modals/moderation/warn.js';
 import { WatchlistModalHandler } from '../modals/moderation/watchlist.js';
 import { TicketPanelModalHandler } from '../modals/utility/ticket-panel.js';
+import { SnoCommandHandler } from 'commands/fun/sno.js';
 
 class InteractionCreateHandler extends EventHandler {
   interaction: Interaction;
@@ -53,6 +54,7 @@ class InteractionCreateHandler extends EventHandler {
     else if (cmd === '8ball') new EightBallCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'fox') new FoxCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'reading') new ReadingCommandHandler(chatInputInteraction).handle();
+    else if (cmd === 'sno') new SnoCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'writing') new WritingCommandHandler(chatInputInteraction).handle();
 
     // Information

@@ -275,12 +275,17 @@ const commands = [
     .setDescription('View a list of all available commands')
     .setDMPermission(false),
 
+  new SlashCommandBuilder()
+    .setName('sno')
+    .setDescription('SNO!')
+    .setDMPermission(false),
+
+
   new ContextMenuCommandBuilder()
     .setName('Ban User')
     .setType(ApplicationCommandType.User)
     .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .setDMPermission(false)
-
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');

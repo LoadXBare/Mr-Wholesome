@@ -1,11 +1,12 @@
 import { stripIndents } from 'common-tags';
 import { ColorResolvable, EmbedBuilder } from 'discord.js';
-import { baseEmbed } from '../../lib/config.js';
+import { baseEmbed, ChannelIDs } from '../../lib/config.js';
 import { CommandHandler } from '../command.js';
 
 export class EightBallCommandHandler extends CommandHandler {
   async handle() {
-    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
     await this.interaction.deferReply();
 
     const question = this.interaction.options.getString('question', true);

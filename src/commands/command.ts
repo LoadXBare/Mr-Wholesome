@@ -1,5 +1,5 @@
 import { channelMention, ChatInputCommandInteraction } from "discord.js";
-import { BaseInteractionHandler, ChannelIDs } from "../lib/config.js";
+import { BaseInteractionHandler } from "../lib/config.js";
 
 export abstract class CommandHandler extends BaseInteractionHandler {
   protected interaction: ChatInputCommandInteraction;
@@ -9,27 +9,20 @@ export abstract class CommandHandler extends BaseInteractionHandler {
     this.interaction = interaction;
   }
 
-  protected postChannelIneligibleMessage(comfyVibes: boolean) {
-    // We're assuming here that commands that trigger this can always be ran in the BotSpam channel,
-    // as the only commands that cannot be ran in either channel are moderator commands which have
-    // their own permissions preventing non-moderators from running them anyway.
-    const comfyVibesMessage = comfyVibes ? `or ${channelMention(ChannelIDs.ComfyVibes)}` : '';
-    const content = `This command can only be ran in ${channelMention(ChannelIDs.BotSpam)}${comfyVibesMessage}`;
+  protected postChannelIneligibleMessage(allowedChannelIDs: Array<string>) {
+    const channelList = allowedChannelIDs.map((id) => channelMention(id)).join(', ');
+    const content = `This command can only be ran in the following channels: ${channelList}`;
 
     if (this.interaction.deferred || this.interaction.replied) this.interaction.editReply({ content });
     else this.interaction.reply({ content, ephemeral: true });
   }
 
-  protected checkChannelEligibility(botSpam: boolean, comfyVibes: boolean) {
-    const channelIsBotSpam = this.commandRanInBotSpam();
-    const channelIsComfyVibes = this.commandRanInComfyVibes();
+  protected checkChannelEligibility(allowedChannelIDs: Array<string>) {
+    const commandAllowedInChannel = allowedChannelIDs.includes(this.interaction.channelId);
     const executorIsModerator = this.commandRanByModerator();
 
     if (executorIsModerator) return true;
-    else if (botSpam && comfyVibes) return channelIsBotSpam || channelIsComfyVibes;
-    else if (botSpam) return channelIsBotSpam;
-    else if (comfyVibes) return channelIsComfyVibes;
-    else return false;
+    return commandAllowedInChannel;
   }
 
   private commandRanByModerator() {
@@ -37,13 +30,5 @@ export abstract class CommandHandler extends BaseInteractionHandler {
     if (!memberPermissions) return false;
 
     return memberPermissions.has('BanMembers');
-  }
-
-  private commandRanInBotSpam() {
-    return this.interaction.channelId === ChannelIDs.BotSpam;
-  }
-
-  private commandRanInComfyVibes() {
-    return this.interaction.channelId === ChannelIDs.ComfyVibes;
   }
 }

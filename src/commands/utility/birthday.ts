@@ -1,13 +1,14 @@
 import { Birthday } from '@prisma/client';
 import { stripIndents } from 'common-tags';
 import { EmbedBuilder } from 'discord.js';
-import { baseEmbed, database } from '../../lib/config.js';
+import { baseEmbed, ChannelIDs, database } from '../../lib/config.js';
 import { formatDate } from '../../lib/utilities.js';
 import { CommandHandler } from '../command.js';
 
 export class BirthdayCommandHandler extends CommandHandler {
   async handle() {
-    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
     await this.interaction.deferReply();
 
     const command = this.interaction.options.getSubcommand();

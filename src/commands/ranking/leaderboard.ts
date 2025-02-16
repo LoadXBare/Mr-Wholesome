@@ -2,7 +2,7 @@ import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { Rank } from "@prisma/client";
 import { stripIndents } from "common-tags";
 import { AttachmentBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
-import { baseEmbed, database } from "../../lib/config.js";
+import { baseEmbed, ChannelIDs, database } from "../../lib/config.js";
 import { CommandHandler } from "../command.js";
 
 export class LeaderboardCommandHandler extends CommandHandler {
@@ -21,7 +21,8 @@ export class LeaderboardCommandHandler extends CommandHandler {
   }
 
   async handle() {
-    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
     await this.interaction.deferReply();
 
     const leaderboardImage = await this.createLeaderboardImage();

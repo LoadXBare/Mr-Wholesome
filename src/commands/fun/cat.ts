@@ -1,8 +1,10 @@
+import { ChannelIDs } from 'lib/config.js';
 import { CommandHandler } from '../command.js';
 
 export class CatCommandHandler extends CommandHandler {
   async handle() {
-    if (!this.checkChannelEligibility(true, true)) return this.postChannelIneligibleMessage(true);
+    const allowedChannelIDs = [ChannelIDs.BotSpam, ChannelIDs.ComfyVibes];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
     await this.interaction.deferReply();
 
     const response = await fetch('https://api.thecatapi.com/v1/images/search').catch(() => null);

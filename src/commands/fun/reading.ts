@@ -1,6 +1,6 @@
 import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { Emotes } from '../../lib/config.js';
+import { ChannelIDs, Emotes } from '../../lib/config.js';
 import { getRandomIntegerFromSeed, sleep } from '../../lib/utilities.js';
 import { CommandHandler } from '../command.js';
 
@@ -19,7 +19,8 @@ export class ReadingCommandHandler extends CommandHandler {
   }
 
   async handle() {
-    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
     await this.interaction.deferReply();
 
     const cursed = this.todayIsCursedDay ? 'cursed ' : '';

@@ -1,10 +1,11 @@
 import { CommandHandler } from "commands/command.js";
 import { ApplicationCommandType, chatInputApplicationCommandMention, EmbedBuilder } from "discord.js";
-import { baseEmbed, Emotes } from "lib/config.js";
+import { baseEmbed, ChannelIDs, Emotes } from "lib/config.js";
 
 export class HelpCommandHandler extends CommandHandler {
   async handle() {
-    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
     await this.interaction.deferReply();
 
     const funCommands = ['cat', 'dog', '8ball', 'fox', 'reading', 'writing'];
@@ -32,7 +33,8 @@ export class HelpCommandHandler extends CommandHandler {
         { name: `${Emotes.Bonque} Moderation`, value: moderationCommands.join(' ') },
         { name: '🏆 Ranking', value: rankingCommands.join(' ') },
         { name: '⚙️ Utility', value: utilityCommands.join(' ') }
-      ]);
+      ])
+      .setFooter({ text: '💡 Commands that cannot be clicked have multiple subcommands that would take up too much space to display' });
 
     await this.interaction.editReply({ embeds: [embed] });
   }

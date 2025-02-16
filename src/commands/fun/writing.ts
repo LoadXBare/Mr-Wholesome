@@ -2,7 +2,7 @@ import { createCanvas, GlobalFonts, loadImage } from "@napi-rs/canvas";
 import Chart, { ChartItem } from 'chart.js/auto';
 import { stripIndents } from "common-tags";
 import { AttachmentBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
-import { baseEmbed, database } from "../../lib/config.js";
+import { baseEmbed, ChannelIDs, database } from "../../lib/config.js";
 import { CommandHandler } from "../command.js";
 
 export class WritingCommandHandler extends CommandHandler {
@@ -16,7 +16,8 @@ export class WritingCommandHandler extends CommandHandler {
   }
 
   public async handle() {
-    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
     await this.interaction.deferReply();
 
     const { messageCount, messagesPerHour } = await this.fetchMemberStats();

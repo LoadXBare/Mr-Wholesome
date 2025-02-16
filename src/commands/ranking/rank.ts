@@ -1,6 +1,6 @@
 import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
 import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
-import { database } from "../../lib/config.js";
+import { ChannelIDs, database } from "../../lib/config.js";
 import { xpRequiredForLevel } from "../../lib/ranking-handler.js";
 import { CommandHandler } from "../command.js";
 
@@ -18,7 +18,8 @@ export class RankCommandHandler extends CommandHandler {
   }
 
   async handle() {
-    if (!this.checkChannelEligibility(true, false)) return this.postChannelIneligibleMessage(false);
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
     await this.interaction.deferReply();
 
     const userRankImage = await this.createUserRankImage();
