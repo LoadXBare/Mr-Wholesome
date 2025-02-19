@@ -19,10 +19,10 @@ class MessageDeleteHandler extends EventHandler {
     const channelHasEventsIgnored = await channelIgnoresEvents(guildId, channelId);
     if (author?.bot || channelHasEventsIgnored) return;
 
-    this.#logDeletedMessage();
+    this.logDeletedMessage();
   }
 
-  async #logDeletedMessage() {
+  private async logDeletedMessage() {
     const embeddableContentTypes = ['image/png', 'image/gif', 'image/webp', 'image/jpeg'];
 
     const removedAttachments = this.message.attachments;
@@ -69,7 +69,7 @@ class MessageDeleteHandler extends EventHandler {
 
     embed.setDescription(embedDescription.join('\n'));
 
-    const watchlist = await this.#fetchWatchlist();
+    const watchlist = await this.fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.message.author?.id ?? '');
     if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
 
@@ -77,7 +77,7 @@ class MessageDeleteHandler extends EventHandler {
   }
 
   // == Database Methods ==
-  async #fetchWatchlist() {
+  private async fetchWatchlist() {
     const result = await database.notes.findMany({
       where: { guildID: this.message.guild?.id }
     });

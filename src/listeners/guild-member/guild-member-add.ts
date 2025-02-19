@@ -13,11 +13,11 @@ class GuildMemberAddHandler extends EventHandler {
   }
 
   handle() {
-    this.#logMemberJoined();
-    this.#giveMemberRole();
+    this.logMemberJoined();
+    this.giveMemberRole();
   }
 
-  async #logMemberJoined() {
+  private async logMemberJoined() {
     const embed = new EmbedBuilder(baseEmbed)
       .setTitle('Member Joined')
       .setDescription(stripIndents
@@ -33,14 +33,14 @@ class GuildMemberAddHandler extends EventHandler {
       })
       .setTimestamp();
 
-    const watchlist = await this.#fetchWatchlist();
+    const watchlist = await this.fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.member.id);
     if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
 
     super.logChannel.send({ embeds: [embed] });
   }
 
-  async #giveMemberRole() {
+  private async giveMemberRole() {
     /*
      * This delay is necessary to prevent duplicate Member Role Updated embeds from being posted.
      * Because upon a user joining a server for the first time, multiple guild-member-update events
@@ -58,7 +58,7 @@ class GuildMemberAddHandler extends EventHandler {
   }
 
   // == Database Methods ==
-  async #fetchWatchlist() {
+  private async fetchWatchlist() {
     const result = await database.notes.findMany({
       where: { guildID: this.member.guild.id }
     });

@@ -15,10 +15,10 @@ class GuildMemberRemoveHandler extends EventHandler {
   }
 
   handle() {
-    this.#logMemberLeave();
+    this.logMemberLeave();
   }
 
-  async #logMemberLeave() {
+  private async logMemberLeave() {
     const memberRolesList = this.member.roles.cache.map((r) => `- ${r}`).join('\n');
 
     const embed = new EmbedBuilder(baseEmbed)
@@ -38,7 +38,7 @@ class GuildMemberRemoveHandler extends EventHandler {
       .setTimestamp()
       .setColor(EmbedColours.Negative);
 
-    const watchlist = await this.#fetchWatchlist();
+    const watchlist = await this.fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.member.id);
     if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
 
@@ -46,7 +46,7 @@ class GuildMemberRemoveHandler extends EventHandler {
   }
 
   // == Database Methods ==
-  async #fetchWatchlist() {
+  private async fetchWatchlist() {
     const result = await database.notes.findMany({
       where: { guildID: this.member.guild.id }
     });

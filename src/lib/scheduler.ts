@@ -7,21 +7,21 @@ import { formatDate, styleLog } from "./utilities.js";
 
 export default class Scheduler {
   start() {
-    this.#birthdayScheduler();
-    Cron('0 0 0 * * *', () => this.#birthdayScheduler()); // At 12:00 AM
+    this.birthdayScheduler();
+    Cron('0 0 0 * * *', () => this.birthdayScheduler()); // At 12:00 AM
   }
 
-  async #birthdayScheduler() {
+  private async birthdayScheduler() {
     const date = new Date().getUTCDate();
     const lastCheckDate = await lastBirthdayCheck.get();
     if (lastCheckDate === date) return;
 
-    await this.#postBirthdayMessage();
-    await this.#updateBirthdayRole();
+    await this.postBirthdayMessage();
+    await this.updateBirthdayRole();
   }
 
-  async #postBirthdayMessage() {
-    const birthdays = await this.#fetchTodaysBirthdays();
+  private async postBirthdayMessage() {
+    const birthdays = await this.fetchTodaysBirthdays();
     const birthdayMembers = birthdays
       .map((birthday) => akialytesGuild.members.cache.get(birthday.userID))
       .filter((member): member is GuildMember => member instanceof GuildMember);
@@ -50,14 +50,14 @@ export default class Scheduler {
     await lastBirthdayCheck.set(new Date().getUTCDate());
   }
 
-  async #updateBirthdayRole() {
+  private async updateBirthdayRole() {
     const birthdayRole = akialytesGuild.roles.cache.get(RoleIDs.Birthday);
     if (!birthdayRole) return styleLog('Error fetching birthday role from cache!', false, 'scheduler.js');
 
     const akialyne = await akialytesGuild.members.fetch(UserIDs.Akialyne).catch(() => null);
     if (!akialyne) return styleLog('Error fetching Akialyne member!', false, 'scheduler.js');
 
-    const birthdays = await this.#fetchTodaysBirthdays();
+    const birthdays = await this.fetchTodaysBirthdays();
     const birthdayMembers = birthdays
       .map((birthday) => akialytesGuild.members.cache.get(birthday.userID))
       .filter((member): member is GuildMember => member instanceof GuildMember);
@@ -80,7 +80,7 @@ export default class Scheduler {
   }
 
   // == DATABASE METHODS ==
-  async #fetchTodaysBirthdays() {
+  private async fetchTodaysBirthdays() {
     const date = formatDate(new Date().getUTCDate(), new Date().getUTCMonth());
     const birthdays = await database.birthday.findMany({
       where: { date }

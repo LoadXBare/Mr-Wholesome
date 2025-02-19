@@ -16,11 +16,11 @@ class GuildMemberUpdateHandler extends EventHandler {
   }
 
   handle() {
-    this.#logNicknameUpdate();
-    this.#logRolesUpdate();
+    this.logNicknameUpdate();
+    this.logRolesUpdate();
   }
 
-  async #logNicknameUpdate() {
+  private async logNicknameUpdate() {
     if (this.oldMember.nickname === this.newMember.nickname) return;
     const oldNickname = escapeAllFormatting(this.oldMember.nickname);
     const newNickname = escapeAllFormatting(this.newMember.nickname);
@@ -54,14 +54,14 @@ class GuildMemberUpdateHandler extends EventHandler {
       );
     }
 
-    const watchlist = await this.#fetchWatchlist();
+    const watchlist = await this.fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMember.id);
     if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
 
     super.logChannel.send({ embeds: [embed] });
   }
 
-  async #logRolesUpdate() {
+  private async logRolesUpdate() {
     const oldRoles = this.oldMember.roles.cache;
     const newRoles = this.newMember.roles.cache;
     if (oldRoles.equals(newRoles)) return;
@@ -87,7 +87,7 @@ class GuildMemberUpdateHandler extends EventHandler {
       })
       .setTimestamp();
 
-    const watchlist = await this.#fetchWatchlist();
+    const watchlist = await this.fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMember.id);
     if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
 
@@ -95,7 +95,7 @@ class GuildMemberUpdateHandler extends EventHandler {
   }
 
   // == Database Methods ==
-  async #fetchWatchlist() {
+  private async fetchWatchlist() {
     const result = await database.notes.findMany({
       where: { guildID: this.newMember.guild.id }
     });

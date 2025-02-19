@@ -19,19 +19,19 @@ class MessageCreateHandler extends EventHandler {
     const channelHasEventsIgnored = await channelIgnoresEvents(guildId, channelId);
     if (author.bot || channelHasEventsIgnored) return;
 
-    this.#autoCrosspost();
-    this.#bonkAkiaForSorry();
-    this.#painAuChocolat();
-    this.#reactWithArson();
-    this.#useSlashCommands();
-    this.#handleRanking();
+    this.autoCrosspost();
+    this.bonkAkiaForSorry();
+    this.painAuChocolat();
+    this.reactWithArson();
+    this.useSlashCommands();
+    this.handleRanking();
     this.handleMessageStatistics();
     this.handleModOnlyForumChannel();
     this.akiaSnoGif();
   }
 
   // Automatically crosspost any message sent in Announcement channels
-  async #autoCrosspost() {
+  private async autoCrosspost() {
     if (!this.message.crosspostable) return;
 
     await this.message.crosspost()
@@ -40,7 +40,7 @@ class MessageCreateHandler extends EventHandler {
   }
 
   // React with :akiaBonque: emoji and say "NO SORRY" if message contains "sorry" and sent by Akia
-  async #bonkAkiaForSorry() {
+  private async bonkAkiaForSorry() {
     const messageContainsSorry = this.message.content.search(/[s]+[o]+[rw]+[y]+/mi) !== -1;
     const authorIsAkia = this.message.author.id === UserIDs.Akialyne;
     if (!messageContainsSorry || !authorIsAkia) return;
@@ -54,7 +54,7 @@ class MessageCreateHandler extends EventHandler {
   }
 
   // Say "au chocolat?" if the message ends with "pain" and is sent in #🤡-memes-🤡
-  async #painAuChocolat() {
+  private async painAuChocolat() {
     const messageEndsWithPain = this.message.content.search(/\bpain\W{0,}$/i) !== -1;
     const channelIsMemes = this.message.channelId === ChannelIDs.Memes;
     if (!messageEndsWithPain || !channelIsMemes) return;
@@ -65,7 +65,7 @@ class MessageCreateHandler extends EventHandler {
   }
 
   // React with the :arson: emoji if the message contains "arson"
-  async #reactWithArson() {
+  private async reactWithArson() {
     const messageContainsArson = this.message.content.search(/(?<!\S)[a]+[r]+[s]+[o]+[n]+/mi) !== -1;
     if (!messageContainsArson) return;
 
@@ -75,7 +75,7 @@ class MessageCreateHandler extends EventHandler {
   }
 
   // Say "Hey, I use slash commands now!" if the message is an old command
-  async #useSlashCommands() {
+  private async useSlashCommands() {
     const oldCommands = ['!birthday', '!8ball', '!cookie', '!cat', '!dog', '!fox', '!reading', '!help', '!mystats', '!ping', '!ban', '!warn', '!watchlist', '!top', '!rank', '!ticketpanel'];
     const messageIsOldCommand = oldCommands.includes(this.message.content.split(' ')[0]);
     if (!messageIsOldCommand) return;
@@ -86,7 +86,7 @@ class MessageCreateHandler extends EventHandler {
   }
 
   // Handle everything related to member ranking
-  async #handleRanking() {
+  private async handleRanking() {
     new RankingHandler(this.message).handle();
   }
 

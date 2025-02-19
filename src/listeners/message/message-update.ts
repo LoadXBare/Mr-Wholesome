@@ -25,8 +25,8 @@ class MessageUpdateHandler extends EventHandler {
     const channelHasEventsIgnored = await channelIgnoresEvents(guildId, channelId);
     if (author?.bot || channelHasEventsIgnored) return;
 
-    this.#logEditedMessage();
-    this.#logRemovedMessageAttachment();
+    this.logEditedMessage();
+    this.logRemovedMessageAttachment();
   }
 
   private findEditIndexes(contentDifference: Array<Change>) {
@@ -54,7 +54,7 @@ class MessageUpdateHandler extends EventHandler {
     return indexes;
   }
 
-  async #logEditedMessage() {
+  private async logEditedMessage() {
     const oldContent = this.oldMessage.content ?? '';
     const newContent = this.newMessage.content ?? '';
     if (oldContent === newContent) return;
@@ -104,14 +104,14 @@ class MessageUpdateHandler extends EventHandler {
         .setURL(this.newMessage.url),
     );
 
-    const watchlist = await this.#fetchWatchlist();
+    const watchlist = await this.fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMessage.author?.id ?? '');
     if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
 
     super.logChannel.send({ embeds: [embed], components: [jumpButton] });
   }
 
-  async #logRemovedMessageAttachment() {
+  private async logRemovedMessageAttachment() {
     if (this.oldMessage.attachments.size === this.newMessage.attachments.size) return;
     const embeddableContentTypes = ['image/png', 'image/gif', 'image/webp', 'image/jpeg'];
     const removedAttachment = this.oldMessage.attachments.difference(this.newMessage.attachments);
@@ -141,7 +141,7 @@ class MessageUpdateHandler extends EventHandler {
         .setURL(this.newMessage.url),
     );
 
-    const watchlist = await this.#fetchWatchlist();
+    const watchlist = await this.fetchWatchlist();
     const userOnWatchlist = watchlist.map((note) => note.watchedID).includes(this.newMessage.author?.id ?? '');
     if (userOnWatchlist) embed.setThumbnail(Images.WatchedUser);
 
@@ -149,7 +149,7 @@ class MessageUpdateHandler extends EventHandler {
   }
 
   // == Database Methods ==
-  async #fetchWatchlist() {
+  private async fetchWatchlist() {
     const result = await database.notes.findMany({
       where: { guildID: this.newMessage.guild?.id }
     });

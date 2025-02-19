@@ -14,10 +14,10 @@ class GuildRoleUpdateHandler extends EventHandler {
   }
 
   handle() {
-    this.#logRoleUpdate();
+    this.logRoleUpdate();
   }
 
-  #logRoleUpdate() {
+  private logRoleUpdate() {
     const {
       name: oldName, hexColor: oldColour, hoist: oldHoist, mentionable: oldMentionable,
     } = this.oldRole;

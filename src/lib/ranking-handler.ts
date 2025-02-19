@@ -12,15 +12,15 @@ export default class RankingHandler {
   }
 
   handle() {
-    this.#handleRanking();
+    this.handleRanking();
   }
 
-  async #handleRanking() {
-    const channelGivesXP = await this.#channelGivesXP();
-    const userOnCooldown = this.#userOnCooldown();
+  private async handleRanking() {
+    const channelGivesXP = await this.channelGivesXP();
+    const userOnCooldown = this.userOnCooldown();
     if (!channelGivesXP || userOnCooldown) return;
 
-    const memberRank = await this.#fetchMemberRankFromDatabase();
+    const memberRank = await this.fetchMemberRankFromDatabase();
     if (!memberRank) return;
 
     const currentXP = memberRank.xp;
@@ -32,13 +32,13 @@ export default class RankingHandler {
     const memberLevelledUp = levelAtGivenXP(xp) > currentLevel;
     const xpLevel = levelAtGivenXP(xp);
 
-    if (memberLevelledUp) this.#handleLevelUp(xpLevel, levelNotifs);
+    if (memberLevelledUp) this.handleLevelUp(xpLevel, levelNotifs);
 
-    await this.#updateMemberRankInDatabase(xp, xpLevel);
+    await this.updateMemberRankInDatabase(xp, xpLevel);
     xpCooldownCache[this.message.author.id] = this.message.createdTimestamp;
   }
 
-  #userOnCooldown() {
+  private userOnCooldown() {
     const timeOfLastMessage = xpCooldownCache[this.message.author.id] ?? 0;
     const timeDifference = Date.now() - timeOfLastMessage;
     const cooldown = 30_000; // 30 seconds
@@ -47,7 +47,7 @@ export default class RankingHandler {
     return userOnCooldown;
   }
 
-  async #handleLevelUp(level: number, levelNotifs: boolean) {
+  private async handleLevelUp(level: number, levelNotifs: boolean) {
     const levelUpNotifChannel = await this.message.guild?.channels.fetch(ChannelIDs.LevelUp);
     if (!(levelUpNotifChannel instanceof TextChannel)) return;
 
@@ -76,7 +76,7 @@ export default class RankingHandler {
   }
 
   // == DATABASE METHODS ==
-  async #channelGivesXP() {
+  private async channelGivesXP() {
     const guildID = this.message.guildId;
     if (!guildID) return false;
 
@@ -91,7 +91,7 @@ export default class RankingHandler {
     return !rankedIgnoredChannelIDs.includes(this.message.channelId);
   }
 
-  async #fetchMemberRankFromDatabase() {
+  private async fetchMemberRankFromDatabase() {
     const guildID = this.message.guildId!; // Bot cannot receive DMs
     const userID = this.message.author.id;
 
@@ -105,7 +105,7 @@ export default class RankingHandler {
     return memberRank;
   }
 
-  async #updateMemberRankInDatabase(xp: number, xpLevel: number) {
+  private async updateMemberRankInDatabase(xp: number, xpLevel: number) {
     const guildID = this.message.guildId!; // Bot cannot receive DMs
     const userID = this.message.author.id;
 

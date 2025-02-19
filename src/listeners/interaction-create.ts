@@ -38,13 +38,13 @@ class InteractionCreateHandler extends EventHandler {
   }
 
   handle() {
-    this.#handleChatInputCommand();
-    this.#handleButton();
-    this.#handleModal();
-    this.#handleUserContextMenu();
+    this.handleChatInputCommand();
+    this.handleButton();
+    this.handleModal();
+    this.handleUserContextMenu();
   }
 
-  async #handleChatInputCommand() {
+  private async handleChatInputCommand() {
     if (!this.interaction.isChatInputCommand()) return;
     const chatInputInteraction = this.interaction;
     const cmd = chatInputInteraction.commandName;
@@ -84,7 +84,7 @@ class InteractionCreateHandler extends EventHandler {
     else chatInputInteraction.reply({ content: 'This command hasn\'t been implemented yet, come back later (*・ω・)ﾉ', ephemeral: true });
   }
 
-  async #handleButton() {
+  private async handleButton() {
     if (!this.interaction.isButton()) return;
     const buttonInteraction = this.interaction;
     const customId = buttonInteraction.customId;
@@ -93,7 +93,7 @@ class InteractionCreateHandler extends EventHandler {
     if (customId.startsWith('ticket:')) new ticketButtonHandler(buttonInteraction).handle();
   }
 
-  async #handleModal() {
+  private async handleModal() {
     if (!this.interaction.isModalSubmit()) return;
     const modalInteraction = this.interaction;
 
@@ -103,7 +103,7 @@ class InteractionCreateHandler extends EventHandler {
     else if (modalInteraction.customId.startsWith('watchlist:')) new WatchlistModalHandler(modalInteraction).handle();
   }
 
-  async #handleUserContextMenu() {
+  private async handleUserContextMenu() {
     if (!this.interaction.isUserContextMenuCommand()) return;
     const contextMenuInteraction = this.interaction;
 

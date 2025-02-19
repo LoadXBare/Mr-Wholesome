@@ -12,10 +12,10 @@ class GuildRoleDeleteHandler extends EventHandler {
   }
 
   handle() {
-    this.#logDeletedRole();
+    this.logDeletedRole();
   }
 
-  #logDeletedRole() {
+  private logDeletedRole() {
     const roleProperties = [
       `- **Name** — \`${this.role.name}\``,
       `- **Colour** — \`${this.role.hexColor}\``,

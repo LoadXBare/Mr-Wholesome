@@ -12,10 +12,10 @@ class GuildRoleCreateHandler extends EventHandler {
   }
 
   handle() {
-    this.#logCreatedRole();
+    this.logCreatedRole();
   }
 
-  #logCreatedRole() {
+  private logCreatedRole() {
     const roleProperties = [
       `- **Name** — \`${this.role.name}\``,
       `- **Colour** — \`${this.role.hexColor}\``,
