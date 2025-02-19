@@ -17,9 +17,12 @@ export class BirthdayCommandHandler extends CommandHandler {
   }
 
   private async handleSetBirthday() {
+    const daysinMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // Does not account for leap years, but who is actually born on a leap day?
     const day = this.interaction.options.getInteger('day', true);
     const month = this.interaction.options.getInteger('month', true);
     const date = formatDate(day, month);
+
+    if (daysinMonth[month] < day) return this.handleError(`${date} is not a valid date!`);
 
     const birthday = await database.birthday.upsert({
       where: { userID: this.interaction.user.id },
