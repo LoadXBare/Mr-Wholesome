@@ -29,8 +29,8 @@ export default class RankingHandler {
 
     const currentLevel = memberRank.xpLevel;
     const levelNotifs = memberRank.levelNotifs;
-    const memberLevelledUp = xpRequiredForLevel(currentLevel + 1) <= xp;
-    const xpLevel = memberLevelledUp ? currentLevel + 1 : currentLevel;
+    const memberLevelledUp = levelAtGivenXP(xp) > currentLevel;
+    const xpLevel = levelAtGivenXP(xp);
 
     if (memberLevelledUp) this.#handleLevelUp(xpLevel, levelNotifs);
 
@@ -120,5 +120,9 @@ export default class RankingHandler {
 }
 
 export function xpRequiredForLevel(level: number) {
-  return Math.round(level * 1500); // 1500XP per level
+  return Math.round(Math.pow(level, 1.75) * 200);
+}
+
+export function levelAtGivenXP(xp: number) {
+  return Math.floor(Math.pow(xp / 200, 1 / 1.75));
 }

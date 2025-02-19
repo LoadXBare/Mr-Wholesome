@@ -20,9 +20,8 @@ model Birthday {
 // --- GUILD MODELS --- //
 model GuildConfig {
   guildID                 String @id
-  cmdIgnoredChannelIDs    String @default("")
-  eventIgnoredChannelIDs  String @default("")
-  rankedIgnoredChannelIDs String @default("")
+  eventIgnoredChannelIDs  String @default("[]")
+  rankedIgnoredChannelIDs String @default("[]")
 }
 
 model Ban {

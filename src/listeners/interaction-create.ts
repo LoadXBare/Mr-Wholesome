@@ -1,4 +1,6 @@
+import { SnoCommandHandler } from 'commands/fun/sno.js';
 import { HelpCommandHandler } from 'commands/information/help.js';
+import { XPCommandHandler } from 'commands/utility/xp.js';
 import { Events, Interaction } from 'discord.js';
 import { ToggleLevelNotifButtonHandler } from '../buttons/ranking/toggle-level-notifs.js';
 import { ticketButtonHandler } from '../buttons/tickets/handler.js';
@@ -26,7 +28,6 @@ import { BanModalHandler } from '../modals/moderation/ban.js';
 import { WarningModalHandler } from '../modals/moderation/warn.js';
 import { WatchlistModalHandler } from '../modals/moderation/watchlist.js';
 import { TicketPanelModalHandler } from '../modals/utility/ticket-panel.js';
-import { SnoCommandHandler } from 'commands/fun/sno.js';
 
 class InteractionCreateHandler extends EventHandler {
   interaction: Interaction;
@@ -77,6 +78,7 @@ class InteractionCreateHandler extends EventHandler {
     else if (cmd === 'ticket-panel') new TicketPanelCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'ticket') new TicketCommandHandler(chatInputInteraction).handle();
     else if (cmd === 'view') new ViewCommandHandler(chatInputInteraction).handle();
+    else if (cmd === 'xp') new XPCommandHandler(chatInputInteraction).handle();
 
     // Unknown Command / Not Implemented
     else chatInputInteraction.reply({ content: 'This command hasn\'t been implemented yet, come back later (*・ω・)ﾉ', ephemeral: true });

@@ -280,6 +280,86 @@ const commands = [
     .setDescription('SNO!')
     .setDMPermission(false),
 
+  new SlashCommandBuilder()
+    .setName('xp')
+    .setDescription('"/xp" command')
+    .addSubcommandGroup(subcommandGroup => subcommandGroup
+      .setName('channels')
+      .setDescription('"/xp channels" subcommand group')
+      .addSubcommand(subcommand => subcommand
+        .setName('allow')
+        .setDescription('Allow a channel to start awarding XP to users')
+        .addChannelOption(option => option
+          .setName('channel')
+          .setDescription('The channel to allow')
+          .addChannelTypes(ChannelType.GuildText, ChannelType.GuildVoice, ChannelType.GuildAnnouncement, ChannelType.AnnouncementThread, ChannelType.PublicThread)
+          .setRequired(true)
+        )
+      )
+      .addSubcommand(subcommand => subcommand
+        .setName('deny')
+        .setDescription('Deny a channel from awarding XP to users')
+        .addChannelOption(option => option
+          .setName('channel')
+          .setDescription('The channel to deny')
+          .addChannelTypes(ChannelType.GuildText, ChannelType.GuildVoice, ChannelType.GuildAnnouncement, ChannelType.AnnouncementThread, ChannelType.PublicThread)
+          .setRequired(true)
+        )
+      )
+      .addSubcommand(subcommand => subcommand
+        .setName('view')
+        .setDescription('View all channels currently awarding XP to users')
+      )
+    )
+    .addSubcommandGroup(subcommandGroup => subcommandGroup
+      .setName('user')
+      .setDescription('"/xp user" subcommand group')
+      .addSubcommand(subcommand => subcommand
+        .setName('add')
+        .setDescription('Add XP to a user')
+        .addUserOption(option => option
+          .setName('user')
+          .setDescription('The user to add XP to')
+          .setRequired(true)
+        )
+        .addIntegerOption(option => option
+          .setName('amount')
+          .setDescription('The amount of XP to add')
+          .setMinValue(1)
+          .setRequired(true)
+        )
+      )
+      .addSubcommand(subcommand => subcommand
+        .setName('remove')
+        .setDescription('Remove XP from a user')
+        .addUserOption(option => option
+          .setName('user')
+          .setDescription('The user to add XP to')
+          .setRequired(true)
+        )
+        .addIntegerOption(option => option
+          .setName('amount')
+          .setDescription('The amount of XP to remove')
+          .setMinValue(1)
+          .setRequired(true)
+        )
+      )
+      .addSubcommand(subcommand => subcommand
+        .setName('set')
+        .setDescription('Set a user\'s XP amount')
+        .addUserOption(option => option
+          .setName('user')
+          .setDescription('The user to add XP to')
+          .setRequired(true)
+        )
+        .addIntegerOption(option => option
+          .setName('amount')
+          .setDescription('The amount of XP to set')
+          .setRequired(true)
+        )
+      )
+    ),
+
 
   new ContextMenuCommandBuilder()
     .setName('Ban User')
