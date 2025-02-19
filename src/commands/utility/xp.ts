@@ -11,7 +11,6 @@ export class XPCommandHandler extends CommandHandler {
 
         const subcommandGroup = this.interaction.options.getSubcommandGroup(true);
         const subcommand = this.interaction.options.getSubcommand(true);
-        console.log(subcommandGroup, subcommand);
 
         if (subcommandGroup === 'channels') {
             if (subcommand === 'allow') this.allowChannel();
@@ -30,8 +29,8 @@ export class XPCommandHandler extends CommandHandler {
         const channel = this.interaction.options.getChannel('channel', true, [GuildText, GuildVoice, GuildAnnouncement, AnnouncementThread, PublicThread]);
 
         const guildConfig = await database.guildConfig.upsert({
-            where: { guildID: this.interaction.guildId! },
-            create: { guildID: this.interaction.guildId! },
+            where: { guildID: this.guild.id },
+            create: { guildID: this.guild.id },
             update: {},
         });
         if (!guildConfig) return styleLog('Error upserting the GUILDCONFIG table!', false, 'xp.js');
@@ -42,7 +41,7 @@ export class XPCommandHandler extends CommandHandler {
         const updatedChannelIDs = rankedIgnoredChannelIDs.filter((channelID) => channelID !== channel.id);
 
         await database.guildConfig.update({
-            where: { guildID: this.interaction.guildId! },
+            where: { guildID: this.guild.id },
             data: { rankedIgnoredChannelIDs: JSON.stringify(updatedChannelIDs) }
         });
 
@@ -54,8 +53,8 @@ export class XPCommandHandler extends CommandHandler {
         const channel = this.interaction.options.getChannel('channel', true, [GuildText, GuildVoice, GuildAnnouncement, AnnouncementThread, PublicThread]);
 
         const guildConfig = await database.guildConfig.upsert({
-            where: { guildID: this.interaction.guildId! },
-            create: { guildID: this.interaction.guildId! },
+            where: { guildID: this.guild.id },
+            create: { guildID: this.guild.id },
             update: {},
         });
         if (!guildConfig) return styleLog('Error upserting the GUILDCONFIG table!', false, 'xp.js');
@@ -66,7 +65,7 @@ export class XPCommandHandler extends CommandHandler {
         rankedIgnoredChannelIDs.push(channel.id);
 
         await database.guildConfig.update({
-            where: { guildID: this.interaction.guildId! },
+            where: { guildID: this.guild.id },
             data: { rankedIgnoredChannelIDs: JSON.stringify(rankedIgnoredChannelIDs) }
         });
 
@@ -75,8 +74,8 @@ export class XPCommandHandler extends CommandHandler {
 
     private async viewChannels() {
         const guildConfig = await database.guildConfig.upsert({
-            where: { guildID: this.interaction.guildId! },
-            create: { guildID: this.interaction.guildId! },
+            where: { guildID: this.guild.id },
+            create: { guildID: this.guild.id },
             update: {},
         });
         if (!guildConfig) return styleLog('Error upserting the GUILDCONFIG table!', false, 'xp.js');

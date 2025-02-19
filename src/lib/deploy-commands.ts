@@ -283,6 +283,8 @@ const commands = [
   new SlashCommandBuilder()
     .setName('xp')
     .setDescription('"/xp" command')
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDMPermission(false)
     .addSubcommandGroup(subcommandGroup => subcommandGroup
       .setName('channels')
       .setDescription('"/xp channels" subcommand group')
