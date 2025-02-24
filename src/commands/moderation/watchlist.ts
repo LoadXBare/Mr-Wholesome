@@ -22,6 +22,7 @@ export class WatchlistCommandHandler extends CommandHandler {
       .setCustomId('note')
       .setLabel('Note')
       .setPlaceholder('No note provided.')
+      .setMaxLength(3900)
       .setRequired(false)
       .setStyle(TextInputStyle.Paragraph);
 

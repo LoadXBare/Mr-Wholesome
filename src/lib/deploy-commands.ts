@@ -17,7 +17,8 @@ const commands = [
       .setName('question')
       .setDescription('The question to ask the 8ball')
       .setRequired(true)
-      .setMinLength(1))
+      .setMinLength(1)
+      .setMaxLength(128))
     .setDMPermission(false),
 
   new SlashCommandBuilder()
@@ -193,6 +194,7 @@ const commands = [
       .addStringOption((option) => option
         .setName('name')
         .setDescription('The name of the ticket panel')
+        .setMaxLength(32)
         .setRequired(true))
       .addChannelOption((option) => option
         .setName('category')
@@ -209,6 +211,7 @@ const commands = [
       .addStringOption((option) => option
         .setName('name')
         .setDescription('The name of the ticket panel to delete')
+        .setMaxLength(32)
         .setRequired(true)))
     .addSubcommand((subcommand) => subcommand
       .setName('post')
@@ -216,6 +219,7 @@ const commands = [
       .addStringOption((option) => option
         .setName('name')
         .setDescription('The name of the ticket panel to post')
+        .setMaxLength(32)
         .setRequired(true))
       .addChannelOption((option) => option
         .setName('channel')

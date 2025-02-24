@@ -21,6 +21,7 @@ export class WarnCommandHandler extends CommandHandler {
       .setCustomId('reason')
       .setLabel('Warning Reason')
       .setPlaceholder('No reason provided.')
+      .setMaxLength(3900)
       .setRequired(false)
       .setStyle(TextInputStyle.Paragraph);
 

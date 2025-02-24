@@ -23,6 +23,7 @@ export class BanCommandHandler extends CommandHandler {
       .setCustomId('reason')
       .setLabel('Ban Reason')
       .setPlaceholder('No reason provided.')
+      .setMaxLength(3900)
       .setRequired(false)
       .setStyle(TextInputStyle.Paragraph);
 
@@ -52,6 +53,7 @@ export class ContextMenuBanCommandHandler {
       .setCustomId('reason')
       .setLabel('Ban Reason')
       .setPlaceholder('No reason provided.')
+      .setMaxLength(3900)
       .setRequired(false)
       .setStyle(TextInputStyle.Paragraph);
 

@@ -54,13 +54,14 @@ model Ticket {
 }
 
 model TicketPanel {
-  timeCreated     String @id
-  name            String
-  guildID         String
-  categoryID      String
-  moderatorRoleID String
-  panelEmbedJSON  String
-  ticketEmbedJSON String
+  timeCreated           String @id
+  name                  String
+  guildID               String
+  categoryID            String
+  moderatorRoleID       String
+  panelEmbedJSON        String
+  ticketEmbedJSON       String
+  postedPanelMessageIDs String @default("[]")
 
   @@unique([name, guildID])
 }

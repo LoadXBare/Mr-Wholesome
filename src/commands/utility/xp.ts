@@ -1,7 +1,7 @@
 import { CommandHandler } from "commands/command.js";
 import { stripIndents } from "common-tags";
 import { ChannelType, EmbedBuilder } from "discord.js";
-import { database, EmbedColours } from "lib/config.js";
+import { baseEmbed, database } from "lib/config.js";
 import { levelAtGivenXP } from "lib/ranking-handler.js";
 import { styleLog } from "lib/utilities.js";
 
@@ -90,13 +90,12 @@ export class XPCommandHandler extends CommandHandler {
 
         const channelsList = rankedIgnoredChannels.length > 0 ? rankedIgnoredChannels.join('\n') : 'There are no denied channels.';
 
-        const embed = new EmbedBuilder()
+        const embed = new EmbedBuilder(baseEmbed)
             .setTitle('Channels Denying XP')
             .setDescription(stripIndents`
             Below is a list of all **denied** channels that are **not** awarding XP.
             
-            ${channelsList}`)
-            .setColor(EmbedColours.Neutral);
+            ${channelsList}`);
 
         await this.interaction.editReply({ embeds: [embed] });
     }
