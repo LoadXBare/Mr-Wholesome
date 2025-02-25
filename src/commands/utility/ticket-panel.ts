@@ -1,5 +1,5 @@
 import { stripIndents } from "common-tags";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, CategoryChannel, ChannelType, ComponentType, EmbedBuilder, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, CategoryChannel, ChannelType, ComponentType, EmbedBuilder, ForumChannel, MediaChannel, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { ticketPanelModalData } from "../../lib/api.js";
 import { baseEmbed, database, EmbedColours } from "../../lib/config.js";
 import { CommandHandler } from "../command.js";
@@ -140,7 +140,7 @@ export class TicketPanelCommandHandler extends CommandHandler {
     const postedPanelMessageIDs = JSON.parse(ticketPanel.postedPanelMessageIDs) as Array<{ channelID: string, messageID: string; }>;
     for await (const panel of postedPanelMessageIDs) {
       const channel = await this.guild.channels.fetch(panel.channelID);
-      if (!channel || channel instanceof CategoryChannel) continue;
+      if (!channel || channel instanceof CategoryChannel || channel instanceof ForumChannel || channel instanceof MediaChannel) continue;
 
       const message = await channel.messages.fetch(panel.messageID);
       if (message && message.deletable) await message.delete();
