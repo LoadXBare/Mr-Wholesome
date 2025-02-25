@@ -86,7 +86,7 @@ export class WarningModalHandler extends ModalHandler {
     const embed = new EmbedBuilder(baseEmbed)
       .setDescription(embedDescription.join('\n'));
 
-    await this.interaction.editReply({ embeds: [embed] });
+    await this.interaction.editReply({ embeds: [embed], components: [] });
   }
 
   // == Database Methods ==
