@@ -1,6 +1,6 @@
-import { CommandHandler } from "commands/command.js";
 import { ApplicationCommandType, chatInputApplicationCommandMention, EmbedBuilder } from "discord.js";
-import { baseEmbed, ChannelIDs, Emotes } from "lib/config.js";
+import { baseEmbed, ChannelIDs, Emotes } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
 export class HelpCommandHandler extends CommandHandler {
   async handle() {

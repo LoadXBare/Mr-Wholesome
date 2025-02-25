@@ -1,6 +1,6 @@
-import { CommandHandler } from "commands/command.js";
 import { AttachmentBuilder } from "discord.js";
-import { ChannelIDs } from "lib/config.js";
+import { ChannelIDs } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
 export class SnoCommandHandler extends CommandHandler {
     async handle() {

@@ -1,4 +1,4 @@
-import { ChannelIDs } from 'lib/config.js';
+import { ChannelIDs } from '../../lib/config.js';
 import { CommandHandler } from '../command.js';
 
 export class DogCommandHandler extends CommandHandler {

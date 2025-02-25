@@ -1,9 +1,9 @@
-import { CommandHandler } from "commands/command.js";
 import { stripIndents } from "common-tags";
 import { ChannelType, EmbedBuilder } from "discord.js";
-import { baseEmbed, database } from "lib/config.js";
-import { levelAtGivenXP } from "lib/ranking-handler.js";
-import { styleLog } from "lib/utilities.js";
+import { baseEmbed, database } from "../../lib/config.js";
+import { levelAtGivenXP } from "../../lib/ranking-handler.js";
+import { styleLog } from "../../lib/utilities.js";
+import { CommandHandler } from "../command.js";
 
 export class XPCommandHandler extends CommandHandler {
     async handle() {
