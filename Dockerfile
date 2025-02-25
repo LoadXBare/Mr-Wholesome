@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS build
+FROM node:lts AS build
 
 WORKDIR /home/mr-wholesome/
 
@@ -13,7 +13,7 @@ COPY src ./src
 RUN npx tsc
 
 
-FROM node:lts-alpine
+FROM node:lts
 
 WORKDIR /home/mr-wholesome/
 

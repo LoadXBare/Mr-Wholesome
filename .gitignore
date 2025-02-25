@@ -1,8 +1,7 @@
 node_modules
-prisma/migrations
-prisma/*.db
-prisma/*.db-journal
-.env
+.env.development
+.env.production
+v2-migration-files
 .wakatime-project
 tsconfig.tsbuildinfo
 package-lock.json

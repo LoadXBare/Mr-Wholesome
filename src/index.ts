@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 
 const { Guilds, GuildMembers, GuildMessages, MessageContent, GuildModeration } = GatewayIntentBits;
 
-dotenv.config();
+dotenv.config({ path: '.env.development' });
 
 export const client = new Client({
   intents: [Guilds, GuildMembers, GuildMessages, MessageContent, GuildModeration],
@@ -15,7 +15,7 @@ export const client = new Client({
   },
   allowedMentions: {
     repliedUser: false,
-    roles: [],
+    roles: []
   },
 });
 
