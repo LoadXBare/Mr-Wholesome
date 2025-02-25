@@ -38,18 +38,19 @@ export class ToggleLevelNotifButtonHandler extends ButtonHandler {
         You will ${levelNotifState ? 'no longer' : 'now'} be pinged when you level up.`
       );
 
-    await this.disableButtonReusability();
+    await this.disableButtonReusability(levelNotifState);
     await levelNotifButtonData.del(this.interaction.message.id);
 
     await this.interaction.editReply({ embeds: [embed] });
   }
 
-  private async disableButtonReusability() {
+  private async disableButtonReusability(levelNotifState: boolean) {
+    const label = levelNotifState ? 'Disable Ping' : 'Enable Ping';
     const button = new ActionRowBuilder<ButtonBuilder>()
       .setComponents(
         new ButtonBuilder()
           .setCustomId(this.interaction.customId)
-          .setLabel(this.interaction.component.label ?? 'Disabled')
+          .setLabel(label)
           .setStyle(this.interaction.component.style)
           .setDisabled(true)
       );
