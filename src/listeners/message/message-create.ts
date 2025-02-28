@@ -119,7 +119,8 @@ class MessageCreateHandler extends EventHandler {
   private async akiaSnoGif() {
     const channelIsIRLStuff = this.message.channelId === ChannelIDs.IRLStuff;
     const authorIsAkia = this.message.author.id === UserIDs.Akialyne;
-    if (!(channelIsIRLStuff && authorIsAkia)) return;
+    const messageContainsSno = this.message.content.search(/[s]+[n]+[o]+/mi) !== -1;
+    if (!(channelIsIRLStuff && authorIsAkia && messageContainsSno)) return;
 
     const snoAttachment = new AttachmentBuilder('./assets/SNO.gif');
     await this.message.reply({ files: [snoAttachment] });
