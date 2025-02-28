@@ -1,23 +1,21 @@
-import { EmbedBuilder } from 'discord.js';
-import { fetch } from 'undici';
-import { COLORS } from '../../config/constants.js';
-import { BotCommand, Cat, Command } from '../../index.js';
+import { ChannelIDs } from '../../lib/config.js';
+import { CommandHandler } from '../command.js';
 
-const catCommand = async (args: BotCommand): Promise<void> => {
-	const { message } = args;
-	const response = await fetch('https://api.thecatapi.com/v1/images/search');
-	const responseJSON = await response.json() as Cat;
+export class CatCommandHandler extends CommandHandler {
+  async handle() {
+    const allowedChannelIDs = [ChannelIDs.BotSpam, ChannelIDs.ComfyVibes];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
+    await this.interaction.deferReply();
 
-	const catImageEmbed = new EmbedBuilder()
-		.setImage(responseJSON.at(0).url)
-		.setColor(COLORS.COMMAND);
+    const response = await fetch('https://api.thecatapi.com/v1/images/search').catch(() => null);
 
-	message.reply({ embeds: [catImageEmbed] });
-};
+    if (!response) {
+      return this.handleError('Error fetching cat image from API.', true, 'cat.js');
+    }
 
-export const cat: Command = {
-	devOnly: false,
-	modOnly: false,
-	run: catCommand,
-	type: 'Fun'
-};
+    const responseJSON = await response.json();
+    const catURL = responseJSON.at(0).url;
+
+    await this.interaction.editReply(catURL);
+  }
+}

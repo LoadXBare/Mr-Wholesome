@@ -1,127 +1,184 @@
-import * as Canvas from '@napi-rs/canvas';
-import { AttachmentBuilder, GuildMember, inlineCode, quote } from 'discord.js';
-import { request } from 'undici';
-import { fetchMemberRanking } from '../../api/guild-ranking.js';
-import { BotCommand, Command, GuildRanking, XPLevelBounds } from '../../index.js';
-import { fetchMemberLeaderboardPosition } from '../../lib/guild-ranking/handler.js';
-import { fetchXPLevelBounds } from '../../lib/guild-ranking/xp-level.js';
-import { fetchGuildMember } from '../../lib/misc/fetch-guild-member.js';
-import { sendError } from '../../lib/misc/send-error.js';
-import { channelIsBotSpam } from './leaderboard.js';
+import { Canvas, GlobalFonts, SKRSContext2D, loadImage } from "@napi-rs/canvas";
+import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
+import { ChannelIDs, database } from "../../lib/config.js";
+import { xpRequiredForLevel } from "../../lib/ranking-handler.js";
+import { CommandHandler } from "../command.js";
 
-export const findFontSize = (canvas: Canvas.Canvas, text: string, maxFontSize: number, maxTextWidth: number): string => {
-	const ctx = canvas.getContext('2d');
-	let fontSize = maxFontSize;
+export class RankCommandHandler extends CommandHandler {
+  private canvas: Canvas;
+  private canvasContext: SKRSContext2D;
 
-	do {
-		ctx.font = `${fontSize}px ubuntu-medium`;
-		fontSize = parseFloat((fontSize - 0.05).toFixed(2));
-	} while (ctx.measureText(text).width > maxTextWidth);
+  constructor(interaction: ChatInputCommandInteraction) {
+    super(interaction);
 
-	return ctx.font;
-};
+    GlobalFonts.registerFromPath('assets/fonts/Ubuntu-Medium.ttf', 'ubuntu-medium');
+    GlobalFonts.registerFromPath('assets/fonts/TwitterColorEmoji-SVGinOT.ttf', 'twitter-emoji');
+    this.canvas = new Canvas(1343, 410);
+    this.canvasContext = this.canvas.getContext('2d');
+  }
 
-const checkRankCommand = async (args: BotCommand): Promise<void> => {
-	const { commandArgs, message } = args;
-	if (!channelIsBotSpam(message)) return;
+  async handle() {
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
+    await this.interaction.deferReply();
 
-	let memberRanking: GuildRanking;
-	let xpLevelBounds: XPLevelBounds;
-	let memberLeaderboardPos: number;
-	let member: GuildMember;
-	if (commandArgs.length === 0) {
-		member = message.member;
-		memberRanking = await fetchMemberRanking(message.guildId, message.author.id);
-		xpLevelBounds = fetchXPLevelBounds(memberRanking.xpLevel);
-		memberLeaderboardPos = await fetchMemberLeaderboardPosition(member);
-	}
-	else {
-		const memberText = commandArgs.shift() ?? 'undefined';
-		const memberID = memberText.replace(/\D/g, '');
+    const userRankImage = await this.createUserRankImage();
 
-		member = await fetchGuildMember(message.guild, memberID);
-		if (member === null) {
-			sendError(message, `${inlineCode(memberText)} is not a valid User!`);
-			return;
-		}
+    if (!userRankImage) {
+      return;
+    }
 
-		memberRanking = await fetchMemberRanking(message.guildId, member.id);
-		xpLevelBounds = fetchXPLevelBounds(memberRanking.xpLevel);
-		memberLeaderboardPos = await fetchMemberLeaderboardPosition(member);
-	}
+    await this.interaction.editReply({ files: [userRankImage] });
+  }
 
-	// Create canvas
-	const canvas = Canvas.createCanvas(823, 274);
-	Canvas.GlobalFonts.registerFromPath('./assets/Ubuntu-Medium.ttf', 'ubuntu-medium');
-	const ctx = canvas.getContext('2d');
+  private async intialiseCanvas() {
+    const backgroundImage = await loadImage('assets/rank/rank.png');
+    this.canvasContext.drawImage(backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+  }
 
-	// Draw background
-	const background = await Canvas.loadImage('./assets/rank_card_background.png');
-	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+  private async drawAvatar() {
+    const response = await fetch(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }))
+      .catch(() => fetch('assets/rank/avatar-error.png'));
+    const avatar = await loadImage(await response.arrayBuffer());
+    const avatarX = 50;
+    const avatarY = 50;
+    const avatarSize = 310;
+    const avatarRadius = avatarSize / 2;
 
-	// Draw member's profile picture
-	const { body } = await request(member.displayAvatarURL({ extension: 'png' }));
-	const avatar = await Canvas.loadImage(await body.arrayBuffer());
-	ctx.beginPath();
-	ctx.arc(160, 135, 110, 0, Math.PI * 2, true);
-	ctx.closePath();
-	ctx.save();
-	ctx.clip();
-	ctx.fillStyle = '#FFFFFF55';
-	ctx.fillRect(50, 25, 220, 220);
-	ctx.drawImage(avatar, 50, 25, 220, 220);
-	ctx.lineWidth = 8;
-	ctx.strokeStyle = '#FFFFFF';
-	ctx.stroke();
-	ctx.restore();
+    this.canvasContext.save();
 
-	// Draw progress bar
-	const progressPercent = Math.round(((memberRanking.xp - xpLevelBounds.lower) / (xpLevelBounds.upper - xpLevelBounds.lower)) * 100);
-	const progressBar = await Canvas.loadImage('./assets/rank-card-progress-bar.png');
-	ctx.fillStyle = '#00FF66';
-	ctx.fillRect(337, 172, progressPercent * 4, 33);
-	ctx.drawImage(progressBar, 0, 0, canvas.width, canvas.height);
+    this.canvasContext.beginPath();
+    this.canvasContext.arc(avatarX + avatarRadius, avatarY + avatarRadius, avatarRadius, 0, Math.PI * 2, true);
+    this.canvasContext.closePath();
+    this.canvasContext.clip();
 
-	// Draw text
-	const leftBoundary = 336;
-	const centerBoundary = 536;
-	const rightBoundary = 736;
-	const buffer = 20;
+    this.canvasContext.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
 
-	ctx.fillStyle = '#FFFFFF';
-	ctx.font = '40px ubuntu-medium';
-	ctx.textAlign = 'right';
-	ctx.fillText(`#${memberLeaderboardPos}`, rightBoundary, 75);
+    this.canvasContext.restore();
 
-	ctx.textAlign = 'left';
-	ctx.font = findFontSize(canvas, member.displayName, 40, rightBoundary - leftBoundary - ctx.measureText(`#${memberLeaderboardPos}`).width - buffer);
-	ctx.fillText(member.displayName, leftBoundary, 75);
+    const avatarOutline = await loadImage('assets/rank/avatar-outline.png');
+    this.canvasContext.drawImage(avatarOutline, 0, 0, this.canvas.width, this.canvas.height);
+  }
 
-	ctx.font = '30px ubuntu-medium';
-	ctx.textAlign = 'center';
-	ctx.fillText(`${progressPercent}%`, centerBoundary, 200);
+  private async drawProgressBar(percent: number, xp: number, xpNeeded: number) {
+    const barX = 452;
+    const barY = 258;
+    const barWidth = 800;
+    const barHeight = 72;
+    const barRadius = barHeight / 2;
+    const pixelsPerPercent = barWidth / 100;
 
-	ctx.font = '20px ubuntu-medium';
-	ctx.textAlign = 'left';
-	ctx.fillText(`${memberRanking.xp - xpLevelBounds.lower} / ${xpLevelBounds.upper - xpLevelBounds.lower} XP`, leftBoundary, 155);
+    // Create clipping mask for progress bar
+    this.canvasContext.save();
+    this.canvasContext.beginPath();
+    this.canvasContext.arc(barX + barRadius, barY + barRadius, barRadius, Math.PI / 2, Math.PI * 1.5);
+    this.canvasContext.lineTo(barX + barWidth - barRadius, barY);
+    this.canvasContext.arc(barX + barWidth - barRadius, barY + barRadius, barRadius, Math.PI * 1.5, Math.PI / 2);
+    this.canvasContext.lineTo(barX + barRadius, barY + barHeight);
+    this.canvasContext.clip();
 
-	ctx.textAlign = 'right';
-	ctx.fillText(`Level ${memberRanking.xpLevel}`, rightBoundary, 155);
+    // Draw progress bar
+    this.canvasContext.fillStyle = '#66ff99';
+    this.canvasContext.fillRect(barX, barY, pixelsPerPercent * percent, barHeight);
+    this.canvasContext.restore();
 
-	ctx.textAlign = 'left';
-	ctx.fillText('Total XP', leftBoundary, 235);
+    // Draw progress bar text
+    this.canvasContext.font = 'bold 45px ubuntu-medium';
+    this.canvasContext.textAlign = 'center';
+    this.canvasContext.fillStyle = 'white';
+    this.canvasContext.fillText(`${xp} / ${xpNeeded} XP`, barX + barWidth / 2, barY + barHeight / 2 + 15);
 
-	ctx.textAlign = 'right';
-	ctx.fillText(memberRanking.xp.toString(), rightBoundary, 235);
+    const progressBarOutline = await loadImage('assets/rank/progress-bar-outline.png');
+    this.canvasContext.drawImage(progressBarOutline, 0, 0, this.canvas.width, this.canvas.height);
+  }
 
-	const rankCardAttachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'rank-card.png' });
+  private async drawRankInfo(level: number) {
+    const progressBarX = 452;
+    const progressBarY = 258;
+    const progressBarWidth = 800;
 
-	message.reply({ content: quote(`Viewing rank card • [ ${member.user.tag} ]`), files: [rankCardAttachment] });
-};
+    const aboveBarX = progressBarX + progressBarWidth / 2;
+    const aboveBarY = progressBarY - 20;
 
-export const checkRank: Command = {
-	devOnly: false,
-	modOnly: false,
-	run: checkRankCommand,
-	type: 'Ranking'
-};
+    const userPosition = await this.fetchRankPosition() || '???';
+
+    const usernameText = this.interaction.user.displayName;
+    const levelText = `Level ${level}`;
+    const userPositionText = `Rank #${userPosition}`;
+
+    this.canvasContext.fillStyle = 'white';
+    this.canvasContext.textAlign = 'center';
+    this.canvasContext.font = 'bold 80px ubuntu-medium, twitter-emoji';
+    this.canvasContext.fillText(usernameText, aboveBarX, 100, 900);
+
+    this.canvasContext.font = 'bold 35px ubuntu-medium';
+    this.canvasContext.textAlign = 'left';
+    this.canvasContext.fillText(userPositionText, progressBarX, aboveBarY);
+
+    this.canvasContext.textAlign = 'right';
+    this.canvasContext.fillText(levelText, progressBarX + progressBarWidth, aboveBarY);
+
+  }
+
+  private fetchLevelProgress(xp: number, level: number) {
+    const currentLevelTotalXP = xpRequiredForLevel(level);
+    const nextLevelTotalXP = xpRequiredForLevel(level + 1);
+    const xpNeededForEntireCurrentLevel = nextLevelTotalXP - currentLevelTotalXP;
+
+    const xpIntoLevel = xp - currentLevelTotalXP;
+    const xpIntoLevelPercent = Math.round(xpIntoLevel / xpNeededForEntireCurrentLevel * 100);
+
+    return {
+      xpNeeded: nextLevelTotalXP,
+      percent: xpIntoLevelPercent,
+    };
+  }
+
+  private async createUserRankImage() {
+    const memberRank = await database.rank.upsert({
+      where: { userID_guildID: { guildID: this.guild.id, userID: this.interaction.user.id } },
+      create: { guildID: this.guild.id, userID: this.interaction.user.id },
+      update: {},
+    }).catch(() => null);
+
+    if (!memberRank) {
+      return this.handleError('Error upserting ranks from RANK table!', true, 'rank.js');
+    }
+
+    const { xp, xpLevel } = memberRank;
+    const { percent, xpNeeded } = this.fetchLevelProgress(xp, xpLevel);
+
+    await this.intialiseCanvas();
+    await this.drawAvatar();
+    await this.drawProgressBar(percent, xp, xpNeeded);
+    await this.drawRankInfo(xpLevel);
+
+    const imageAltText = `You are Level ${xpLevel} with ${xp} XP! ${xpNeeded - xp} XP until Level ${xpLevel + 1}!`;
+    const attachment = new AttachmentBuilder(await this.canvas.encode('jpeg'), { name: 'rank.jpeg', description: imageAltText });
+    return attachment;
+  }
+
+  private async fetchRankPosition() {
+    const guildID = this.guild.id;
+    const userID = this.interaction.user.id;
+
+    const guildMembers = await this.guild.members.fetch().catch(() => null);
+
+    if (!guildMembers) {
+      return this.handleError('Error fetching members from guild!', true, 'rank.js');
+    }
+
+    const guildMemberIDs = guildMembers.map((member) => member.id);
+
+    const guildRanks = await database.rank.findMany({ where: { guildID }, orderBy: { xp: 'desc' } }).catch(() => null);
+
+    if (!guildRanks) {
+      return this.handleError('Error fetching ranks from RANK table!', true, 'rank.js');
+    }
+
+    const filteredRanks = guildRanks.filter((rank) => guildMemberIDs.includes(rank.userID));
+
+    const memberRankPosition = filteredRanks.findIndex((rank) => rank.userID === userID) + 1;
+    return memberRankPosition;
+  }
+}

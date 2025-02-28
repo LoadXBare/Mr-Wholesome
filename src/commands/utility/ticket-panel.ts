@@ -1,313 +1,157 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, channelMention, ChannelType, codeBlock, Collection, EmbedBuilder, inlineCode, Message, TextChannel, time } from 'discord.js';
-import { mongodb } from '../../api/mongo.js';
-import { BOT_PREFIX, COLORS } from '../../config/constants.js';
-import { BotCommand, Command } from '../../index.js';
-import { sendError } from '../../lib/misc/send-error.js';
+import { stripIndents } from "common-tags";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, CategoryChannel, ChannelType, ComponentType, EmbedBuilder, ForumChannel, MediaChannel, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ticketPanelModalData } from "../../lib/api.js";
+import { baseEmbed, database, EmbedColours } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
-const embedPrompt = async (message: Message, commandReply: Message, prompt: string): Promise<string> => {
-	const awaitTime = 30_000; // Milliseconds
+export class TicketPanelCommandHandler extends CommandHandler {
+  async handle() {
+    const subcommand = this.interaction.options.getSubcommand(true);
 
-	const promptEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.member.displayAvatarURL()
-		})
-		.setTitle('Ticket Panel')
-		.setDescription(`Paste the JSON used for the **${prompt}**!\
-		\n\n*This will timeout ${time(Math.round((Date.now() + awaitTime) / 1000), 'R')}!*`)
-		.setFooter({ text: 'You can use https://glitchii.github.io/embedbuilder/ for embed JSON!' })
-		.setColor(COLORS.COMMAND);
+    if (subcommand === 'create') this.showTicketPanelCreationModal();
+    else if (subcommand === 'delete') this.deleteTicketPanel();
+    else if (subcommand === 'post') this.postTicketPanel();
+  }
 
-	commandReply.edit({ content: null, embeds: [promptEmbed] });
+  private async showTicketPanelCreationModal() {
+    const name = this.interaction.options.getString('name', true);
+    const category = this.interaction.options.getChannel('category', true, [ChannelType.GuildCategory]);
+    const moderatorRole = this.interaction.options.getRole('moderator-role', true);
 
-	const filter = (msg: Message): boolean => {
-		return msg.author.id === message.author.id;
-	};
+    const ticketPanelModal = new ModalBuilder()
+      .setCustomId(`ticket-panel:${this.interaction.id}`)
+      .setTitle('Ticket Panel');
 
-	const collectedMessages = await message.channel.awaitMessages({ filter: filter, max: 1, time: awaitTime }).catch(() => { }) as Collection<string, Message>;
+    const panelTitleTextInput = new TextInputBuilder()
+      .setCustomId('title')
+      .setLabel('Panel Title')
+      .setPlaceholder('Support Tickets')
+      .setRequired(true)
+      .setStyle(TextInputStyle.Short);
 
-	if (collectedMessages.size === 0) {
-		sendError(message, `No messages sent within ${awaitTime / 1000} seconds, panel creation cancelled.`);
-		return null;
-	}
+    const panelDescriptionTextInput = new TextInputBuilder()
+      .setCustomId('description')
+      .setLabel('Panel Description')
+      .setPlaceholder('Need help? Create a ticket using the button below!')
+      .setRequired(true)
+      .setStyle(TextInputStyle.Paragraph);
 
-	const embedString = collectedMessages.at(0).content;
+    const ticketDescriptionTextInput = new TextInputBuilder()
+      .setCustomId('ticket-description')
+      .setLabel('Ticket Description')
+      .setPlaceholder('Welcome {user}! Please describe your issue below.')
+      .setRequired(true)
+      .setStyle(TextInputStyle.Paragraph);
 
-	try {
-		JSON.parse(embedString);
-	}
-	catch (e) {
-		sendError(message, `Invalid JSON, panel creation cancelled!\n\n${codeBlock(e)}`);
-		return null;
-	}
+    const panelTitleActionRow = new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(panelTitleTextInput);
+    const panelDescriptionActionRow = new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(panelDescriptionTextInput);
+    const ticketDescriptionActionRow = new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(ticketDescriptionTextInput);
+    ticketPanelModal.addComponents(panelTitleActionRow, panelDescriptionActionRow, ticketDescriptionActionRow);
 
-	const panelEmbed = JSON.parse(embedString);
+    await this.interaction.showModal(ticketPanelModal);
+    await ticketPanelModalData.set(this.interaction.id, name, category.id, moderatorRole.id);
+  }
 
-	try {
-		const tempMsg = await message.channel.send({ embeds: [panelEmbed] });
-		await tempMsg.delete();
-	}
-	catch (e) {
-		sendError(message, `Invalid embed JSON, panel creation cancelled!\n\n${codeBlock(e)}`);
-		return null;
-	}
-	finally {
-		await collectedMessages.at(0).delete();
-	}
+  private async postTicketPanel() {
+    const name = this.interaction.options.getString('name', true);
+    const channel = this.interaction.options.getChannel('channel', true, [ChannelType.GuildText]);
 
-	return JSON.stringify(panelEmbed);
-};
+    const ticketPanel = await database.ticketPanel.findUnique({ where: { name_guildID: { name: name, guildID: this.guild.id } } });
 
-const channelPrompt = async (message: Message, commandReply: Message, prompt: string): Promise<string> => {
-	const awaitTime = 30_000; // Milliseconds
+    if (!ticketPanel) {
+      return this.handleError('Error fetching ticket panel from TICKET_PANEL table!', true, 'ticket-panel.js');
+    }
 
-	const promptEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.member.displayAvatarURL()
-		})
-		.setTitle('Ticket Panel')
-		.setDescription(`Please enter the **${prompt}**!\
-		\n\n*This will timeout ${time(Math.round((Date.now() + awaitTime) / 1000), 'R')}!*`)
-		.setColor(COLORS.COMMAND);
+    const ticketPanelEmbed = JSON.parse(ticketPanel.panelEmbedJSON);
 
-	commandReply.edit({ content: null, embeds: [promptEmbed] });
+    const createTicketButton = new ButtonBuilder()
+      .setCustomId(`ticket:create:${name}`)
+      .setLabel('Create Ticket')
+      .setEmoji('🎫')
+      .setStyle(ButtonStyle.Primary);
+    const createButtonActionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(createTicketButton);
 
-	const filter = (msg: Message): boolean => {
-		return msg.author.id === message.author.id;
-	};
+    const posted = await channel.send({ embeds: [ticketPanelEmbed], components: [createButtonActionRow] }).catch(() => { });
 
-	const collectedMessages = await message.channel.awaitMessages({ filter: filter, max: 1, time: awaitTime }).catch(() => { }) as Collection<string, Message>;
+    if (!posted) {
+      return this.handleError('Failed to post ticket panel to channel!', true, 'ticket-panel.js');
+    }
 
-	if (collectedMessages.size === 0) {
-		sendError(message, `No messages sent within ${awaitTime / 1000} seconds, panel creation cancelled.`);
-		return null;
-	}
+    const postedPanelMessageIDs = JSON.parse(ticketPanel.postedPanelMessageIDs) as Array<{ channelID: string, messageID: string; }>;
+    postedPanelMessageIDs.push({ channelID: channel.id, messageID: posted.id });
+    const updatedPanelMessageIDs = JSON.stringify(postedPanelMessageIDs);
 
-	const channelIDString = collectedMessages.at(0).content;
+    await database.ticketPanel.update({
+      where: { timeCreated: ticketPanel.timeCreated },
+      data: { postedPanelMessageIDs: updatedPanelMessageIDs }
+    });
 
-	try {
-		const category = await message.guild.channels.fetch(channelIDString);
-		if (category.type !== ChannelType.GuildCategory) {
-			sendError(message, `${inlineCode(channelIDString)} is not a valid Category ID!`);
-			return null;
-		}
-	}
-	catch {
-		sendError(message, `${inlineCode(channelIDString)} is not a valid Category ID!`);
-		return null;
-	}
-	finally {
-		await collectedMessages.at(0).delete();
-	}
+    await this.interaction.reply({ content: `✅ Ticket panel "${name}" posted in ${channel} successfully.` });
+  }
 
-	return channelIDString;
-};
+  private async deleteTicketPanel() {
+    const name = this.interaction.options.getString('name', true);
 
-const textPrompt = async (message: Message, commandReply: Message, prompt: string): Promise<string> => {
-	const awaitTime = 30_000; // Milliseconds
+    const ticketPanel = await database.ticketPanel.findUnique({ where: { name_guildID: { name: name, guildID: this.guild.id } } });
 
-	const promptEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.member.displayAvatarURL()
-		})
-		.setTitle('Ticket Panel')
-		.setDescription(`Please enter the **${prompt}**!\
-		\n\n*This will timeout ${time(Math.round((Date.now() + awaitTime) / 1000), 'R')}!*`)
-		.setColor(COLORS.COMMAND);
+    if (!ticketPanel) {
+      return this.handleError('Error fetching ticket panel from TICKET_PANEL table!', true, 'ticket-panel.js');
+    }
 
-	commandReply.edit({ content: null, embeds: [promptEmbed] });
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle(`You're About To Delete '${ticketPanel.name}'`)
+      .setDescription(stripIndents`
+      Doing so will also delete all posted ticket panels, are you sure you want to continue?
+      -# All tickets created will remain functional until deleted.`)
+      .setColor(EmbedColours.Info);
 
-	const filter = (msg: Message): boolean => {
-		return msg.author.id === message.author.id;
-	};
+    const confirmationButtons = new ActionRowBuilder<ButtonBuilder>()
+      .setComponents(
+        new ButtonBuilder()
+          .setCustomId('yes')
+          .setLabel(`Delete '${ticketPanel.name}'`)
+          .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId('no')
+          .setLabel('Cancel')
+          .setStyle(ButtonStyle.Secondary)
+      );
 
-	const collectedMessages = await message.channel.awaitMessages({ filter: filter, max: 1, time: awaitTime }).catch(() => { }) as Collection<string, Message>;
+    const message = await this.interaction.reply({ embeds: [embed], components: [confirmationButtons] });
+    const filter = (i: ButtonInteraction) => i.user.id === this.interaction.user.id;
 
-	if (collectedMessages.size === 0) {
-		sendError(message, `No messages sent within ${awaitTime / 1000} seconds, panel creation cancelled.`);
-		return null;
-	}
+    const confirmation = await message.awaitMessageComponent({ filter, componentType: ComponentType.Button, time: 30_000 }).catch(() => { });
 
-	let text = collectedMessages.at(0).content;
-	if (text.length === 0) {
-		text = 'No text provided.';
-	}
-	await collectedMessages.at(0).delete();
+    embed
+      .setTitle('Deletion Cancelled')
+      .setDescription('No input detected after 30 seconds, deletion has been cancelled.')
+      .setColor(EmbedColours.Negative);
+    if (!confirmation) return this.interaction.editReply({ embeds: [embed], components: [] });
 
-	return text;
-};
+    embed
+      .setDescription('Deletion has been cancelled.')
+      .setColor(EmbedColours.Neutral);
+    if (confirmation.customId === 'no') return this.interaction.editReply({ embeds: [embed], components: [] });
 
-const createPanel = async (message: Message): Promise<void> => {
-	const commandReply = await message.reply('Please wait...');
+    await database.ticketPanel.delete({
+      where: { timeCreated: ticketPanel.timeCreated }
+    });
 
-	const panelEmbedString = await embedPrompt(message, commandReply, 'Panel Embed');
-	if (panelEmbedString === null) {
-		return;
-	}
+    const postedPanelMessageIDs = JSON.parse(ticketPanel.postedPanelMessageIDs) as Array<{ channelID: string, messageID: string; }>;
+    for await (const panel of postedPanelMessageIDs) {
+      const channel = await this.guild.channels.fetch(panel.channelID);
+      if (!channel || channel instanceof CategoryChannel || channel instanceof ForumChannel || channel instanceof MediaChannel) continue;
 
-	const ticketEmbedString = await embedPrompt(message, commandReply, 'Ticket Embed');
-	if (ticketEmbedString === null) {
-		return;
-	}
+      const message = await channel.messages.fetch(panel.messageID);
+      if (message && message.deletable) await message.delete();
+    }
 
-	const ticketCategoryID = await channelPrompt(message, commandReply, 'Ticket Category ID');
-	if (ticketCategoryID === null) {
-		return;
-	}
-
-	const panelName = await textPrompt(message, commandReply, 'Panel Name');
-	if (panelName === null) {
-		return;
-	}
-
-	const panelDatabaseEntry = await mongodb.guildTicketPanel.create({
-		guildID: message.guildId,
-		panelEmbedJSON: panelEmbedString,
-		ticketCategoryID: ticketCategoryID,
-		ticketEmbedJSON: ticketEmbedString,
-		panelName: panelName
-	});
-
-	const panelCreatedEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.member.displayAvatarURL()
-		})
-		.setTitle('Ticket Panel')
-		.setDescription(`Successfully created Ticket Panel: **${panelName}**!`)
-		.setFooter({ text: `Panel ID: ${panelDatabaseEntry.id}` })
-		.setColor(COLORS.SUCCESS);
-
-	commandReply.edit({ embeds: [panelCreatedEmbed] });
-};
-
-const deletePanel = async (message: Message, panelName: string): Promise<void> => {
-	const panelDeletedEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.member.displayAvatarURL()
-		})
-		.setTitle('Ticket Panel')
-		.setDescription(`Successfully deleted Ticket Panel **${panelName}**!`)
-		.setFooter({ text: 'Any tickets created using this panel will continue to function.' })
-		.setColor(COLORS.SUCCESS);
-
-	const panel = await mongodb.guildTicketPanel.findOne({
-		panelName: panelName
-	});
-
-	if (panel !== null) {
-		panel.delete();
-		message.reply({ embeds: [panelDeletedEmbed] });
-		return;
-	}
-
-	sendError(message, `The panel ${inlineCode(panelName)} is either invalid or doesn't exist!`);
-};
-
-const postPanel = async (message: Message, panelName: string, channelID: string): Promise<void> => {
-	let panelChannel: TextChannel;
-	try {
-		panelChannel = await message.guild.channels.fetch(channelID) as TextChannel;
-	}
-	catch {
-		sendError(message, `${inlineCode(channelID)} is not a valid Channel!`);
-		return;
-	}
-
-	const panel = await mongodb.guildTicketPanel.findOne({
-		panelName: panelName
-	});
-	if (panel === null) {
-		sendError(message, `The panel ${inlineCode(panelName)} does not exist!`);
-		return;
-	}
-
-	const panelEmbed = JSON.parse(panel.panelEmbedJSON);
-	const panelButtons = new ActionRowBuilder<ButtonBuilder>().setComponents(
-		new ButtonBuilder()
-			.setCustomId(JSON.stringify({ type: 'createTicket', panelName: panelName }))
-			.setLabel('Create Ticket')
-			.setStyle(ButtonStyle.Primary)
-	);
-
-	try {
-		await panelChannel.send({ embeds: [panelEmbed], components: [panelButtons] });
-	}
-	catch (e) {
-		sendError(message, `An error occurred whilst attempting to post the panel in ${channelMention(channelID)}!\
-		\n${codeBlock(e)}`);
-		return;
-	}
-
-	const panelPostedEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.member.displayAvatarURL()
-		})
-		.setTitle('Ticket Panel')
-		.setDescription(`Successfully posted Ticket Panel **${panelName}** in ${channelMention(channelID)}!`)
-		.setColor(COLORS.SUCCESS);
-
-	message.reply({ embeds: [panelPostedEmbed] });
-};
-
-const listPanels = async (message: Message): Promise<void> => {
-	const panels = await mongodb.guildTicketPanel.find({
-		guildID: message.guildId
-	});
-
-	let panelsList = '';
-	if (panels.length === 0) {
-		panelsList = 'There are no Ticket Panels within this guild!';
-	}
-
-	for (const panel of panels) {
-		panelsList = panelsList.concat(`\n• **${panel.panelName}**`);
-	}
-
-	const panelsListEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.member.displayAvatarURL()
-		})
-		.setTitle(`Displaying all Ticket Panels within ${message.guild.name}`)
-		.setDescription(panelsList)
-		.setColor(COLORS.COMMAND);
-
-	message.reply({ embeds: [panelsListEmbed] });
-};
-
-const ticketPanelCommand = (args: BotCommand): void => {
-	const { commandArgs, message } = args;
-	const operation = commandArgs.shift();
-
-	if (operation === 'create') {
-		createPanel(message);
-	}
-	else if (operation === 'delete') {
-		const panelName = commandArgs.join(' ');
-		deletePanel(message, panelName);
-	}
-	else if (operation === 'post') {
-		const channelID = commandArgs.shift().replace(/\D/g, '') ?? 'undefined';
-		const panelName = commandArgs.join(' ');
-		postPanel(message, panelName, channelID);
-	}
-	else if (operation === 'list') {
-		listPanels(message);
-	}
-	else {
-		sendError(message, `${inlineCode(operation)} is not a valid operation!\
-		\n*For help, run ${inlineCode(`${BOT_PREFIX}help ticketpanel`)}*`);
-	}
-};
-
-export const ticketPanel: Command = {
-	devOnly: false,
-	modOnly: true,
-	run: ticketPanelCommand,
-	type: 'Utility'
-};
+    embed
+      .setTitle(`'${ticketPanel.name}' Deleted Successfully`)
+      .setDescription(stripIndents`
+      All posted ticket panels have been deleted and no new tickets can be created.
+      Any remaining tickets will continue to function until deleted.`)
+      .setColor(EmbedColours.Positive);
+    await this.interaction.editReply({ embeds: [embed], components: [] });
+  }
+}

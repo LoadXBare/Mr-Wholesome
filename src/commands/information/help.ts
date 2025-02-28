@@ -1,82 +1,53 @@
-import { EmbedBuilder, inlineCode } from 'discord.js';
-import { BOT_PREFIX, COLORS, COMMAND_INFO } from '../../config/constants.js';
-import { BotCommand, Command, CommandsList } from '../../index.js';
-import { sendError } from '../../lib/misc/send-error.js';
-import { commands } from '../index.js';
+import { ApplicationCommandType, chatInputApplicationCommandMention, EmbedBuilder } from "discord.js";
+import { baseEmbed, ChannelIDs, Emotes } from "../../lib/config.js";
+import { CommandHandler } from "../command.js";
 
-const helpCommand = (args: BotCommand): Promise<void> => {
-	const { message, commandArgs } = args;
-	const P = BOT_PREFIX;
+export class HelpCommandHandler extends CommandHandler {
+  async handle() {
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
+    await this.interaction.deferReply();
 
-	if (commandArgs.length > 0) {
-		const commandsList = Object.keys(commands);
-		const command = commandArgs.shift();
+    const funCommands = ['cat', 'dog', '8ball', 'fox', 'reading', 'writing'];
+    const informationCommands = ['help', 'ping'];
+    const moderationCommands = ['ban', 'unban', 'warn', 'unwarn', 'watchlist'];
+    const rankingCommands = ['leaderboard', 'rank'];
+    const utilityCommands = ['birthday', 'ticket-panel', 'ticket', 'view'];
+    const slashCommands = (await this.fetchSlashCommands()).filter((command) => command.type === ApplicationCommandType.ChatInput);
 
-		if (commandsList.includes(command)) {
-			if (!(command.toUpperCase() in COMMAND_INFO)) {
-				sendError(message, `The command "${inlineCode(`${P}${command}`)}" does not seem to have any additional help information.`);
-				return;
-			}
+    slashCommands.forEach((command) => {
+      const { name, id } = command;
 
-			const commandInfoEmbed = COMMAND_INFO[command.toUpperCase()];
-			message.reply({ embeds: [commandInfoEmbed] });
-		}
-		else {
-			sendError(message, `${inlineCode(command)} is not a valid command!`);
-		}
+      if (funCommands.includes(name)) funCommands[funCommands.indexOf(name)] = chatInputApplicationCommandMention(name, id);
+      else if (informationCommands.includes(name)) informationCommands[informationCommands.indexOf(name)] = chatInputApplicationCommandMention(name, id);
+      else if (moderationCommands.includes(name)) moderationCommands[moderationCommands.indexOf(name)] = chatInputApplicationCommandMention(name, id);
+      else if (rankingCommands.includes(name)) rankingCommands[rankingCommands.indexOf(name)] = chatInputApplicationCommandMention(name, id);
+      else if (utilityCommands.includes(name)) utilityCommands[utilityCommands.indexOf(name)] = chatInputApplicationCommandMention(name, id);
+    });
 
-		return;
-	}
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle('Available Commands')
+      .setFields([
+        { name: '🥳 Fun', value: funCommands.join(' ') },
+        { name: '📖 Information', value: informationCommands.join(' ') },
+        { name: `${Emotes.Bonque} Moderation`, value: moderationCommands.join(' ') },
+        { name: '🏆 Ranking', value: rankingCommands.join(' ') },
+        { name: '⚙️ Utility', value: utilityCommands.join(' ') }
+      ])
+      .setFooter({ text: '💡 Commands that cannot be clicked have multiple subcommands that would take up too much space to display' });
 
-	const commandsList: CommandsList = {
-		Dev: '',
-		Fun: '',
-		Information: '',
-		Moderation: '',
-		Ranking: '',
-		Utility: '',
-		Other: ''
-	};
-	for (const [cmd, cmdConfig] of Object.entries(commands)) {
-		const modOnlyCommand = cmdConfig.modOnly ? '🛡️' : '';
-		const devOnlyCommand = cmdConfig.devOnly ? '🚫' : '';
-		commandsList[cmdConfig.type] = commandsList[cmdConfig.type].concat(`${inlineCode(`${modOnlyCommand}${devOnlyCommand}${P}${cmd}`)} `);
-	}
+    await this.interaction.editReply({ embeds: [embed] });
+  }
 
-	const helpMenuEmbed = new EmbedBuilder()
-		.setTitle('Available Commands')
-		.setDescription(`You can get more detailed information on a command by running ${inlineCode(`${P}help [command]`)}, for example: ${inlineCode(`${P}help ping`)}`)
-		.setFields([
-			{
-				name: '📋 Information',
-				value: commandsList.Information
-			},
-			{
-				name: '🛡️ Moderation',
-				value: commandsList.Moderation
-			},
-			{
-				name: '🛠️ Utility',
-				value: commandsList.Utility
-			},
-			{
-				name: '🎉 Fun',
-				value: commandsList.Fun
-			},
-			{
-				name: '🏆 Ranking',
-				value: commandsList.Ranking
-			}
-		])
-		.setFooter({ text: '🛡️ = Moderator Command, 🚫 = Developer Command' })
-		.setColor(COLORS.COMMAND);
+  private async fetchSlashCommands() {
+    const botEnvironment = process.env.ENVIRONMENT ?? '';
 
-	message.reply({ embeds: [helpMenuEmbed] });
-};
-
-export const help: Command = {
-	devOnly: false,
-	modOnly: false,
-	run: helpCommand,
-	type: 'Information'
-};
+    if (botEnvironment === 'DEVELOPMENT') {
+      const guildCommands = await this.guild.commands.fetch();
+      return guildCommands;
+    } else {
+      const globalCommands = await this.interaction.client.application.commands.fetch();
+      return globalCommands;
+    }
+  }
+}

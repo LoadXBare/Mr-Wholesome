@@ -1,14 +1,30 @@
 {
+	"compileOnSave": true,
 	"compilerOptions": {
+		"importHelpers": true,
+		"incremental": true,
+		"lib": [
+			"ESNext",
+			"DOM"
+		],
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"newLine": "lf",
+		"noEmitHelpers": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"preserveConstEnums": true,
+		"pretty": true,
+		"removeComments": true,
+		"resolveJsonModule": true,
+		"strict": true,
 		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "Node",
-		"noImplicitAny": true,
-		"rootDir": "./src",
-		"outDir": "./dist",
-		"allowSyntheticDefaultImports": true
-	},
-	"exclude": [
-		"backlog"
-	]
+		"useDefineForClassFields": true,
+		"rootDir": "src",
+		"outDir": "dist",
+		"baseUrl": "src",
+		"skipLibCheck": true
+	}
 }

@@ -1,11 +1,29 @@
-FROM node:16-buster-slim
+FROM node:lts AS build
 
-WORKDIR /app
+WORKDIR /home/mr-wholesome/
 
-COPY package.json /app
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY prisma ./prisma/
 
-RUN npm install
+RUN npm ci
 
-COPY . /app
+COPY src ./src
 
-CMD ["npm","start"]
+RUN npx tsc
+
+
+FROM node:lts
+
+WORKDIR /home/mr-wholesome/
+
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY prisma ./prisma/
+COPY assets ./assets/
+
+RUN npm install --omit=dev
+
+COPY --from=build /home/mr-wholesome/dist ./dist
+
+CMD ["node", "./dist/index.js"]

@@ -1,97 +1,49 @@
-import { EmbedBuilder } from 'discord.js';
-import { COLORS } from '../../config/constants.js';
-import { BotCommand, Command } from '../../index.js';
-import { sendError } from '../../lib/misc/send-error.js';
+import { stripIndents } from 'common-tags';
+import { ColorResolvable, EmbedBuilder } from 'discord.js';
+import { baseEmbed, ChannelIDs } from '../../lib/config.js';
+import { CommandHandler } from '../command.js';
 
-const eightBallCommand = (args: BotCommand): void => {
-	const { commandArgs, message } = args;
-	const question = commandArgs.join(' ');
-	const positive = {
-		chance: 4,
-		type: 'positive',
-		responses: [
-			'It is certain.',
-			'It is decidedly so.',
-			'Without a doubt.',
-			'Yes definitely.',
-			'You may rely on it.',
-			'As I see it, yes.',
-			'Most likely.',
-			'Outlook good.',
-			'Yes.',
-			'Signs point to yes.'
-		]
-	};
-	const neutral = {
-		chance: 2,
-		type: 'neutral',
-		responses: [
-			'Reply hazy, try again.',
-			'Ask again later.',
-			'Better not tell you now.',
-			'Cannot predict now.',
-			'Concentrate and ask again.'
-		]
-	};
-	const negative = {
-		chance: 4,
-		type: 'negative',
-		responses: [
-			'Don\'t count on it.',
-			'My reply is no.',
-			'My sources say no.',
-			'Outlook not so good.',
-			'Very doubtful.'
-		]
-	};
+export class EightBallCommandHandler extends CommandHandler {
+  async handle() {
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
+    await this.interaction.deferReply();
 
-	const responsePool = [];
-	for (let i = 0; i < positive.chance; i++) {
-		responsePool.push(positive);
-	}
-	for (let i = 0; i < neutral.chance; i++) {
-		responsePool.push(neutral);
-	}
-	for (let i = 0; i < negative.chance; i++) {
-		responsePool.push(negative);
-	}
+    const question = this.interaction.options.getString('question', true);
+    const responses: Array<{ response: string, colour: ColorResolvable; }> = [
+      // Positive
+      { response: 'It is certain.', colour: 'Green' },
+      { response: 'It is decidedly so.', colour: 'Green' },
+      { response: 'Without a doubt.', colour: 'Green' },
+      { response: 'Yes - definitely.', colour: 'Green' },
+      { response: 'You may rely on it.', colour: 'Green' },
+      { response: 'As I see it, yes.', colour: 'Green' },
+      { response: 'Most likely.', colour: 'Green' },
+      { response: 'Outlook good.', colour: 'Green' },
+      { response: 'Yes.', colour: 'Green' },
+      { response: 'Signs point to yes.', colour: 'Green' },
 
-	const randomResponseList = responsePool.at(Math.floor(Math.random() * responsePool.length));
-	const randomResponse = randomResponseList.responses.at(Math.floor(Math.random() * randomResponseList.responses.length));
+      // Neutral
+      { response: 'Reply hazy, try again.', colour: 'Yellow' },
+      { response: 'Better not tell you now.', colour: 'Yellow' },
 
-	if (commandArgs.length === 0) {
-		sendError(message, 'You must enter a question!');
-		return;
-	}
-	else if (!question.endsWith('?')) {
-		sendError(message, 'That doesn\'t look like a question!\n\n*End your sentence with a question mark.*');
-		return;
-	}
+      // Negative
+      { response: "Don't count on it.", colour: 'Red' },
+      { response: 'My reply is no.', colour: 'Red' },
+      { response: 'My sources say no.', colour: 'Red' },
+      { response: 'Outlook not so good.', colour: 'Red' },
+      { response: 'Very doubtful.', colour: 'Red' },
+    ];
 
-	const responseEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.member.displayAvatarURL()
-		})
-		.setDescription(`*${question}*\
-		\n\n**${randomResponse}**`);
+    const randomResponse = responses.at(Math.round(Math.random() * responses.length)) ?? responses[0];
 
-	if (randomResponseList.type === 'positive') {
-		responseEmbed.setColor(COLORS.SUCCESS);
-	}
-	else if (randomResponseList.type === 'negative') {
-		responseEmbed.setColor(COLORS.FAIL);
-	}
-	else {
-		responseEmbed.setColor('Yellow');
-	}
+    const embed = new EmbedBuilder(baseEmbed)
+      .setDescription(stripIndents
+        `**Question** — *${question}*
+        ## ${randomResponse.response || 'No response found.'}`
+      )
+      .setColor(randomResponse.colour);
 
-	message.reply({ embeds: [responseEmbed] });
-};
-
-export const eightBall: Command = {
-	devOnly: false,
-	modOnly: false,
-	run: eightBallCommand,
-	type: 'Fun'
-};
+    await this.interaction.editReply({ embeds: [embed] });
+  }
+}

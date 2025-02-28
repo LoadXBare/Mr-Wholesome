@@ -1,6 +1,9 @@
 node_modules
-private
-dist
-.env
+.env.development
+.env.production
+v2-migration-files
+.wakatime-project
+tsconfig.tsbuildinfo
 package-lock.json
-.todo
+*.sqlite
+.TODO

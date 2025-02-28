@@ -1,23 +1,21 @@
-import { EmbedBuilder } from 'discord.js';
-import { fetch } from 'undici';
-import { COLORS } from '../../config/constants.js';
-import { BotCommand, Command, Dog } from '../../index.js';
+import { ChannelIDs } from '../../lib/config.js';
+import { CommandHandler } from '../command.js';
 
-const dogCommand = async (args: BotCommand): Promise<void> => {
-	const { message } = args;
-	const response = await fetch('https://api.thedogapi.com/v1/images/search');
-	const responseJSON = await response.json() as Dog;
+export class DogCommandHandler extends CommandHandler {
+  async handle() {
+    const allowedChannelIDs = [ChannelIDs.BotSpam, ChannelIDs.ComfyVibes];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
+    await this.interaction.deferReply();
 
-	const dogImageEmbed = new EmbedBuilder()
-		.setImage(responseJSON.at(0).url)
-		.setColor(COLORS.COMMAND);
+    const response = await fetch('https://api.thedogapi.com/v1/images/search').catch(() => null);
 
-	message.reply({ embeds: [dogImageEmbed] });
-};
+    if (!response) {
+      return this.handleError('Error fetching dog image from API.', true, 'dog.js');
+    }
 
-export const dog: Command = {
-	devOnly: false,
-	modOnly: false,
-	run: dogCommand,
-	type: 'Fun'
-};
+    const responseJSON = await response.json();
+    const dogURL = responseJSON.at(0).url;
+
+    await this.interaction.editReply(dogURL);
+  }
+}

@@ -1,203 +1,134 @@
-import { Chance } from 'chance';
-import dayjs from 'dayjs';
-import { EmbedBuilder, Message } from 'discord.js';
-import { BotCommand, Command } from '../..';
-import { updateMemberRanking } from '../../api/guild-ranking.js';
-import { COLORS, ZERO_WIDTH_SPACE } from '../../config/constants.js';
-import { sleep } from '../../lib/misc/sleep.js';
-import { config } from '../../private/config.js';
-import { channelIsBotSpam } from '../ranking/leaderboard.js';
+import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
+import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { ChannelIDs, Emotes } from '../../lib/config.js';
+import { getRandomIntegerFromSeed, sleep } from '../../lib/utilities.js';
+import { CommandHandler } from '../command.js';
 
-const generateStarRating = (starRating: number, starCount: number): string => {
-	const rating = Math.round(starRating * 2) / 2;
-	const fullStarCount = Math.floor(Math.abs(rating));
-	const halfStarCount = Math.abs(rating) % 1 === 0.5 ? 1 : 0;
-	const emptyStarCount = starCount - fullStarCount - halfStarCount;
-	const negative = rating < 0;
+export class ReadingCommandHandler extends CommandHandler {
+  private canvas: Canvas;
+  private canvasContext: SKRSContext2D;
+  private todayIsCursedDay: boolean;
 
-	let starRatingString = '';
-	if (negative) {
-		starRatingString = `${config.botEmotes.starBlackFull.repeat(fullStarCount)}${config.botEmotes.starBlackHalfFull.repeat(halfStarCount)}${config.botEmotes.starBlackEmpty.repeat(emptyStarCount)}`;
-	} else {
-		starRatingString = `${config.botEmotes.starFull.repeat(fullStarCount)}${config.botEmotes.starHalfFull.repeat(halfStarCount)}${config.botEmotes.starEmpty.repeat(emptyStarCount)}`;
-	}
+  constructor(interaction: ChatInputCommandInteraction) {
+    super(interaction);
+    this.canvas = createCanvas(1343, 720);
+    this.canvasContext = this.canvas.getContext('2d');
 
-	return starRatingString;
-};
+    // Thursday is Cursed Day!!! Changes stars to black and inverts colours.
+    this.todayIsCursedDay = new Date().getDay() === 4;
+  }
 
-const dailyReadingIchiCommand = async (message: Message): Promise<void> => {
-	const dateToday = dayjs();
-	const seed = `${dateToday}${message.author.id}`;
-	const chance = new Chance(seed);
+  async handle() {
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
+    await this.interaction.deferReply();
 
-	const loveRating = chance.integer({ min: -20, max: 0 }) / 2;
-	const luckRating = chance.integer({ min: -20, max: 0 }) / 2;
-	const successRating = chance.integer({ min: -20, max: 0 }) / 2;
-	const wealthRating = chance.integer({ min: -20, max: 0 }) / 2;
-	const overallRating = (successRating + luckRating + loveRating + wealthRating) / 4;
-	const resetXP = overallRating === -10;
+    const cursed = this.todayIsCursedDay ? 'cursed ' : '';
+    const attachment = await this.createUserReadingImage();
+    const userName = this.interaction.user.displayName;
 
-	const readingEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.author.displayAvatarURL()
-		})
-		.setTitle(`Daily Reading for ${message.member.displayName}`)
-		.setDescription('**Please Wait**\
-		\nContacting spirits...')
-		.setThumbnail(config.botEmoteUrls.loading)
-		.setColor(COLORS.COMMAND);
+    await this.interaction.editReply(`# Contacting spirits... ${Emotes.Ghost}`);
+    await sleep(3000);
 
-	const reply = await message.reply({ embeds: [readingEmbed] });
-	await sleep(2_000);
+    await this.interaction.editReply(`# Querying bird gods... ${Emotes.Bird}`);
+    await sleep(3000);
 
-	readingEmbed
-		.setDescription('**Please Wait**\
-		\nQuerying bird gods...');
-	reply.edit({ embeds: [readingEmbed] });
-	await sleep(2_000);
+    await this.interaction.editReply(`# Almost done, finalising results... ${Emotes.Chart}`);
+    await sleep(3000);
 
-	readingEmbed
-		.setDescription('**Please Wait**\
-		\nAlmost done, finalising results...');
-	reply.edit({ embeds: [readingEmbed] });
-	await sleep(2_000);
+    await this.interaction.editReply({ content: `## Here is your ${cursed}reading for ${new Date().toDateString()}, ${userName}...`, files: [attachment] });
+  }
 
-	readingEmbed
-		.setDescription('**Done!** Here is your reading for today...')
-		.setFields([
-			{
-				name: 'Overall',
-				value: `${generateStarRating(overallRating, 10)} ${(Math.round(overallRating * 2) / 2)}/10`
-			},
-			{
-				name: ZERO_WIDTH_SPACE,
-				value: ZERO_WIDTH_SPACE
-			},
-			{
-				name: 'Love',
-				value: `${generateStarRating(loveRating, 10)} ${loveRating}/0`,
-				inline: true
-			},
-			{
-				name: 'Luck',
-				value: `${generateStarRating(luckRating, 10)} ${luckRating}/0`,
-				inline: true
-			},
-			{
-				name: 'Success',
-				value: `${generateStarRating(successRating, 10)} ${successRating}/0`,
-				inline: true
-			},
-			{
-				name: 'Wealth',
-				value: `${generateStarRating(wealthRating, 10)} ${wealthRating}/0`,
-				inline: true
-			}
-		])
-		.setThumbnail(null)
-		.setFooter({ text: `${resetXP ? 'Uh oh, you may wanna check your XP.. 💥' : 'Hmmm, not a perfect -10, you\'re safe... for today...'}` });
+  private fetchStarDrawOrder(starReading: number, starCount: number) {
+    const fullStarCount = Math.floor(starReading);
+    const halfStarCount = starReading % 1 >= 0.5 ? 1 : 0;
+    const emptyStarCount = starCount - fullStarCount - halfStarCount;
 
-	if (resetXP) {
-		await updateMemberRanking({
-			credits: 0,
-			guildID: message.guildId,
-			levelUpNotifications: true,
-			memberID: message.author.id,
-			xp: 0,
-			xpLevel: 0
-		});
-	}
+    return `${'full,'.repeat(fullStarCount)}${'half,'.repeat(halfStarCount)}${'empty,'.repeat(emptyStarCount)}`.split(',').slice(0, -1);
+  }
 
-	reply.edit({ embeds: [readingEmbed] });
-};
+  private async drawStars(starReading: number, x: number, y: number, starSize: number) {
+    const cursed = this.todayIsCursedDay ? 'cursed-' : '';
 
-const dailyReadingCommand = async (args: BotCommand): Promise<void> => {
-	const { message } = args;
-	if (!channelIsBotSpam(message)) return;
+    const fullStarImage = await loadImage(`assets/reading/${cursed}star-filled.png`);
+    const halfStarImage = await loadImage(`assets/reading/${cursed}star-half.png`);
+    const emptyStarImage = await loadImage(`assets/reading/${cursed}star-empty.png`);
 
-	const authorIsIchi = message.author.id === config.userIDs.Ichi;
-	if (authorIsIchi) {
-		dailyReadingIchiCommand(message);
-		return;
-	}
+    const drawOrder = this.fetchStarDrawOrder(starReading, 5);
+    const pixelsBetweenStars = 5;
 
-	const dateToday = dayjs().format('DDMMYYYY');
-	const seed = `${dateToday}${message.author.id}`;
-	const chance = new Chance(seed);
+    drawOrder.forEach((star, index) => {
+      let starImage: Image;
+      if (star === 'full') starImage = fullStarImage;
+      else if (star === 'half') starImage = halfStarImage;
+      else starImage = emptyStarImage;
 
-	const loveRating = chance.integer({ min: -10, max: 10 }) / 2;
-	const luckRating = chance.integer({ min: -10, max: 10 }) / 2;
-	const successRating = chance.integer({ min: -10, max: 10 }) / 2;
-	const wealthRating = chance.integer({ min: -10, max: 10 }) / 2;
-	const overallRating = (successRating + luckRating + loveRating + wealthRating) / 4;
+      const starX = x + index * (starSize + pixelsBetweenStars);
 
-	const readingEmbed = new EmbedBuilder()
-		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.author.displayAvatarURL()
-		})
-		.setTitle(`Daily Reading for ${message.member.displayName}`)
-		.setDescription('**Please Wait**\
-		\nContacting spirits...')
-		.setThumbnail(config.botEmoteUrls.loading)
-		.setColor(COLORS.COMMAND);
+      this.canvasContext.drawImage(starImage, starX, y, starSize, starSize);
+    });
+  }
 
-	const reply = await message.reply({ embeds: [readingEmbed] });
-	await sleep(2_000);
+  private async drawAvatar() {
+    const cursed = this.todayIsCursedDay ? 'cursed-' : '';
 
-	readingEmbed
-		.setDescription('**Please Wait**\
-		\nQuerying bird gods...');
-	reply.edit({ embeds: [readingEmbed] });
-	await sleep(2_000);
+    const response = await fetch(this.interaction.user.displayAvatarURL({ extension: 'png', size: 1024 }))
+      .catch(() => fetch('assets/reading/avatar-error.png'));
+    const avatar = await loadImage(await response.arrayBuffer());
+    const avatarX = 517;
+    const avatarY = 97;
+    const avatarSize = 310;
+    const avatarRadius = avatarSize / 2;
 
-	readingEmbed
-		.setDescription('**Please Wait**\
-		\nAlmost done, finalising results...');
-	reply.edit({ embeds: [readingEmbed] });
-	await sleep(2_000);
+    this.canvasContext.save();
 
-	readingEmbed
-		.setDescription('**Done!** Here is your reading for today...')
-		.setFields([
-			{
-				name: 'Overall',
-				value: `${generateStarRating(overallRating, 5)} ${(Math.round(overallRating * 2) / 2)}/5`
-			},
-			{
-				name: ZERO_WIDTH_SPACE,
-				value: ZERO_WIDTH_SPACE
-			},
-			{
-				name: 'Love',
-				value: `${generateStarRating(loveRating, 5)} ${loveRating}/5`,
-				inline: true
-			},
-			{
-				name: 'Luck',
-				value: `${generateStarRating(luckRating, 5)} ${luckRating}/5`,
-				inline: true
-			},
-			{
-				name: 'Success',
-				value: `${generateStarRating(successRating, 5)} ${successRating}/5`,
-				inline: true
-			},
-			{
-				name: 'Wealth',
-				value: `${generateStarRating(wealthRating, 5)} ${wealthRating}/5`,
-				inline: true
-			}
-		])
-		.setThumbnail(null);
+    this.canvasContext.beginPath();
+    this.canvasContext.arc(avatarX + avatarRadius, avatarY + avatarRadius, avatarRadius, 0, Math.PI * 2, true);
+    this.canvasContext.closePath();
+    this.canvasContext.clip();
 
-	reply.edit({ embeds: [readingEmbed] });
-};
+    this.canvasContext.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
 
-export const reading: Command = {
-	devOnly: false,
-	modOnly: false,
-	run: dailyReadingCommand,
-	type: 'Fun'
-};
+    this.canvasContext.restore();
+
+    const avatarRing = await loadImage(`assets/reading/${cursed}avatar-ring.png`);
+    this.canvasContext.drawImage(avatarRing, 0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  private generateStarReading() {
+    const seed = `${this.interaction.user.id}${new Date().toDateString()}`;
+
+    const love = getRandomIntegerFromSeed(`${seed}love`, 0, 10) / 2;
+    const success = getRandomIntegerFromSeed(`${seed}success`, 0, 10) / 2;
+    const luck = getRandomIntegerFromSeed(`${seed}luck`, 0, 10) / 2;
+    const wealth = getRandomIntegerFromSeed(`${seed}wealth`, 0, 10) / 2;
+    const overall = Math.round((love + success + luck + wealth) / 4 * 2) / 2; // Rounded to nearest 0.5
+
+    return { love, success, luck, wealth, overall };
+  }
+
+  private async initialiseCanvas() {
+    const cursed = this.todayIsCursedDay ? 'cursed-' : '';
+
+    const backgroundImage = await loadImage(`assets/reading/${cursed}reading.png`);
+    this.canvasContext.drawImage(backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  private async createUserReadingImage() {
+    const cursed = this.todayIsCursedDay ? 'cursed ' : '';
+    const cMod = this.todayIsCursedDay ? -1 : 1;
+    await this.initialiseCanvas();
+
+    const readings = this.generateStarReading();
+    await this.drawStars(readings.love, 73, 170, 65);
+    await this.drawStars(readings.success, 926, 170, 65);
+    await this.drawStars(readings.luck, 73, 359, 65);
+    await this.drawStars(readings.wealth, 926, 359, 65);
+    await this.drawStars(readings.overall, 438, 615, 90);
+    await this.drawAvatar();
+
+    const imageAltText = `Your ${cursed}reading is ${readings.overall * cMod} stars overall, with ${readings.love * cMod} stars for love, ${readings.success * cMod} stars for success, ${readings.luck * cMod} stars for luck, and ${readings.wealth * cMod} stars for wealth.`;
+    const attachment = new AttachmentBuilder(await this.canvas.encode('jpeg'), { name: 'reading.jpeg', description: imageAltText });
+    return attachment;
+  }
+}

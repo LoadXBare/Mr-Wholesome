@@ -1,51 +1,25 @@
-import { AttachmentBuilder, EmbedBuilder, inlineCode } from 'discord.js';
-import ImageCharts from 'image-charts';
-import { cache } from '../../config/cache.js';
-import { COLORS } from '../../config/constants.js';
-import { BotCommand, Command } from '../../index.js';
-import { fetchUptime } from '../../lib/misc/fetch-uptime.js';
-import { config } from '../../private/config.js';
+import { stripIndents } from 'common-tags';
+import { EmbedBuilder, PartialGroupDMChannel } from 'discord.js';
+import { baseEmbed, ChannelIDs } from '../../lib/config.js';
+import { CommandHandler } from '../command.js';
 
-const pingCommand = async (args: BotCommand): Promise<void> => {
-	const { message } = args;
-	const uptime = fetchUptime();
-	const uptimeText = `${uptime.days} days, ${uptime.hours} hours, ${uptime.minutes} minutes & ${uptime.seconds} seconds`;
-	const wsPingHistory = await cache.fetch('wsPingHistory');
+export class PingCommandHandler extends CommandHandler {
+  async handle() {
+    const allowedChannelIDs = [ChannelIDs.BotSpam];
+    if (!this.checkChannelEligibility(allowedChannelIDs) || this.interaction.channel instanceof PartialGroupDMChannel) return this.postChannelIneligibleMessage(allowedChannelIDs);
+    await this.interaction.deferReply();
 
-	const historyGraph = new ImageCharts()
-		.cht('lc')
-		.chd(`t:${wsPingHistory.join(',')}`)
-		.chs('600x300')
-		.chxt('y')
-		.chds('a')
-		.chls('4')
-		.chco('32f032cc')
-		.chm('B,32c83266,0,0,0')
-		.chf('a,s,00000000')
-		.chxs('0N**ms,969696')
-		.chtt('Latency')
-		.chts('969696,20');
+    const interactionResponse = await this.interaction.channel!.send('uwu');
+    const botLatency = interactionResponse.createdTimestamp - this.interaction.createdTimestamp;
+    interactionResponse.delete();
 
-	const buffer = await historyGraph.toBuffer();
-	const reply = await message.reply({ content: 'uwu' });
-	const historyGraphAttachment = new AttachmentBuilder(buffer, { name: 'history-graph.png' });
+    const embed = new EmbedBuilder(baseEmbed)
+      .setTitle('Tweet! 🐦')
+      .setDescription(stripIndents
+        `**⌛ User <-> Bot Latency** — \`${botLatency}ms\`
+        **☁️ Bot <-> API Latency** — \`${this.interaction.client.ws.ping}ms\``
+      );
 
-	const pingCommand = new EmbedBuilder()
-		.setTitle('Tweet!')
-		.setDescription(`⌛ ⇒ ${inlineCode(`${reply.createdTimestamp - message.createdTimestamp}ms`)}\
-		\n☁️ ⇒ ${inlineCode(`${message.client.ws.ping}ms`)}\
-		\n⏱️ ⇒ ${inlineCode(uptimeText)}\
-		\n${config.botEmotes.memory} ⇒ ${inlineCode(`${(process.memoryUsage().rss / (1024 * 1024)).toFixed(2)} MB`)}`)
-		.setImage('attachment://history-graph.png')
-		.setFooter({ text: 'Latency graph updated every 5 minutes.' })
-		.setColor(COLORS.COMMAND);
-
-	reply.edit({ content: null, embeds: [pingCommand], files: [historyGraphAttachment] });
-};
-
-export const ping: Command = {
-	devOnly: false,
-	modOnly: false,
-	run: pingCommand,
-	type: 'Information'
-};
+    await this.interaction.editReply({ embeds: [embed] });
+  }
+}

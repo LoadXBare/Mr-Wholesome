@@ -1,194 +1,91 @@
-import dayjs from 'dayjs';
-import { Client, EmbedBuilder, inlineCode, userMention } from 'discord.js';
-import schedule from 'node-schedule';
-import { mongodb } from '../api/mongo.js';
-import { cache } from '../config/cache.js';
-import { COLORS } from '../config/constants.js';
-import { config } from '../private/config.js';
-import { fetchDiscordTextChannel } from './misc/fetch-discord-text-channel.js';
-import { fetchDiscordUser } from './misc/fetch-discord-user.js';
-import { fetchGuildMember } from './misc/fetch-guild-member.js';
-import { log } from './misc/log.js';
+import { commaListsAnd } from "common-tags";
+import Cron from "croner";
+import { GuildMember, TextChannel } from "discord.js";
+import { lastBirthdayCheck } from "./api.js";
+import { ChannelIDs, RoleIDs, UserIDs, akialytesGuild, database } from "./config.js";
+import { formatDate, styleLog } from "./utilities.js";
 
-const checkRoles = async (client: Client): Promise<void> => {
-	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
-	const akiasBirthday = 'September 03';
-	const currentDate = dayjs().utc().format('MMMM DD');
-	const birthdayList = await mongodb.userBirthday.find();
+export default class Scheduler {
+  start() {
+    this.birthdayScheduler();
+    Cron('0 0 0 * * *', () => this.birthdayScheduler()); // At 12:00 AM
+  }
 
-	log('Checking roles...');
-	const startTime = dayjs().utc().valueOf();
+  private async birthdayScheduler() {
+    const date = new Date().getUTCDate();
+    const lastCheckDate = await lastBirthdayCheck.get();
+    if (lastCheckDate === date) return;
 
-	if (currentDate !== akiasBirthday) {
-		const member = await fetchGuildMember(guild, config.userIDs.Akialyne);
-		member.roles.add(config.roles['Birthday Role'], 'Definitely Akia\'s birthday');
-	}
+    await this.postBirthdayMessage();
+    await this.updateBirthdayRole();
+  }
 
-	/* -- NOTE --
-	   This rate-limits the bot and will not scale well with database size.
-	   Perhaps there is a more efficient way?
-	*/
-	for (let i = 0; i < birthdayList.length; i++) {
-		const userID = birthdayList.at(i).userID;
-		const member = await fetchGuildMember(guild, userID);
+  private async postBirthdayMessage() {
+    const birthdays = await this.fetchTodaysBirthdays();
+    const birthdayMembers = birthdays
+      .map((birthday) => akialytesGuild.members.cache.get(birthday.userID))
+      .filter((member): member is GuildMember => member instanceof GuildMember);
 
-		if (member === null) {
-			continue;
-		}
+    if (birthdayMembers.length === 0) return;
 
-		const memberRoles = member.roles.cache;
-		const memberBirthday = birthdayList.at(i).birthday;
-		const memberHasBirthdayRole = memberRoles.has(config.roles['Birthday Role']);
-		const isMembersBirthday = memberBirthday === currentDate;
+    const akialyne = await akialytesGuild.members.fetch(UserIDs.Akialyne).catch(() => null);
+    if (!akialyne) return styleLog('Error fetching Akialyne member!', false, 'scheduler.js');
 
-		if (userID === config.userIDs.Akialyne) {
-			continue;
-		}
-		else if (memberHasBirthdayRole && !isMembersBirthday) {
-			member.roles.remove(config.roles['Birthday Role'], 'No longer birthday');
-			log(`Removed birthday role from ${member.user.tag}!`);
-		}
-		else if (!memberHasBirthdayRole && isMembersBirthday) {
-			member.roles.add(config.roles['Birthday Role'], 'Birthday');
-			log(`Added birthday role to ${member.user.tag}!`);
-		}
-	}
+    const birthdayMembersString = birthdayMembers.map((member) => {
+      if (member === akialyne) return `*definitely not ${member}'s*`;
+      else return `${member}'s`;
+    });
 
-	log(`Roles checked! (${(dayjs().utc().valueOf() - startTime).toLocaleString()}ms)`);
-};
+    const isAkiaBirthday = birthdayMembers.includes(akialyne);
+    const onlyAkiaBirthday = isAkiaBirthday && birthdayMembers.length === 1;
 
-const postBirthdayMessage = async (client: Client): Promise<void> => {
-	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
-	const birthdayChannel = await fetchDiscordTextChannel(guild, config.channelIDs.birthdayAnnouncements);
-	const currentDate = dayjs().utc().format('MMMM DD');
-	const birthdaysToday = await mongodb.userBirthday.find({
-		birthday: currentDate
-	});
+    const birthdayMessage = commaListsAnd`
+      ### Today is ${birthdayMembersString} birthday!
+      ${onlyAkiaBirthday ? `Please continue your day as normal!` : `Let's wish ${isAkiaBirthday ? `all *but ${akialyne}, since it is not her birthday,*` : `them`} a happy birthday 🥳`}
+    `;
 
-	let birthdayMessage = '';
+    const birthdayChannel = akialytesGuild.channels.cache.get(ChannelIDs.Birthday);
+    if (!(birthdayChannel instanceof TextChannel)) return styleLog('Error fetching birthday channel from cache!', false, 'scheduler.js');
+    await birthdayChannel.send(birthdayMessage);
+    await lastBirthdayCheck.set(new Date().getUTCDate());
+  }
 
-	if (birthdaysToday.length === 0) {
-		return;
-	}
-	else if (birthdaysToday.length === 1) {
-		const userID = birthdaysToday.at(0).userID;
-		const member = await fetchGuildMember(guild, userID);
+  private async updateBirthdayRole() {
+    const birthdayRole = akialytesGuild.roles.cache.get(RoleIDs.Birthday);
+    if (!birthdayRole) return styleLog('Error fetching birthday role from cache!', false, 'scheduler.js');
 
-		if (member === null) {
-			return;
-		}
+    const akialyne = await akialytesGuild.members.fetch(UserIDs.Akialyne).catch(() => null);
+    if (!akialyne) return styleLog('Error fetching Akialyne member!', false, 'scheduler.js');
 
-		if (userID === config.userIDs.Akialyne) {
-			birthdayMessage = `Today is *definitely not* ${userMention(userID)}'s birthday, please continue your day as normal! ${config.emotes.akiaLaugh}`;
-			member.roles.remove(config.roles['Birthday Role'], 'Definitely not Akia\'s birthday');
-		}
-		else {
-			birthdayMessage = `Today is ${userMention(userID)}'s birthday!\nLet's wish them a happy birthday 🥳`;
-			member.roles.add(config.roles['Birthday Role'], 'Birthday');
-		}
-		log(`Given birthday role to ${member.user.tag}!`);
-	}
-	else {
-		birthdayMessage = 'We have more than 1 birthday today!\nLet\'s wish a happy birthday to ';
-		for (let i = 0; i < birthdaysToday.length; i++) {
-			const userID = birthdaysToday.at(i).userID;
-			const member = await fetchGuildMember(guild, userID);
+    const birthdays = await this.fetchTodaysBirthdays();
+    const birthdayMembers = birthdays
+      .map((birthday) => akialytesGuild.members.cache.get(birthday.userID))
+      .filter((member): member is GuildMember => member instanceof GuildMember);
 
-			if (member === null) {
-				birthdayMessage = birthdayMessage.concat(inlineCode('[Member Left Server]'));
-			}
-			else {
-				member.roles.add(config.roles['Birthday Role']);
-				log(`Given birthday role to ${member.user.tag}!`);
+    const nonBirthdayMembers = birthdayRole.members
+      .map((member) => member) // Convert Collection to Array
+      .filter((member) => !birthdayMembers.includes(member));
 
-				birthdayMessage = birthdayMessage.concat(`${userMention(userID)}`);
-			}
+    if (!birthdayMembers.includes(akialyne) && !nonBirthdayMembers.includes(akialyne)) await akialyne.roles.add(birthdayRole);
 
-			if (i === birthdaysToday.length - 2) {
-				birthdayMessage = birthdayMessage.concat(' and ');
-			}
-			else if (i < birthdaysToday.length - 2) {
-				birthdayMessage = birthdayMessage.concat(', ');
-			}
-		}
-		birthdayMessage = birthdayMessage.concat(' 🥳');
-	}
+    for (const member of birthdayMembers) {
+      if (member === akialyne) await member.roles.remove(birthdayRole);
+      else await member.roles.add(birthdayRole);
+    };
 
-	birthdayChannel.send(birthdayMessage);
-	log(`Birthday message posted to #${birthdayChannel.name}!`);
-};
+    for (const member of nonBirthdayMembers) {
+      if (member === akialyne) continue;
+      await member.roles.remove(birthdayRole);
+    }
+  }
 
-const birthday = (client: Client): void => {
-	checkRoles(client);
-	postBirthdayMessage(client);
-};
+  // == DATABASE METHODS ==
+  private async fetchTodaysBirthdays() {
+    const date = formatDate(new Date().getUTCDate(), new Date().getUTCMonth());
+    const birthdays = await database.birthday.findMany({
+      where: { date }
+    });
 
-export const warning = async (client: Client, nextRunDate: Date): Promise<void> => {
-	const warnings = await mongodb.guildWarning.find({
-		guildID: config.guildIDs['The Akialytes']
-	});
-	const guild = await client.guilds.fetch(config.guildIDs['The Akialytes']);
-	const warningReminderChannel = await fetchDiscordTextChannel(guild, config.channelIDs.warningReminders);
-
-	const warnedUsersIDList: Array<string> = [];
-	for (const warning of warnings) {
-		if (!warnedUsersIDList.includes(warning.warnedUserID)) {
-			warnedUsersIDList.push(warning.warnedUserID);
-		}
-	}
-
-	let warningsList = '';
-	for (const warnedUserID of warnedUsersIDList) {
-		const latestWarning = await mongodb.guildWarning.findOne({
-			warnedUserID: warnedUserID,
-			guildID: config.guildIDs['The Akialytes']
-		}).sort({
-			warningDate: 'descending'
-		});
-
-		const warningAgeInMonths = dayjs().utc().diff(dayjs(latestWarning.warningDate), 'month');
-		if (warningAgeInMonths >= 6) {
-			const warnedUser = await fetchDiscordUser(client, latestWarning.warnedUserID);
-			warningsList = warningsList.concat(`\n**${warningAgeInMonths} months ago** - **${warnedUser.tag}** (${inlineCode(latestWarning.id)})`);
-		}
-	}
-
-	if (warningsList.length === 0) {
-		warningsList = 'There are no users that were last warned 6 or more months ago!';
-	}
-
-	const warningReminderEmbed = new EmbedBuilder()
-		.setTitle('The following users were last warned 6 or more months ago')
-		.setDescription(warningsList)
-		.setFooter({ text: `Next Reminder: ${dayjs(nextRunDate).format('MMMM DD, YYYY')}` })
-		.setColor(COLORS.NEUTRAL);
-
-	warningReminderChannel.send({ embeds: [warningReminderEmbed] });
-};
-
-export const startScheduler = (client: Client): void => {
-	// Runs at 12:00am UTC each day
-	const birthdayScheduler = schedule.scheduleJob('0 0 * * * ', () => {
-		birthday(client);
-		log(`Birthday scheduler ran! Next run date: ${dayjs(birthdayScheduler.nextInvocation()).format('MMMM DD, YYYY')}`);
-	});
-	log(`Birthday scheduler will run on ${dayjs(birthdayScheduler.nextInvocation()).format('MMMM DD, YYYY')}!`);
-
-	// Runs at 12:00am UTC on the first day of each month
-	const warningScheduler = schedule.scheduleJob('0 0 1 * *', () => {
-		warning(client, warningScheduler.nextInvocation());
-		log(`Warning scheduler ran! Next run date: ${dayjs(warningScheduler.nextInvocation()).format('MMMM DD, YYYY')}`);
-	});
-	log(`Warning scheduler will run on ${dayjs(warningScheduler.nextInvocation()).format('MMMM DD, YYYY')}!`);
-
-	schedule.scheduleJob('*/5 * * * *', async () => {
-		const wsPingHistory = await cache.fetch('wsPingHistory');
-
-		wsPingHistory.push(client.ws.ping);
-		if (wsPingHistory.length > 500) {
-			wsPingHistory.shift();
-		}
-
-		await cache.update('wsPingHistory', wsPingHistory);
-	});
-};
+    return birthdays;
+  }
+}

@@ -1,23 +1,21 @@
-import { EmbedBuilder } from 'discord.js';
-import { fetch } from 'undici';
-import { COLORS } from '../../config/constants.js';
-import { BotCommand, Command, Fox } from '../../index.js';
+import { ChannelIDs } from '../../lib/config.js';
+import { CommandHandler } from '../command.js';
 
-const foxCommand = async (args: BotCommand): Promise<void> => {
-	const { message } = args;
-	const response = await fetch('https://randomfox.ca/floof/');
-	const responseJSON = await response.json() as Fox;
+export class FoxCommandHandler extends CommandHandler {
+  async handle() {
+    const allowedChannelIDs = [ChannelIDs.BotSpam, ChannelIDs.ComfyVibes];
+    if (!this.checkChannelEligibility(allowedChannelIDs)) return this.postChannelIneligibleMessage(allowedChannelIDs);
+    await this.interaction.deferReply();
 
-	const foxImageEmbed = new EmbedBuilder()
-		.setImage(responseJSON.image)
-		.setColor(COLORS.COMMAND);
+    const response = await fetch('https://randomfox.ca/floof/').catch(() => null);
 
-	message.reply({ embeds: [foxImageEmbed] });
-};
+    if (!response) {
+      return this.handleError('Error fetching fox image from API.', true, 'fox.js');
+    }
 
-export const fox: Command = {
-	devOnly: false,
-	modOnly: false,
-	run: foxCommand,
-	type: 'Fun'
-};
+    const responseJSON = await response.json();
+    const foxURL = responseJSON.image;
+
+    await this.interaction.editReply(foxURL);
+  }
+}

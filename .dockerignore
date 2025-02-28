@@ -1,7 +1,0 @@
-node_modules
-src
-.env
-Dockerfile
-README.md
-package-lock.json
-tsconfig.json

@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- USER MODELS --- //
+
+model Birthday {
+  userID String @id
+  date   String
+}
+
+// --- GUILD MODELS --- //
+model GuildConfig {
+  guildID                 String @id
+  eventIgnoredChannelIDs  String @default("[]")
+  rankedIgnoredChannelIDs String @default("[]")
+}
+
+model Ban {
+  date     String  @id
+  guildID  String
+  authorID String
+  bannedID String
+  reason   String
+  unbanned Boolean @default(false)
+}
+
+model Rank {
+  userID      String
+  guildID     String
+  xp          Int     @default(0)
+  xpLevel     Int     @default(0)
+  levelNotifs Boolean @default(true)
+  credits     Int     @default(0)
+
+  @@id([userID, guildID])
+}
+
+model Ticket {
+  timeCreated     String  @id
+  ticketPanelName String
+  authorID        String
+  channelID       String  @unique
+  addedUsers      String  @default("[]")
+  open            Boolean @default(true)
+}
+
+model TicketPanel {
+  timeCreated           String @id
+  name                  String
+  guildID               String
+  categoryID            String
+  moderatorRoleID       String
+  panelEmbedJSON        String
+  ticketEmbedJSON       String
+  postedPanelMessageIDs String @default("[]")
+
+  @@unique([name, guildID])
+}
+
+model Warning {
+  date     String @id
+  guildID  String
+  authorID String
+  warnedID String
+  reason   String
+}
+
+model Notes {
+  date      String @id
+  authorID  String
+  watchedID String
+  guildID   String
+  noteText  String
+}
+
+model MemberStats {
+  userID          String
+  guildID         String
+  messageCount    Int    @default(0)
+  messagesPerHour String
+
+  @@id([userID, guildID])
+}
