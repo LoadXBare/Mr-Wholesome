@@ -26,7 +26,7 @@ export class BanModalHandler extends ModalHandler {
     const guildBans = await this.guild.bans.fetch();
     if (guildBans.has(user.id)) return this.handleError(`**${user.displayName}** is already banned.`);
 
-    const member = await this.guild.members.fetch(user);
+    const member = await this.guild.members.fetch(user).catch(() => { });
     if (member && !member.bannable) return this.handleError(`**${user.displayName}** is not considered bannable. This is likely permission related.`);
 
     let deleteMessageLength = '';
